@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { PomodoroRecord, PomodoroStats } from '../../electron/database/repositories/pomodoro.repo'
+import type { PomodoroRecord, PomodoroStats } from '../types/repositories'
 
 export const usePomodoroStore = defineStore('pomodoro', () => {
   // State

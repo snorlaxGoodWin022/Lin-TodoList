@@ -9,8 +9,7 @@
       </div>
     </div>
     <div class="content-body">
-      <router-view v-if="isRouterView" />
-      <component v-else :is="currentComponent" />
+      <router-view />
     </div>
   </main>
 </template>
@@ -22,7 +21,6 @@ import { useAppStore } from '../../stores/app.store'
 const appStore = useAppStore()
 
 const showContentHeader = computed(() => appStore.currentView !== 'pomodoro')
-const isRouterView = true
 </script>
 
 <style scoped>

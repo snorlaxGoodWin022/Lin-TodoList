@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { List } from '../../electron/database/repositories/list.repo'
+import type { List } from '../types/repositories'
 
 export const useListStore = defineStore('list', () => {
   // State

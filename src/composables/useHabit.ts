@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { useHabitStore } from '../stores/habit.store'
-import type { Habit, HabitFilters } from '../../electron/database/repositories/habit.repo'
+import type { Habit, HabitFilters } from '../types/repositories'
 
 export function useHabit() {
   const habitStore = useHabitStore()

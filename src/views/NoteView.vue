@@ -75,16 +75,21 @@
       </div>
 
       <div v-else class="note-grid">
-        <div
-          v-for="note in displayNotes"
-          :key="note.id"
-          class="note-card"
-          :style="{
-            '--note-color': getNoteColor(note.color),
-            'background': getNoteColor(note.color)
-          }"
-          @click="selectNote(note)"
+        <draggable
+          v-model="displayNotesList"
+          item-key="id"
+          class="note-drag-area"
+          ghost-class="ghost"
         >
+          <template #item="{ element: note }">
+            <div
+              class="note-card"
+              :style="{
+                '--note-color': getNoteColor(note.color),
+                'background': getNoteColor(note.color)
+              }"
+              @click="selectNote(note)"
+            >
           <div class="note-card-header">
             <div class="note-title">
               <h4 class="title-text">{{ note.title || '无标题' }}</h4>
@@ -132,7 +137,9 @@
               </div>
             </div>
           </div>
-        </div>
+          </div>
+          </template>
+        </draggable>
       </div>
     </div>
 
@@ -270,7 +277,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { Icon } from '@iconify/vue'
+import draggable from 'vuedraggable'
 import { useNoteStore } from '../stores/note.store'
+import type { Note } from '../types/repositories'
 
 const noteStore = useNoteStore()
 
@@ -284,8 +293,7 @@ const editingNote = ref<any>({
   title: '',
   content: '',
   color: '#FFFFFF',
-  pinned: 0,
-  tags: []
+  pinned: 0
 })
 const tagInput = ref('')
 const editorContent = ref<HTMLElement | null>(null)
@@ -304,7 +312,7 @@ const noteColors = ref([
 ])
 
 // 计算属性
-const allNotes = computed(() => noteStore.notes)
+const allNotes = noteStore.notes
 const pinnedNotes = computed(() => noteStore.pinnedNotes)
 const recentNotes = computed(() => {
   return [...noteStore.notes].sort((a, b) => {
@@ -312,17 +320,48 @@ const recentNotes = computed(() => {
   }).slice(0, 10)
 })
 
+// For drag and drop
+const displayNotesList = computed({
+  get: () => {
+    let notes = []
+    switch (activeTab.value) {
+      case 'pinned':
+        notes = [...noteStore.pinnedNotes]
+        break
+      case 'recent':
+        notes = [...recentNotes.value]
+        break
+      default:
+        notes = searchQuery.value ? noteStore.searchResults : [...noteStore.notes]
+    }
+    // Sort: pinned first, then by sort_order
+    return notes.sort((a, b) => {
+      if (a.pinned !== b.pinned) {
+        return b.pinned - a.pinned
+      }
+      return (a.sort_order || 0) - (b.sort_order || 0)
+    })
+  },
+  set: (newNotes) => {
+    // Update sort orders
+    newNotes.forEach((note, index) => {
+      note.sort_order = index
+      noteStore.updateNote(note.id, { sort_order: index })
+    })
+  }
+})
+
 const displayNotes = computed(() => {
-  let notes = []
+  let notes: Note[] = []
   switch (activeTab.value) {
     case 'pinned':
-      notes = pinnedNotes.value
+      notes = [...pinnedNotes.value]
       break
     case 'recent':
-      notes = recentNotes.value
+      notes = [...recentNotes.value]
       break
     default:
-      notes = searchQuery.value ? noteStore.searchResults : allNotes.value
+      notes = searchQuery.value ? [...noteStore.searchResults] : [...allNotes]
   }
 
   // 按置顶和时间排序
@@ -411,7 +450,7 @@ const selectNote = (note: any) => {
 
 const toggleNotePin = async (note: any) => {
   try {
-    await noteStore.toggleNotePin(note.id, !note.pinned)
+    await noteStore.togglePin(note.id, !note.pinned)
   } catch (err) {
     console.error('Error toggling note pin:', err)
   }
@@ -438,8 +477,7 @@ const openNewNote = () => {
     title: '',
     content: '',
     color: '#FFFFFF',
-    pinned: 0,
-    tags: []
+    pinned: 0
   }
   showNoteEditor.value = true
 
@@ -736,6 +774,15 @@ onMounted(() => {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
   align-items: start;
+}
+
+.note-drag-area {
+  display: contents;
+}
+
+.note-drag-area.ghost {
+  opacity: 0.5;
+  background: var(--color-primary-light);
 }
 
 .note-card {

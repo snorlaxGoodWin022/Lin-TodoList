@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useListStore } from '../../stores/list.store'
-import type { List } from '../../electron/database/repositories/list.repo'
+import type { List } from '../../types/repositories'
 
 const listStore = useListStore()
 

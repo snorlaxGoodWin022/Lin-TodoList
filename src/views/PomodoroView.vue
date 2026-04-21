@@ -145,6 +145,16 @@
             打开迷你窗口
           </button>
         </div>
+
+        <div class="task-link-section">
+          <label class="setting-label">关联任务</label>
+          <select v-model="selectedTaskId" class="form-select">
+            <option value="">不关联任务</option>
+            <option v-for="task in pendingTasks" :key="task.id" :value="task.id">
+              {{ task.title }}
+            </option>
+          </select>
+        </div>
       </div>
 
       <div class="stats-section">
@@ -237,8 +247,10 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { usePomodoroStore } from '../stores/pomodoro.store'
+import { useTaskStore } from '../stores/task.store'
 
 const pomodoroStore = usePomodoroStore()
+const taskStore = useTaskStore()
 
 // Audio context for white noise
 let audioContext: AudioContext | null = null
@@ -252,6 +264,10 @@ const isFocusMode = ref(true)
 const focusTime = ref(25) // 分钟
 const breakTime = ref(5) // 分钟
 const timerInterval = ref<NodeJS.Timeout | null>(null)
+
+// Task linking
+const selectedTaskId = ref('')
+const pendingTasks = computed(() => taskStore.pendingTasks)
 
 // White noise
 const currentSound = ref<string | null>(null)
@@ -407,6 +423,7 @@ const sessionComplete = async () => {
     await pomodoroStore.savePomodoro({
       type: isFocusMode.value ? 'focus' : 'break',
       duration: isFocusMode.value ? focusTime.value : breakTime.value,
+      task_id: selectedTaskId.value || null,
       completed_at: new Date().toISOString()
     })
   } catch (err) {
@@ -688,6 +705,20 @@ onUnmounted(() => {
 
 .mini-window-section {
   margin-top: 8px;
+}
+
+.task-link-section {
+  margin-top: 16px;
+}
+
+.task-link-section .form-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--color-background);
+  color: var(--color-text-primary);
 }
 
 .volume-slider::-webkit-slider-thumb {

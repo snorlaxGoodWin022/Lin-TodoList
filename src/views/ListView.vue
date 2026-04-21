@@ -88,10 +88,10 @@ const listId = computed(() => route.params.id as string)
 // Computed properties
 const currentList = computed(() => list.getListById(listId.value))
 const pendingTasks = computed(() => {
-  return task.pendingTasks.filter(t => t.list_id === listId.value)
+  return task.pendingTasks.value.filter((t: any) => t.list_id === listId.value)
 })
 const completedTasks = computed(() => {
-  return task.completedTasks.filter(t => t.list_id === listId.value)
+  return task.completedTasks.value.filter((t: any) => t.list_id === listId.value)
 })
 const totalTasks = computed(() => pendingTasks.value.length + completedTasks.value.length)
 
@@ -128,7 +128,7 @@ const editList = () => {
 }
 
 const loadListTasks = () => {
-  task.loadTasks({ list_id: listId.value })
+  task.loadTasks({ listId: listId.value })
 }
 
 const onDragEnd = () => {

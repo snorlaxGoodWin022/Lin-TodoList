@@ -8,11 +8,21 @@
       </div>
     </div>
 
+    <!-- Batch Action Bar -->
+    <div v-if="batchSelectMode" class="batch-action-bar">
+      <span class="selected-count">已选择 {{ selectedCount }} 项</span>
+      <button class="btn btn-secondary" @click="selectAll">全选</button>
+      <button class="btn btn-secondary" @click="batchComplete">标记完成</button>
+      <button class="btn btn-secondary" @click="batchMove">移动到</button>
+      <button class="btn btn-danger" @click="batchDelete">删除</button>
+      <button class="btn btn-text" @click="cancelBatch">取消</button>
+    </div>
+
     <div class="view-content">
       <div class="overdue-section" v-if="overdueTasks.length > 0">
         <h2 class="section-title">过期任务</h2>
         <draggable
-          v-model="overdueTaskList"
+          v-model="overdueTasks"
           item-key="id"
           class="task-list"
           ghost-class="ghost"
@@ -29,9 +39,14 @@
       </div>
 
       <div class="today-section">
-        <h2 class="section-title">今天到期</h2>
+        <div class="section-header">
+          <h2 class="section-title">今天到期</h2>
+          <button v-if="!batchSelectMode && pendingTasks.length > 0" class="btn btn-text" @click="startBatchSelect">
+            多选
+          </button>
+        </div>
         <draggable
-          v-model="todayTaskList"
+          v-model="todayTasks"
           item-key="id"
           class="task-list"
           ghost-class="ghost"
@@ -73,26 +88,49 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import draggable from 'vuedraggable'
 import { useTask } from '../composables/useTask'
 import { useList } from '../composables/useList'
+import { useTaskStore } from '../stores/task.store'
 import TaskCard from '../components/task/TaskCard.vue'
-import type { Task } from '../../electron/database/repositories/task.repo'
 
 const task = useTask()
 const list = useList()
+const taskStore = useTaskStore()
 
-// Create reactive copies for drag and drop
-const overdueTaskList = computed({
-  get: () => task.overdueTasks,
-  set: () => {}
-})
+// Batch mode
+const batchSelectMode = computed(() => taskStore.batchSelectMode)
+const selectedCount = computed(() => taskStore.selectedTaskIds.size)
 
-const todayTaskList = computed({
-  get: () => task.todayTasks,
-  set: () => {}
-})
+const startBatchSelect = () => {
+  taskStore.toggleBatchSelectMode()
+}
+
+const selectAll = () => {
+  taskStore.selectAllTasks()
+}
+
+const batchComplete = () => {
+  taskStore.batchCompleteTasks(true)
+}
+
+const batchMove = () => {
+  const targetListId = prompt('请输入目标清单ID:')
+  if (targetListId) {
+    taskStore.batchMoveTasks(targetListId)
+  }
+}
+
+const batchDelete = () => {
+  if (confirm(`确定要删除选中的 ${selectedCount.value} 个任务吗？此操作不可撤销。`)) {
+    taskStore.batchDeleteTasks()
+  }
+}
+
+const cancelBatch = () => {
+  taskStore.toggleBatchSelectMode()
+}
 
 // Computed properties
 const formattedDate = computed(() => {
@@ -105,17 +143,11 @@ const formattedDate = computed(() => {
   })
 })
 
-const pendingTasks = computed(() => task.pendingTasks)
-const completedTasks = computed(() => task.completedTasks)
-const todayTasks = computed(() => {
-  const today = new Date().toISOString().split('T')[0]
-  return task.pendingTasks.filter(t => t.due_date === today)
-})
-const overdueTasks = computed(() => {
-  const today = new Date().toISOString().split('T')[0]
-  return task.pendingTasks.filter(t => t.due_date && t.due_date < today)
-})
-const totalTasks = computed(() => task.tasks.length)
+const pendingTasks = computed(() => task.pendingTasks.value)
+const completedTasks = computed(() => task.completedTasks.value)
+const todayTasks = computed(() => task.todayTasks.value)
+const overdueTasks = computed(() => task.overdueTasks.value)
+const totalTasks = computed(() => task.tasks.value.length)
 
 // Actions
 const selectTask = (taskItem: any) => {
@@ -150,6 +182,23 @@ onMounted(() => {
 
 .view-header {
   margin-bottom: var(--spacing-xl);
+}
+
+.batch-action-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.selected-count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-right: auto;
 }
 
 .view-title {
@@ -192,6 +241,22 @@ onMounted(() => {
   margin: var(--spacing-xl) 0 var(--spacing-md) 0;
   padding-bottom: var(--spacing-xs);
   border-bottom: 1px solid var(--color-border);
+  display: inline-block;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--spacing-xl) 0 var(--spacing-md) 0;
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.section-header .section-title {
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 
 .task-list {
@@ -253,5 +318,37 @@ onMounted(() => {
 
 .btn-primary:hover {
   background-color: var(--color-primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-surface);
+  border-color: var(--color-border-hover);
+}
+
+.btn-danger {
+  background-color: #EF4444;
+  color: white;
+  border: none;
+}
+
+.btn-danger:hover {
+  background-color: #DC2626;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.btn-text:hover {
+  color: var(--color-primary);
 }
 </style>

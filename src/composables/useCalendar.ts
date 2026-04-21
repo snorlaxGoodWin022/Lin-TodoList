@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { useTaskStore } from '../stores/task.store'
-import type { Task } from '../../electron/database/repositories/task.repo'
+import type { Task } from '../types/repositories'
 
 export function useCalendar() {
   const taskStore = useTaskStore()

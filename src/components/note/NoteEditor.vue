@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useNoteStore } from '../../stores/note.store'
-import type { Note } from '../../electron/database/repositories/note.repo'
+import type { Note } from '../../types/repositories'
 
 const noteStore = useNoteStore()
 

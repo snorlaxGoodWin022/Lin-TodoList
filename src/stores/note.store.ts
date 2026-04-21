@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Note, NoteFilters } from '../../electron/database/repositories/note.repo'
+import type { Note, NoteFilters } from '../types/repositories'
 
 export const useNoteStore = defineStore('note', () => {
   // State
@@ -13,6 +13,14 @@ export const useNoteStore = defineStore('note', () => {
   // Getters
   const pinnedNotes = computed(() => notes.value.filter(note => note.pinned === 1))
   const unpinnedNotes = computed(() => notes.value.filter(note => note.pinned === 0))
+  const searchResults = computed(() => {
+    if (!filters.value.search) return notes.value
+    const query = filters.value.search.toLowerCase()
+    return notes.value.filter(note =>
+      note.title.toLowerCase().includes(query) ||
+      note.content.toLowerCase().includes(query)
+    )
+  })
 
   // Actions
   const loadNotes = async (newFilters?: NoteFilters) => {
@@ -136,6 +144,7 @@ export const useNoteStore = defineStore('note', () => {
     // Getters
     pinnedNotes,
     unpinnedNotes,
+    searchResults,
 
     // Actions
     loadNotes,

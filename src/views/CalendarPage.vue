@@ -12,7 +12,7 @@
             v-for="mode in viewModes"
             :key="mode.value"
             class="btn btn-text"
-            :class="{ active: viewMode === mode.value }"
+            :class="{ active: viewModeValue === mode.value }"
             @click="setViewMode(mode.value)"
           >
             {{ mode.label }}
@@ -31,7 +31,7 @@
     </div>
 
     <div class="calendar-content">
-      <div v-if="viewMode === 'month'" class="month-view">
+      <div v-if="viewModeValue === 'month'" class="month-view">
         <div class="calendar-header">
           <div class="weekdays">
             <div v-for="day in weekdays" :key="day" class="weekday">
@@ -41,7 +41,7 @@
         </div>
         <div class="calendar-grid">
           <div
-            v-for="day in monthDays"
+            v-for="day in calendar.monthDays.value"
             :key="day.date.toISOString()"
             class="calendar-day"
             :class="{ 'current-month': day.isCurrentMonth, 'today': isToday(day.date) }"
@@ -65,10 +65,10 @@
         </div>
       </div>
 
-      <div v-else-if="viewMode === 'week'" class="week-view">
+      <div v-else-if="viewModeValue === 'week'" class="week-view">
         <div class="week-grid">
           <div
-            v-for="day in weekDays"
+            v-for="day in calendar.weekDays.value"
             :key="day.date.toISOString()"
             class="week-day"
             :class="{ 'today': isToday(day.date) }"
@@ -96,7 +96,7 @@
 
       <div v-else class="day-view">
         <div class="day-header">
-          <h2 class="day-title">{{ formatDate(currentDate, 'long') }}</h2>
+          <h2 class="day-title">{{ formatDate(currentDateValue, 'long') }}</h2>
         </div>
         <div class="time-slots">
           <!-- Time slots would be implemented here -->
@@ -124,19 +124,17 @@ const viewModes = [
 // Weekdays in Chinese
 const weekdays = ['日', '一', '二', '三', '四', '五', '六']
 
-// Computed properties
-const viewMode = computed(() => calendar.viewMode)
-const currentDate = computed(() => calendar.currentDate)
-const monthDays = computed(() => calendar.monthDays)
-const weekDays = computed(() => calendar.weekDays)
+// Computed properties that unwrap refs for template use
+const viewModeValue = computed(() => calendar.viewMode.value)
+const currentDateValue = computed(() => calendar.currentDate.value)
 
 const periodLabel = computed(() => {
-  if (viewMode.value === 'month') {
+  if (viewModeValue.value === 'month') {
     return calendar.monthName
-  } else if (viewMode.value === 'week') {
-    return `Week of ${calendar.formatDate(currentDate.value, 'medium')}`
+  } else if (viewModeValue.value === 'week') {
+    return `Week of ${calendar.formatDate(calendar.currentDate.value, 'medium')}`
   } else {
-    return calendar.formatDate(currentDate.value, 'long')
+    return calendar.formatDate(calendar.currentDate.value, 'long')
   }
 })
 
@@ -146,9 +144,9 @@ const goToToday = () => {
 }
 
 const goToPrev = () => {
-  if (viewMode.value === 'month') {
+  if (viewModeValue.value === 'month') {
     calendar.goToPrevMonth()
-  } else if (viewMode.value === 'week') {
+  } else if (viewModeValue.value === 'week') {
     calendar.goToPrevWeek()
   } else {
     calendar.goToPrevDay()
@@ -156,9 +154,9 @@ const goToPrev = () => {
 }
 
 const goToNext = () => {
-  if (viewMode.value === 'month') {
+  if (viewModeValue.value === 'month') {
     calendar.goToNextMonth()
-  } else if (viewMode.value === 'week') {
+  } else if (viewModeValue.value === 'week') {
     calendar.goToNextWeek()
   } else {
     calendar.goToNextDay()

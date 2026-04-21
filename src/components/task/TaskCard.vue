@@ -1,12 +1,15 @@
 <template>
   <div
     class="task-card"
-    :class="{ selected: isSelected, completed: task.completed }"
+    :class="{ selected: isSelected, completed: task.completed, 'batch-mode': batchSelectMode }"
     @click="handleClick"
   >
     <div class="task-content">
-      <div class="task-checkbox" @click.stop="toggleCompletion">
-        <div class="checkbox" :class="{ checked: task.completed }">
+      <div class="task-checkbox" @click.stop="handleCheckboxClick">
+        <div v-if="batchSelectMode" class="checkbox" :class="{ checked: isSelected }">
+          <span v-if="isSelected" class="checkmark">✓</span>
+        </div>
+        <div v-else class="checkbox" :class="{ checked: task.completed }">
           <span v-if="task.completed" class="checkmark">✓</span>
         </div>
       </div>
@@ -52,8 +55,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Task } from '../../../electron/database/repositories/task.repo'
+import type { Task } from '../../types/repositories'
 import { useTag } from '../../composables/useTag'
+import { useTaskStore } from '../../stores/task.store'
 
 const props = defineProps<{
   task: Task
@@ -66,9 +70,11 @@ const emit = defineEmits<{
 }>()
 
 const tag = useTag()
+const taskStore = useTaskStore()
 
 // Computed properties
-const isSelected = computed(() => props.selected)
+const isSelected = computed(() => props.selected || taskStore.selectedTaskIds.has(props.task.id))
+const batchSelectMode = computed(() => taskStore.batchSelectMode)
 const priorityText = computed(() => {
   const priorities = ['无', '低', '中', '高']
   return priorities[props.task.priority || 0]
@@ -95,7 +101,19 @@ const formatDate = (dateStr: string) => {
 
 // Actions
 const handleClick = () => {
-  emit('select', props.task)
+  if (batchSelectMode.value) {
+    taskStore.toggleTaskSelection(props.task.id)
+  } else {
+    emit('select', props.task)
+  }
+}
+
+const handleCheckboxClick = () => {
+  if (batchSelectMode.value) {
+    taskStore.toggleTaskSelection(props.task.id)
+  } else {
+    toggleCompletion()
+  }
 }
 
 const toggleCompletion = () => {
@@ -103,8 +121,7 @@ const toggleCompletion = () => {
 }
 
 const editTask = () => {
-  // TODO: Open task editor
-  console.log('Edit task:', props.task.id)
+  taskStore.openTaskEditor(props.task.id)
 }
 </script>
 
@@ -135,6 +152,19 @@ const editTask = () => {
 .task-card.completed .task-title {
   text-decoration: line-through;
   color: var(--color-text-muted);
+}
+
+.task-card.batch-mode {
+  cursor: pointer;
+}
+
+.task-card.batch-mode:hover {
+  border-color: var(--color-primary);
+}
+
+.task-card.batch-mode.selected {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-bg);
 }
 
 .task-content {

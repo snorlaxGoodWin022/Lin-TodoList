@@ -89,6 +89,17 @@
               </button>
             </div>
           </div>
+
+          <div class="form-group">
+            <label class="form-label">重复规则</label>
+            <select v-model="form.repeat_rule" class="form-select">
+              <option value="">不重复</option>
+              <option value="daily">每天</option>
+              <option value="weekly">每周</option>
+              <option value="monthly">每月</option>
+              <option value="yearly">每年</option>
+            </select>
+          </div>
         </div>
 
         <div class="modal-footer">
@@ -106,7 +117,7 @@
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useTaskStore } from '../../stores/task.store'
 import { useListStore } from '../../stores/list.store'
-import type { Task } from '../../electron/database/repositories/task.repo'
+import type { Task } from '../../types/repositories'
 
 const taskStore = useTaskStore()
 const listStore = useListStore()
@@ -118,13 +129,14 @@ const form = reactive({
   id: '',
   title: '',
   description: '',
-  priority: 0 as 0 | 1 | 2 | 3,
+  priority: 0 as number,
   list_id: 'inbox',
   due_date: '',
   start_time: '',
   end_time: '',
   remind_at: '',
-  quadrant: 0 as 0 | 1 | 2 | 3 | 4,
+  quadrant: 0 as number,
+  repeat_rule: '',
   tags: '[]'
 })
 
@@ -142,13 +154,14 @@ watch(() => taskStore.editingTask, (task) => {
         id: task.id,
         title: task.title || '',
         description: task.description || '',
-        priority: (task.priority || 0) as 0 | 1 | 2 | 3,
+        priority: (task.priority || 0) as number,
         list_id: task.list_id || 'inbox',
         due_date: task.due_date || '',
         start_time: task.start_time || '',
         end_time: task.end_time || '',
         remind_at: task.remind_at || '',
-        quadrant: (task.quadrant || 0) as 0 | 1 | 2 | 3 | 4,
+        quadrant: (task.quadrant || 0) as number,
+        repeat_rule: task.repeat_rule || '',
         tags: task.tags || '[]'
       })
     } else {
@@ -171,6 +184,7 @@ const resetForm = () => {
   form.end_time = ''
   form.remind_at = ''
   form.quadrant = 0
+  form.repeat_rule = ''
   form.tags = '[]'
 }
 
@@ -193,6 +207,7 @@ const save = async () => {
     end_time: form.end_time || undefined,
     remind_at: form.remind_at || undefined,
     quadrant: form.quadrant,
+    repeat_rule: form.repeat_rule || undefined,
     tags: form.tags
   }
 

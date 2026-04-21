@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { useNoteStore } from '../stores/note.store'
-import type { Note, NoteFilters } from '../../electron/database/repositories/note.repo'
+import type { Note, NoteFilters } from '../types/repositories'
 
 export function useNote() {
   const noteStore = useNoteStore()

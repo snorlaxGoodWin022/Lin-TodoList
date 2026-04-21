@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3'
 import { app } from 'electron'
 import { join } from 'path'
-import { existsSync, mkdirSync } from 'fs'
+import { existsSync, mkdirSync, readdirSync, unlinkSync, statSync } from 'fs'
 
 let db: Database.Database | null = null
 
@@ -209,5 +209,32 @@ export function backupDatabase(): string {
   })
 
   console.log(`Database backed up to ${backupPath}`)
+
+  // Clean up old backups (keep last 7)
+  cleanupOldBackups()
+
   return backupPath
+}
+
+// Clean up old backup files, keeping the most recent 7
+function cleanupOldBackups(): void {
+  const userDataPath = app.getPath('userData')
+  const backupDir = join(userDataPath, 'backup')
+
+  if (!existsSync(backupDir)) return
+
+  const files = readdirSync(backupDir)
+    .filter(f => f.startsWith('todolist-backup-') && f.endsWith('.db'))
+    .map(f => {
+      const filePath = join(backupDir, f)
+      return { name: f, path: filePath, time: statSync(filePath).mtime.getTime() }
+    })
+    .sort((a, b) => b.time - a.time)
+
+  // Keep the 7 most recent backups
+  const toDelete = files.slice(7)
+  for (const file of toDelete) {
+    unlinkSync(file.path)
+    console.log(`Deleted old backup: ${file.name}`)
+  }
 }

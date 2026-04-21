@@ -53,8 +53,8 @@ const api = {
   getUserDataPath: () => ipcRenderer.invoke('app:getPath', 'userData'),
 
   // Event listeners
-  onReminder: (callback) => ipcRenderer.on('reminder:trigger', (_, data) => callback(data)),
-  onDatabaseChange: (callback) => ipcRenderer.on('database:change', (_, data) => callback(data)),
+  onReminder: (callback: (data: any) => void) => ipcRenderer.on('reminder:trigger', (_, data) => callback(data)),
+  onDatabaseChange: (callback: (data: any) => void) => ipcRenderer.on('database:change', (_, data) => callback(data)),
 
   // Shortcut listeners
   onShortcut: (action: string, callback: () => void) => {

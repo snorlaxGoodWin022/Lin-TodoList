@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { useTaskStore } from '../stores/task.store'
 import { useListStore } from '../stores/list.store'
-import type { Task, TaskFilters } from '../../electron/database/repositories/task.repo'
+import type { Task, TaskFilters } from '../types/repositories'
 
 export function useTask() {
   const taskStore = useTaskStore()
@@ -20,6 +20,9 @@ export function useTask() {
   const pendingTasks = computed(() => taskStore.pendingTasks)
   const highPriorityTasks = computed(() => taskStore.highPriorityTasks)
   const todayTasks = computed(() => taskStore.todayTasks)
+  const tomorrowTasks = computed(() => taskStore.tomorrowTasks)
+  const thisWeekTasks = computed(() => taskStore.thisWeekTasks)
+  const allTasks = computed(() => taskStore.allTasks)
   const overdueTasks = computed(() => {
     const today = new Date().toISOString().split('T')[0]
     return taskStore.pendingTasks.filter(t => t.due_date && t.due_date < today)
@@ -121,6 +124,9 @@ export function useTask() {
     pendingTasks,
     highPriorityTasks,
     todayTasks,
+    tomorrowTasks,
+    thisWeekTasks,
+    allTasks,
     overdueTasks,
     selectedTask,
     detailPanelCollapsed,

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Habit, HabitRecord, HabitFilters } from '../../electron/database/repositories/habit.repo'
+import type { Habit, HabitRecord, HabitFilters } from '../types/repositories'
 
 export const useHabitStore = defineStore('habit', () => {
   // State

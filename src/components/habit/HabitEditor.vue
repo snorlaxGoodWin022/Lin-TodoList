@@ -69,7 +69,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useHabitStore } from '../../stores/habit.store'
-import type { Habit } from '../../electron/database/repositories/habit.repo'
+import type { Habit } from '../../types/repositories'
 
 const habitStore = useHabitStore()
 

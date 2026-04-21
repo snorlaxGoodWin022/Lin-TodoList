@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { useTagStore } from '../stores/tag.store'
-import type { Tag } from '../../electron/database/repositories/tag.repo'
+import type { Tag } from '../types/repositories'
 
 export function useTag() {
   const tagStore = useTagStore()

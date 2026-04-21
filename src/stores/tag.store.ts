@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Tag } from '../../electron/database/repositories/tag.repo'
+import type { Tag } from '../types/repositories'
 
 export const useTagStore = defineStore('tag', () => {
   // State

@@ -72,13 +72,11 @@ export function stopReminderScheduler(): void {
 async function checkDueReminders(): Promise<void> {
   try {
     const db = getDatabase()
-    const now = new Date().toISOString()
+    const now = new Date()
+    const nowStr = now.toISOString()
+    const todayStr = nowStr.split('T')[0]
 
-    // Find tasks with due reminders
-    // Conditions:
-    // 1. Task is not completed (completed = 0)
-    // 2. remind_at is not null and remind_at <= now
-    // 3. If remind_persistent = 0, we should clear remind_at after sending
+    // Find tasks with due reminders (existing code)
     const stmt = db.prepare(`
       SELECT id, title, description, remind_at, remind_persistent
       FROM tasks
@@ -88,7 +86,7 @@ async function checkDueReminders(): Promise<void> {
       ORDER BY remind_at ASC
     `)
 
-    const dueTasks = stmt.all(now) as Array<{
+    const dueTasks = stmt.all(nowStr) as Array<{
       id: string
       title: string
       description: string
@@ -97,7 +95,6 @@ async function checkDueReminders(): Promise<void> {
     }>
 
     for (const task of dueTasks) {
-      // Send notification
       showNotification({
         title: '任务提醒',
         body: task.title,
@@ -105,7 +102,6 @@ async function checkDueReminders(): Promise<void> {
         silent: false
       })
 
-      // Send IPC event to renderer for real-time updates
       if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send('reminder:trigger', {
           taskId: task.id,
@@ -114,21 +110,62 @@ async function checkDueReminders(): Promise<void> {
         })
       }
 
-      // If not persistent, clear the reminder
       if (task.remind_persistent === 0) {
         const updateStmt = db.prepare(`
           UPDATE tasks SET remind_at = NULL, updated_at = ? WHERE id = ?
         `)
         updateStmt.run(new Date().toISOString(), task.id)
-      } else {
-        // For persistent reminders, we could schedule the next reminder
-        // For now, we just keep the remind_at as is (will trigger again next minute)
-        // In a real implementation, you might want to advance the remind_at by some interval
       }
     }
 
-    // Also check for tasks with due_date and remind_advance
-    // This is a simplified implementation - in a real app you'd need more sophisticated logic
+    // Check for habit reminders
+    const habitStmt = db.prepare(`
+      SELECT id, name, icon, remind_at, frequency
+      FROM habits
+      WHERE archived = 0
+        AND remind_at IS NOT NULL
+      ORDER BY remind_at ASC
+    `)
+
+    const habitsWithReminders = habitStmt.all() as Array<{
+      id: string
+      name: string
+      icon: string
+      remind_at: string
+      frequency: string
+    }>
+
+    for (const habit of habitsWithReminders) {
+      const remindTime = new Date(habit.remind_at)
+      // Check if the reminder time has passed today
+      if (now >= remindTime) {
+        // Check if the habit was already completed today
+        const recordStmt = db.prepare(`
+          SELECT completed FROM habit_records
+          WHERE habit_id = ? AND date = ?
+        `)
+        const record = recordStmt.get(habit.id, todayStr) as { completed: number } | undefined
+
+        if (!record || record.completed === 0) {
+          showNotification({
+            title: '习惯提醒',
+            body: `${habit.icon} ${habit.name}`,
+            subtitle: '今天还没完成，记得打卡哦！',
+            silent: false
+          })
+
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('habit-reminder:trigger', {
+              habitId: habit.id,
+              name: habit.name,
+              remindAt: habit.remind_at
+            })
+          }
+        }
+      }
+    }
+
+    // Also check for tasks with due_date and remind_advance (existing code)
     const dueDateStmt = db.prepare(`
       SELECT id, title, description, due_date, remind_advance
       FROM tasks
@@ -138,7 +175,7 @@ async function checkDueReminders(): Promise<void> {
         AND datetime(due_date) <= datetime(?, '+' || remind_advance || ' minutes')
     `)
 
-    const dueDateTasks = dueDateStmt.all(now) as Array<{
+    const dueDateTasks = dueDateStmt.all(nowStr) as Array<{
       id: string
       title: string
       description: string
@@ -154,7 +191,6 @@ async function checkDueReminders(): Promise<void> {
         silent: false
       })
 
-      // Send IPC event
       if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send('reminder:trigger', {
           taskId: task.id,

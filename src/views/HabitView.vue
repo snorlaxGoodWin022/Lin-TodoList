@@ -58,7 +58,7 @@
                 <Icon :icon="habit.icon || 'mdi:check-circle-outline'" />
               </div>
               <div class="habit-info">
-                <h4 class="habit-title">{{ habit.title }}</h4>
+                <h4 class="habit-title">{{ habit.name }}</h4>
                 <p class="habit-frequency">{{ getFrequencyText(habit.frequency) }}</p>
               </div>
               <div class="habit-actions">
@@ -75,7 +75,7 @@
             </div>
 
             <div class="habit-card-content">
-              <p class="habit-description">{{ habit.description || '没有描述' }}</p>
+              <p class="habit-description">{{ habit.name }}</p>
 
               <!-- 周进度条 -->
               <div class="week-progress">
@@ -91,7 +91,7 @@
                     :class="{ completed: isHabitCompletedToday(habit.id, day.date) }"
                     @click="toggleHabitRecord(habit.id, day.date)"
                   >
-                    <div class="day-label">{{ day.label }}</div>
+                    <div class="day-label">{{ day.day }}</div>
                     <div class="day-circle">
                       <Icon v-if="isHabitCompletedToday(habit.id, day.date)" icon="mdi:check" />
                     </div>
@@ -316,15 +316,13 @@ const calendarDays = computed(() => {
 })
 
 // 方法
-const getFrequencyText = (frequency: number) => {
-  const freqMap: Record<number, string> = {
-    1: '每天',
-    2: '工作日',
-    3: '周末',
-    4: '每周',
-    5: '每月'
+const getFrequencyText = (frequency: string) => {
+  const freqMap: Record<string, string> = {
+    'daily': '每天',
+    'weekly': '每周',
+    'monthly': '每月'
   }
-  return freqMap[frequency] || '自定义'
+  return freqMap[frequency] || frequency
 }
 
 const isHabitCompletedToday = (habitId: string, date: string) => {

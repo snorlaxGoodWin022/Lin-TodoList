@@ -1,6 +1,6 @@
 import { ref, computed, onUnmounted } from 'vue'
 import { usePomodoroStore } from '../stores/pomodoro.store'
-import type { PomodoroRecord } from '../../electron/database/repositories/pomodoro.repo'
+import type { PomodoroRecord } from '../types/repositories'
 
 export function usePomodoro() {
   const pomodoroStore = usePomodoroStore()

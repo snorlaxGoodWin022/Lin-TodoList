@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { useListStore } from '../stores/list.store'
-import type { List } from '../../electron/database/repositories/list.repo'
+import type { List } from '../types/repositories'
 
 export function useList() {
   const listStore = useListStore()
