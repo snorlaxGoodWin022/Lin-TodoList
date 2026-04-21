@@ -54,9 +54,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAppStore } from '../../stores/app.store'
 import { useTaskStore } from '../../stores/task.store'
 
+const router = useRouter()
 const appStore = useAppStore()
 const taskStore = useTaskStore()
 
@@ -96,18 +98,15 @@ const clearSearch = () => {
 }
 
 const quickAddTask = () => {
-  // TODO: Open quick add task modal
-  console.log('Quick add task')
+  taskStore.openTaskEditor()
 }
 
 const toggleNotifications = () => {
   // TODO: Toggle notifications panel
-  console.log('Toggle notifications')
 }
 
 const openPomodoro = () => {
-  // TODO: Open pomodoro timer
-  console.log('Open pomodoro')
+  router.push('/pomodoro')
 }
 </script>
 

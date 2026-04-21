@@ -53,11 +53,15 @@ export interface ElectronAPI {
   // Event listeners
   onReminder: (callback: (data: any) => void) => void
   onDatabaseChange: (callback: (data: any) => void) => void
+  onShortcut: (action: string, callback: () => void) => void
 
   // Window controls
   minimizeWindow: () => void
   maximizeWindow: () => void
   closeWindow: () => void
+
+  // Mini window
+  openMiniWindow: () => void
 }
 
 declare global {

@@ -5,6 +5,7 @@ import type { Note, NoteFilters } from '../../electron/database/repositories/not
 export const useNoteStore = defineStore('note', () => {
   // State
   const notes = ref<Note[]>([])
+  const editingNote = ref<Partial<Note> | null>(null)
   const filters = ref<NoteFilters>({})
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -106,6 +107,19 @@ export const useNoteStore = defineStore('note', () => {
     loadNotes()
   }
 
+  const openNoteEditor = (noteId?: string) => {
+    if (noteId) {
+      const note = notes.value.find(n => n.id === noteId)
+      editingNote.value = note ? { ...note } : null
+    } else {
+      editingNote.value = {}
+    }
+  }
+
+  const closeNoteEditor = () => {
+    editingNote.value = null
+  }
+
   // Initial load
   const init = () => {
     loadNotes()
@@ -114,6 +128,7 @@ export const useNoteStore = defineStore('note', () => {
   return {
     // State
     notes,
+    editingNote,
     filters,
     loading,
     error,
@@ -130,6 +145,8 @@ export const useNoteStore = defineStore('note', () => {
     togglePin,
     searchNotes,
     clearSearch,
+    openNoteEditor,
+    closeNoteEditor,
     init
   }
 })

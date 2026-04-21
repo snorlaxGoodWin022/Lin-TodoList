@@ -11,28 +11,40 @@
     <div class="view-content">
       <div class="overdue-section" v-if="overdueTasks.length > 0">
         <h2 class="section-title">过期任务</h2>
-        <div class="task-list">
-          <TaskCard
-            v-for="task in overdueTasks"
-            :key="task.id"
-            :task="task"
-            @select="selectTask"
-            @toggle="toggleTaskCompletion(task.id, !task.completed)"
-          />
-        </div>
+        <draggable
+          v-model="overdueTaskList"
+          item-key="id"
+          class="task-list"
+          ghost-class="ghost"
+          @end="onDragEnd"
+        >
+          <template #item="{ element }">
+            <TaskCard
+              :task="element"
+              @select="selectTask"
+              @toggle="toggleTaskCompletion(element.id, !element.completed)"
+            />
+          </template>
+        </draggable>
       </div>
 
       <div class="today-section">
         <h2 class="section-title">今天到期</h2>
-        <div class="task-list">
-          <TaskCard
-            v-for="task in todayTasks"
-            :key="task.id"
-            :task="task"
-            @select="selectTask"
-            @toggle="toggleTaskCompletion(task.id, !task.completed)"
-          />
-        </div>
+        <draggable
+          v-model="todayTaskList"
+          item-key="id"
+          class="task-list"
+          ghost-class="ghost"
+          @end="onDragEnd"
+        >
+          <template #item="{ element }">
+            <TaskCard
+              :task="element"
+              @select="selectTask"
+              @toggle="toggleTaskCompletion(element.id, !element.completed)"
+            />
+          </template>
+        </draggable>
       </div>
 
       <div class="completed-section" v-if="completedTasks.length > 0">
@@ -61,13 +73,26 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import draggable from 'vuedraggable'
 import { useTask } from '../composables/useTask'
 import { useList } from '../composables/useList'
 import TaskCard from '../components/task/TaskCard.vue'
+import type { Task } from '../../electron/database/repositories/task.repo'
 
 const task = useTask()
 const list = useList()
+
+// Create reactive copies for drag and drop
+const overdueTaskList = computed({
+  get: () => task.overdueTasks,
+  set: () => {}
+})
+
+const todayTaskList = computed({
+  get: () => task.todayTasks,
+  set: () => {}
+})
 
 // Computed properties
 const formattedDate = computed(() => {
@@ -103,6 +128,10 @@ const toggleTaskCompletion = (id: string, completed: boolean) => {
 
 const createTask = () => {
   task.openTaskEditor()
+}
+
+const onDragEnd = () => {
+  // Update task sort orders after drag
 }
 
 // Lifecycle
@@ -169,6 +198,13 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  min-height: 10px;
+}
+
+.task-list.ghost {
+  opacity: 0.5;
+  background: var(--color-primary-light);
+  border-radius: 8px;
 }
 
 .empty-state {

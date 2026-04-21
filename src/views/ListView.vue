@@ -28,15 +28,21 @@
     <div class="view-content">
       <div v-if="pendingTasks.length > 0" class="pending-section">
         <h2 class="section-title">待办事项</h2>
-        <div class="task-list">
-          <TaskCard
-            v-for="task in pendingTasks"
-            :key="task.id"
-            :task="task"
-            @select="selectTask"
-            @toggle="toggleTaskCompletion(task.id, !task.completed)"
-          />
-        </div>
+        <draggable
+          v-model="pendingTaskList"
+          item-key="id"
+          class="task-list"
+          ghost-class="ghost"
+          @end="onDragEnd"
+        >
+          <template #item="{ element }">
+            <TaskCard
+              :task="element"
+              @select="selectTask"
+              @toggle="toggleTaskCompletion(element.id, !element.completed)"
+            />
+          </template>
+        </draggable>
       </div>
 
       <div v-if="completedTasks.length > 0" class="completed-section">
@@ -67,6 +73,7 @@
 <script setup lang="ts">
 import { computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import draggable from 'vuedraggable'
 import { useTask } from '../composables/useTask'
 import { useList } from '../composables/useList'
 import TaskCard from '../components/task/TaskCard.vue'
@@ -87,6 +94,11 @@ const completedTasks = computed(() => {
   return task.completedTasks.filter(t => t.list_id === listId.value)
 })
 const totalTasks = computed(() => pendingTasks.value.length + completedTasks.value.length)
+
+const pendingTaskList = computed({
+  get: () => pendingTasks.value,
+  set: () => {}
+})
 
 // Watch for list ID changes
 watch(listId, (newId) => {
@@ -117,6 +129,10 @@ const editList = () => {
 
 const loadListTasks = () => {
   task.loadTasks({ list_id: listId.value })
+}
+
+const onDragEnd = () => {
+  // Update task sort orders after drag
 }
 
 // Lifecycle
@@ -240,6 +256,13 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  min-height: 10px;
+}
+
+.task-list.ghost {
+  opacity: 0.5;
+  background: var(--color-primary-light);
+  border-radius: 8px;
 }
 
 .empty-state {

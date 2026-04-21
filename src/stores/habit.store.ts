@@ -6,6 +6,7 @@ export const useHabitStore = defineStore('habit', () => {
   // State
   const habits = ref<Habit[]>([])
   const habitRecords = ref<Map<string, HabitRecord[]>>(new Map())
+  const editingHabit = ref<Partial<Habit> | null>(null)
   const filters = ref<HabitFilters>({})
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -126,6 +127,19 @@ export const useHabitStore = defineStore('habit', () => {
     return habitRecords.value.get(habitId) || []
   }
 
+  const openHabitEditor = (habitId?: string) => {
+    if (habitId) {
+      const habit = habits.value.find(h => h.id === habitId)
+      editingHabit.value = habit ? { ...habit } : null
+    } else {
+      editingHabit.value = {}
+    }
+  }
+
+  const closeHabitEditor = () => {
+    editingHabit.value = null
+  }
+
   // Initial load
   const init = () => {
     loadHabits()
@@ -135,6 +149,7 @@ export const useHabitStore = defineStore('habit', () => {
     // State
     habits,
     habitRecords,
+    editingHabit,
     filters,
     loading,
     error,
@@ -151,6 +166,8 @@ export const useHabitStore = defineStore('habit', () => {
     toggleHabitRecord,
     loadHabitRecords,
     getHabitRecords,
+    openHabitEditor,
+    closeHabitEditor,
     init
   }
 })

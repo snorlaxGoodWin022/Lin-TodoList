@@ -2,6 +2,10 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import TodayView from '../views/TodayView.vue'
 import CalendarPage from '../views/CalendarPage.vue'
 import ListView from '../views/ListView.vue'
+import QuadrantView from '../views/QuadrantView.vue'
+import PomodoroView from '../views/PomodoroView.vue'
+import HabitView from '../views/HabitView.vue'
+import NoteView from '../views/NoteView.vue'
 
 const routes = [
   {
@@ -24,7 +28,26 @@ const routes = [
     component: ListView,
     props: true
   },
-  // TODO: Add routes for other views (quadrant, pomodoro, habit, note)
+  {
+    path: '/quadrant',
+    name: 'Quadrant',
+    component: QuadrantView
+  },
+  {
+    path: '/pomodoro',
+    name: 'Pomodoro',
+    component: PomodoroView
+  },
+  {
+    path: '/habits',
+    name: 'Habits',
+    component: HabitView
+  },
+  {
+    path: '/notes',
+    name: 'Notes',
+    component: NoteView
+  }
 ]
 
 const router = createRouter({

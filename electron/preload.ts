@@ -25,30 +25,30 @@ const api = {
 
   // Habit operations
   getHabits: () => ipcRenderer.invoke('habit:all'),
-  createHabit: (data) => ipcRenderer.invoke('habit:create', data),
-  updateHabit: (id, data) => ipcRenderer.invoke('habit:update', id, data),
-  deleteHabit: (id) => ipcRenderer.invoke('habit:delete', id),
-  toggleHabit: (id, date) => ipcRenderer.invoke('habit:toggle', id, date),
-  getHabitRecords: (habitId, month) => ipcRenderer.invoke('habit:records', habitId, month),
+  createHabit: (data: Partial<Habit>) => ipcRenderer.invoke('habit:create', data),
+  updateHabit: (id: string, data: Partial<Habit>) => ipcRenderer.invoke('habit:update', id, data),
+  deleteHabit: (id: string) => ipcRenderer.invoke('habit:delete', id),
+  toggleHabit: (id: string, date: string) => ipcRenderer.invoke('habit:toggle', id, date),
+  getHabitRecords: (habitId: string, month?: string) => ipcRenderer.invoke('habit:records', habitId, month),
 
   // Note operations
   getNotes: () => ipcRenderer.invoke('note:all'),
-  createNote: (data) => ipcRenderer.invoke('note:create', data),
-  updateNote: (id, data) => ipcRenderer.invoke('note:update', id, data),
-  deleteNote: (id) => ipcRenderer.invoke('note:delete', id),
+  createNote: (data: Partial<Note>) => ipcRenderer.invoke('note:create', data),
+  updateNote: (id: string, data: Partial<Note>) => ipcRenderer.invoke('note:update', id, data),
+  deleteNote: (id: string) => ipcRenderer.invoke('note:delete', id),
 
   // Pomodoro operations
-  savePomodoro: (data) => ipcRenderer.invoke('pomodoro:save', data),
-  getPomodoroStats: (range) => ipcRenderer.invoke('pomodoro:stats', range),
+  savePomodoro: (data: Partial<PomodoroRecord>) => ipcRenderer.invoke('pomodoro:save', data),
+  getPomodoroStats: (range?: string) => ipcRenderer.invoke('pomodoro:stats', range),
 
   // Tag operations
   getTags: () => ipcRenderer.invoke('tag:all'),
-  createTag: (data) => ipcRenderer.invoke('tag:create', data),
-  updateTag: (id, data) => ipcRenderer.invoke('tag:update', id, data),
-  deleteTag: (id) => ipcRenderer.invoke('tag:delete', id),
+  createTag: (data: Partial<Tag>) => ipcRenderer.invoke('tag:create', data),
+  updateTag: (id: string, data: Partial<Tag>) => ipcRenderer.invoke('tag:update', id, data),
+  deleteTag: (id: string) => ipcRenderer.invoke('tag:delete', id),
 
   // System operations
-  showNotification: (options) => ipcRenderer.invoke('notification:show', options),
+  showNotification: (options: NotificationOptions) => ipcRenderer.invoke('notification:show', options),
   getAppVersion: () => ipcRenderer.invoke('app:getVersion'),
   getUserDataPath: () => ipcRenderer.invoke('app:getPath', 'userData'),
 
@@ -56,10 +56,18 @@ const api = {
   onReminder: (callback) => ipcRenderer.on('reminder:trigger', (_, data) => callback(data)),
   onDatabaseChange: (callback) => ipcRenderer.on('database:change', (_, data) => callback(data)),
 
+  // Shortcut listeners
+  onShortcut: (action: string, callback: () => void) => {
+    ipcRenderer.on(action, () => callback())
+  },
+
   // Window controls
   minimizeWindow: () => ipcRenderer.send('window:minimize'),
   maximizeWindow: () => ipcRenderer.send('window:maximize'),
-  closeWindow: () => ipcRenderer.send('window:close')
+  closeWindow: () => ipcRenderer.send('window:close'),
+
+  // Mini window
+  openMiniWindow: () => ipcRenderer.invoke('mini-window:create')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

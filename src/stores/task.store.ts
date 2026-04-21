@@ -6,6 +6,7 @@ export const useTaskStore = defineStore('task', () => {
   // State
   const tasks = ref<Task[]>([])
   const selectedTask = ref<Task | null>(null)
+  const editingTask = ref<Partial<Task> | null>(null)
   const detailPanelCollapsed = ref(false)
   const filters = ref<TaskFilters>({})
   const loading = ref(false)
@@ -146,8 +147,16 @@ export const useTaskStore = defineStore('task', () => {
   }
 
   const openTaskEditor = (taskId?: string) => {
-    // TODO: Open task editor modal
-    console.log('Open task editor for:', taskId)
+    if (taskId) {
+      const task = tasks.value.find(t => t.id === taskId)
+      editingTask.value = task ? { ...task } : null
+    } else {
+      editingTask.value = {}
+    }
+  }
+
+  const closeTaskEditor = () => {
+    editingTask.value = null
   }
 
   // Initial load
@@ -159,6 +168,7 @@ export const useTaskStore = defineStore('task', () => {
     // State
     tasks,
     selectedTask,
+    editingTask,
     detailPanelCollapsed,
     filters,
     loading,
@@ -181,6 +191,7 @@ export const useTaskStore = defineStore('task', () => {
     searchTasks,
     clearSearch,
     openTaskEditor,
+    closeTaskEditor,
     init
   }
 })

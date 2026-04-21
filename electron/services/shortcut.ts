@@ -1,4 +1,4 @@
-import { BrowserWindow, globalShortcut, ipcMain } from 'electron'
+import { BrowserWindow, globalShortcut, ipcMain, app } from 'electron'
 
 export function registerShortcuts(mainWindow: BrowserWindow | null): void {
   if (!mainWindow) return
@@ -8,13 +8,11 @@ export function registerShortcuts(mainWindow: BrowserWindow | null): void {
     { accelerator: 'CmdOrCtrl+N', action: 'shortcut:new-task' },
     { accelerator: 'CmdOrCtrl+Shift+N', action: 'shortcut:new-note' },
     { accelerator: 'CmdOrCtrl+F', action: 'shortcut:search' },
-    { accelerator: 'CmdOrCtrl+,', action: 'shortcut:settings' },
-    { accelerator: 'CmdOrCtrl+Q', action: 'shortcut:quit' },
     { accelerator: 'CmdOrCtrl+Shift+P', action: 'shortcut:pomodoro' }
   ]
 
-  // View switching shortcuts (Ctrl+1~7)
-  for (let i = 1; i <= 7; i++) {
+  // View switching shortcuts (Ctrl+1~6)
+  for (let i = 1; i <= 6; i++) {
     shortcuts.push({
       accelerator: `CmdOrCtrl+${i}`,
       action: `shortcut:switch-view:${i}`
@@ -32,13 +30,6 @@ export function registerShortcuts(mainWindow: BrowserWindow | null): void {
     if (!ret) {
       console.warn(`Failed to register shortcut: ${accelerator}`)
     }
-  })
-
-  // Handle quit shortcut separately (Ctrl+Q)
-  const quitShortcut = 'CmdOrCtrl+Q'
-  globalShortcut.register(quitShortcut, () => {
-    // This will trigger the app to quit
-    ipcMain.emit('app:quit')
   })
 
   // Cleanup on app quit

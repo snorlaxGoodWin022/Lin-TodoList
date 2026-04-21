@@ -20,6 +20,10 @@ export function useTask() {
   const pendingTasks = computed(() => taskStore.pendingTasks)
   const highPriorityTasks = computed(() => taskStore.highPriorityTasks)
   const todayTasks = computed(() => taskStore.todayTasks)
+  const overdueTasks = computed(() => {
+    const today = new Date().toISOString().split('T')[0]
+    return taskStore.pendingTasks.filter(t => t.due_date && t.due_date < today)
+  })
 
   // Task selection
   const selectedTask = computed(() => taskStore.selectedTask)
@@ -117,6 +121,7 @@ export function useTask() {
     pendingTasks,
     highPriorityTasks,
     todayTasks,
+    overdueTasks,
     selectedTask,
     detailPanelCollapsed,
     currentList,

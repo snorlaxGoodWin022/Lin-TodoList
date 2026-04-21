@@ -14,12 +14,11 @@
           <li
             v-for="item in mainNavItems"
             :key="item.id"
-            :class="['nav-item', { active: activeNav === item.id }]"
-            @click="activeNav = item.id"
+            :class="['nav-item', { active: route.path === item.path }]"
+            @click="navigateTo(item.path)"
           >
             <span class="nav-icon">{{ item.icon }}</span>
             <span class="nav-label">{{ item.label }}</span>
-            <span v-if="item.badge" class="nav-badge">{{ item.badge }}</span>
           </li>
         </ul>
       </div>
@@ -30,16 +29,15 @@
           <li
             v-for="list in lists"
             :key="list.id"
-            :class="['nav-item', { active: activeList === list.id }]"
-            @click="activeList = list.id"
+            :class="['nav-item', { active: route.path === `/lists/${list.id}` }]"
+            @click="navigateToList(list.id)"
           >
             <span class="list-color" :style="{ backgroundColor: list.color }"></span>
             <span class="nav-icon">{{ list.icon }}</span>
             <span class="nav-label">{{ list.name }}</span>
-            <span v-if="list.count" class="nav-badge">{{ list.count }}</span>
           </li>
         </ul>
-        <button class="add-list-btn">
+        <button class="add-list-btn" @click="addNewList">
           <span class="add-icon">+</span>
           <span>添加清单</span>
         </button>
@@ -61,23 +59,22 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAppStore } from '../../stores/app.store'
 import { useListStore } from '../../stores/list.store'
 
+const router = useRouter()
+const route = useRoute()
 const appStore = useAppStore()
 const listStore = useListStore()
 
-const activeNav = ref('today')
-const activeList = ref('inbox')
-
 const mainNavItems = [
-  { id: 'today', label: '今天', icon: '📋', badge: 5 },
-  { id: 'calendar', label: '日历', icon: '📅' },
-  { id: 'list', label: '清单', icon: '✅' },
-  { id: 'pomodoro', label: '番茄钟', icon: '🍅' },
-  { id: 'note', label: '便签', icon: '📝' },
-  { id: 'quadrant', label: '四象限', icon: '📊' },
-  { id: 'habit', label: '习惯', icon: '🔖' }
+  { id: 'today', label: '今天', icon: '📋', path: '/today' },
+  { id: 'calendar', label: '日历', icon: '📅', path: '/calendar' },
+  { id: 'quadrant', label: '四象限', icon: '📊', path: '/quadrant' },
+  { id: 'pomodoro', label: '番茄钟', icon: '🍅', path: '/pomodoro' },
+  { id: 'habit', label: '习惯', icon: '🔖', path: '/habits' },
+  { id: 'note', label: '便签', icon: '📝', path: '/notes' }
 ]
 
 const lists = computed(() => listStore.lists)
@@ -85,8 +82,20 @@ const lists = computed(() => listStore.lists)
 const themeIcon = computed(() => appStore.theme === 'dark' ? '🌙' : '☀️')
 const themeLabel = computed(() => appStore.theme === 'dark' ? '深色模式' : '浅色模式')
 
+const navigateTo = (path: string) => {
+  router.push(path)
+}
+
+const navigateToList = (listId: string) => {
+  router.push(`/lists/${listId}`)
+}
+
 const toggleTheme = () => {
   appStore.toggleTheme()
+}
+
+const addNewList = () => {
+  listStore.openListEditor()
 }
 
 const openSettings = () => {

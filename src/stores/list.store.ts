@@ -6,6 +6,7 @@ export const useListStore = defineStore('list', () => {
   // State
   const lists = ref<List[]>([])
   const selectedListId = ref<string>('inbox')
+  const editingList = ref<Partial<List> | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -91,6 +92,23 @@ export const useListStore = defineStore('list', () => {
     selectedListId.value = listId
   }
 
+  const openListEditor = (listId?: string) => {
+    if (listId) {
+      const list = lists.value.find(l => l.id === listId)
+      editingList.value = list ? { ...list } : null
+    } else {
+      editingList.value = {}
+    }
+  }
+
+  const closeListEditor = () => {
+    editingList.value = null
+  }
+
+  const getListById = (listId: string) => {
+    return lists.value.find(l => l.id === listId)
+  }
+
   // Initial load
   const init = () => {
     loadLists()
@@ -100,6 +118,7 @@ export const useListStore = defineStore('list', () => {
     // State
     lists,
     selectedListId,
+    editingList,
     loading,
     error,
 
@@ -112,6 +131,9 @@ export const useListStore = defineStore('list', () => {
     updateList,
     deleteList,
     selectList,
+    openListEditor,
+    closeListEditor,
+    getListById,
     init
   }
 })
