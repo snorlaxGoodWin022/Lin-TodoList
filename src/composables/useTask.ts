@@ -76,23 +76,13 @@ export function useTask() {
     taskStore.clearSearch()
   }
 
-  // Task editor
+  // Task editor - delegate to store
   const openTaskEditor = (taskId?: string) => {
-    if (taskId) {
-      const task = taskStore.tasks.find((t) => t.id === taskId)
-      editingTask.value = task ? { ...task } : { id: taskId }
-    } else {
-      editingTask.value = {
-        title: '',
-        description: '',
-        priority: 1,
-        list_id: currentList.value?.id || 'inbox',
-      }
-    }
+    taskStore.openTaskEditor(taskId)
   }
 
   const closeTaskEditor = () => {
-    editingTask.value = null
+    taskStore.closeTaskEditor()
   }
 
   const saveTask = async () => {
