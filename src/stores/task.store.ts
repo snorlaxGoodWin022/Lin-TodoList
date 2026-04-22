@@ -59,7 +59,9 @@ export const useTaskStore = defineStore('task', () => {
       if (newFilters) {
         filters.value = newFilters
       }
-      const result = await window.electronAPI.getTasks(filters.value)
+      // Convert reactive proxy to plain object for IPC serialization
+      const plainFilters = JSON.parse(JSON.stringify(filters.value))
+      const result = await window.electronAPI.getTasks(plainFilters)
       tasks.value = result
       error.value = null
     } catch (err) {

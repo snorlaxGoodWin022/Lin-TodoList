@@ -13,7 +13,7 @@ import type { NotificationOptions } from './services/notification'
 // Custom APIs for renderer
 const api = {
   // Task operations
-  getTasks: (filters: TaskFilters) => ipcRenderer.invoke('task:all', filters),
+  getTasks: (filters: TaskFilters) => ipcRenderer.invoke('task:list', filters),
   createTask: (data: Partial<Task>) => ipcRenderer.invoke('task:create', data),
   updateTask: (id: string, data: Partial<Task>) => ipcRenderer.invoke('task:update', id, data),
   deleteTask: (id: string) => ipcRenderer.invoke('task:delete', id),
