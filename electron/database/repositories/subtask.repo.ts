@@ -17,7 +17,7 @@ export interface SubtaskFilters {
 }
 
 export function setupSubtaskHandlers(): void {
-  ipcMain.handle('subtask:list', handleListSubtasks)
+  ipcMain.handle('subtask:all', handleListSubtasks)
   ipcMain.handle('subtask:create', handleCreateSubtask)
   ipcMain.handle('subtask:update', handleUpdateSubtask)
   ipcMain.handle('subtask:delete', handleDeleteSubtask)

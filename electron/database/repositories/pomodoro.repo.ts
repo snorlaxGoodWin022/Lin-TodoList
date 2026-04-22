@@ -85,10 +85,21 @@ async function handleGetPomodoroStats(
   const params: any[] = [startDateStr]
 
   const stmt = db.prepare(sql)
-  const result = stmt.get(...params) as {
-    total_focus_minutes: number | null
-    total_break_minutes: number | null
-    days_with_records: number
+  const result = stmt.get(...params) as
+    | {
+        total_focus_minutes: number | null
+        total_break_minutes: number | null
+        days_with_records: number
+      }
+    | undefined
+
+  if (!result) {
+    return {
+      total_focus_minutes: 0,
+      total_break_minutes: 0,
+      daily_average: 0,
+      streak_days: 0,
+    }
   }
 
   const totalFocus = result.total_focus_minutes || 0

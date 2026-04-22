@@ -102,14 +102,18 @@ const api = {
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
+console.log('[Preload] Starting, contextIsolated:', process.contextIsolated)
 if (process.contextIsolated) {
   try {
+    console.log('[Preload] Exposing APIs with contextBridge')
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('electronAPI', api)
+    console.log('[Preload] APIs exposed successfully')
   } catch (error) {
-    console.error(error)
+    console.error('[Preload] Error:', error)
   }
 } else {
+  console.log('[Preload] Context isolation disabled, adding to window directly')
   // @ts-ignore (define in dts)
   window.electron = electronAPI
   // @ts-ignore (define in dts)

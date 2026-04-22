@@ -4,7 +4,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-Currently in design phase. The repository contains design specifications (`docs/superpowers/specs/2026-04-20-lin-todolist-design.md`), a UI design system (`DESIGN.md`), and a visual preview (`design-preview.html`). Code implementation is pending.
+**Implementation Phase**: P0/P1/P2/P3 core features are complete. Currently working on P4 mid-priority features (看板视图、子任务/清单、高级过滤器、暗色主题完善).
+
+### Completed Features
+
+- Task CRUD operations with priority, due dates, reminders
+- List management with groups and colors
+- Habit tracking with records
+- Notes with rich text
+- Pomodoro timer with statistics
+- Tags and filter presets
+- Subtasks support
+- Today, Calendar, Quadrant, List, Habit, Pomodoro, Note views
+
+### Verified (2026-04-22)
+
+- Task creation via `window.electronAPI.createTask()` works correctly
+- Preload script properly exposes APIs via `contextBridge.exposeInMainWorld`
+- IPC communication between renderer and main process is functional
 
 ## Project Overview
 

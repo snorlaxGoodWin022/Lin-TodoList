@@ -16,7 +16,7 @@ export interface FilterPresetFilters {
 }
 
 export function setupFilterPresetHandlers(): void {
-  ipcMain.handle('filterPreset:list', handleListFilterPresets)
+  ipcMain.handle('filterPreset:all', handleListFilterPresets)
   ipcMain.handle('filterPreset:create', handleCreateFilterPreset)
   ipcMain.handle('filterPreset:update', handleUpdateFilterPreset)
   ipcMain.handle('filterPreset:delete', handleDeleteFilterPreset)
