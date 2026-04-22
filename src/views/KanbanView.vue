@@ -246,7 +246,7 @@ onMounted(() => {
 
 .kanban-card.ghost {
   opacity: 0.5;
-  background: var(--color-primary-light);
+  background: var(--color-primary-bg);
 }
 
 .card-priority {

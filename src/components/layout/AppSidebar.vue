@@ -324,7 +324,7 @@ onMounted(() => {
 }
 
 .nav-item.active {
-  background-color: var(--color-primary-light);
+  background-color: var(--color-primary-bg);
   color: var(--color-primary);
   font-weight: var(--font-weight-medium);
 }

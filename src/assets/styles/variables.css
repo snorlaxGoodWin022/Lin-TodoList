@@ -76,9 +76,9 @@
   --color-border: #374151;
   --color-border-hover: #4b5563;
   --color-primary: #10b981;
-  --color-primary-hover: #059669;
-  --color-primary-light: #065f46;
-  --color-primary-bg: #064e3b;
+  --color-primary-hover: #34d399;
+  --color-primary-light: rgba(16, 185, 129, 0.15);
+  --color-primary-bg: rgba(16, 185, 129, 0.1);
   --color-priority-high: #ef4444;
   --color-priority-medium: #f59e0b;
   --color-priority-low: #3b82f6;
