@@ -4,7 +4,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { initDatabase } from './database/init'
 import { registerShortcuts } from './services/shortcut'
-import { createTray } from './services/tray'
+import { createTray, setIsQuitting } from './services/tray'
 import { setupNotifications, setMainWindow } from './services/notification'
 
 // Import repository handlers
@@ -173,7 +173,6 @@ function createMiniWindow(): void {
 app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.lin.todolist')
-  ;(app as any).isQuitting = false
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -182,7 +181,7 @@ app.whenReady().then(async () => {
   })
 
   app.on('before-quit', () => {
-    ;(app as any).isQuitting = true
+    setIsQuitting(true)
   })
 
   // Initialize database

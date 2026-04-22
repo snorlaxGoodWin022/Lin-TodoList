@@ -4,6 +4,10 @@ import { join } from 'path'
 let tray: Tray | null = null
 let isQuitting = false
 
+export function setIsQuitting(value: boolean): void {
+  isQuitting = value
+}
+
 export function createTray(mainWindow: BrowserWindow | null): void {
   // Create tray icon
   const iconPath = join(__dirname, '../../resources/icon.png')
