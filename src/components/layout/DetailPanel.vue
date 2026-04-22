@@ -58,11 +58,7 @@
           <div class="detail-item">
             <label class="detail-label">标签</label>
             <div class="detail-value tags">
-              <span
-                v-for="tag in taskTags"
-                :key="tag"
-                class="tag"
-              >
+              <span v-for="tag in taskTags" :key="tag" class="tag">
                 {{ tag }}
               </span>
               <span v-if="taskTags.length === 0">无标签</span>
@@ -105,7 +101,7 @@ const isCollapsed = computed(() => taskStore.detailPanelCollapsed)
 const selectedTask = computed(() => taskStore.selectedTask)
 const listName = computed(() => {
   if (!selectedTask.value) return ''
-  const list = listStore.lists.find(l => l.id === selectedTask.value?.list_id)
+  const list = listStore.lists.find((l) => l.id === selectedTask.value?.list_id)
   return list ? list.name : '未知清单'
 })
 
@@ -252,10 +248,22 @@ const deleteTask = () => {
   font-weight: var(--font-weight-medium);
 }
 
-.priority-0 { background-color: var(--color-priority-none); color: var(--color-text-secondary); }
-.priority-1 { background-color: var(--color-priority-low); color: white; }
-.priority-2 { background-color: var(--color-priority-medium); color: white; }
-.priority-3 { background-color: var(--color-priority-high); color: white; }
+.priority-0 {
+  background-color: var(--color-priority-none);
+  color: var(--color-text-secondary);
+}
+.priority-1 {
+  background-color: var(--color-priority-low);
+  color: white;
+}
+.priority-2 {
+  background-color: var(--color-priority-medium);
+  color: white;
+}
+.priority-3 {
+  background-color: var(--color-priority-high);
+  color: white;
+}
 
 .tags {
   display: flex;
@@ -315,7 +323,7 @@ const deleteTask = () => {
 }
 
 .btn-danger:hover {
-  background-color: #DC2626;
+  background-color: var(--color-priority-high);
 }
 
 .empty-state {

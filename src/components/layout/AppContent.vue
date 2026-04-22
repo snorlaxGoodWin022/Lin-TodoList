@@ -1,6 +1,6 @@
 <template>
   <main class="app-content">
-    <div class="content-header" v-if="showContentHeader">
+    <div v-if="showContentHeader" class="content-header">
       <div class="header-actions">
         <slot name="header-actions"></slot>
       </div>
@@ -9,8 +9,11 @@
       </div>
     </div>
     <div class="content-body">
-      <router-view v-if="isRouterView" />
-      <component v-else :is="currentComponent" />
+      <router-view v-slot="{ Component, route }">
+        <Transition name="page" mode="out-in">
+          <component :is="Component" :key="route.path" />
+        </Transition>
+      </router-view>
     </div>
   </main>
 </template>
@@ -22,7 +25,6 @@ import { useAppStore } from '../../stores/app.store'
 const appStore = useAppStore()
 
 const showContentHeader = computed(() => appStore.currentView !== 'pomodoro')
-const isRouterView = true
 </script>
 
 <style scoped>

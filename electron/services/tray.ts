@@ -2,6 +2,11 @@ import { BrowserWindow, Tray, Menu, nativeImage, app } from 'electron'
 import { join } from 'path'
 
 let tray: Tray | null = null
+let isQuitting = false
+
+export function setIsQuitting(value: boolean): void {
+  isQuitting = value
+}
 
 export function createTray(mainWindow: BrowserWindow | null): void {
   // Create tray icon
@@ -36,7 +41,7 @@ export function createTray(mainWindow: BrowserWindow | null): void {
           mainWindow.show()
           mainWindow.focus()
         }
-      }
+      },
     },
     {
       label: '新建任务',
@@ -45,7 +50,7 @@ export function createTray(mainWindow: BrowserWindow | null): void {
         if (mainWindow && !mainWindow.isDestroyed()) {
           mainWindow.webContents.send('shortcut:new-task')
         }
-      }
+      },
     },
     {
       label: '开始番茄钟',
@@ -54,7 +59,7 @@ export function createTray(mainWindow: BrowserWindow | null): void {
         if (mainWindow && !mainWindow.isDestroyed()) {
           mainWindow.webContents.send('shortcut:pomodoro')
         }
-      }
+      },
     },
     { type: 'separator' },
     {
@@ -64,15 +69,15 @@ export function createTray(mainWindow: BrowserWindow | null): void {
         if (mainWindow && !mainWindow.isDestroyed()) {
           mainWindow.webContents.send('app:show-about')
         }
-      }
+      },
     },
     { type: 'separator' },
     {
       label: '退出',
       click: () => {
         app.quit()
-      }
-    }
+      },
+    },
   ])
 
   tray.setContextMenu(contextMenu)
@@ -92,7 +97,7 @@ export function createTray(mainWindow: BrowserWindow | null): void {
   if (mainWindow) {
     mainWindow.on('close', (event) => {
       // Prevent actual close, minimize to tray
-      if (!app.isQuitting) {
+      if (!isQuitting) {
         event.preventDefault()
         mainWindow?.hide()
         return false

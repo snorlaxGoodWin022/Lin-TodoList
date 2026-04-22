@@ -6,20 +6,18 @@
 
 ## 技术栈
 
-
-
-| 类别 | 技术选型 | 说明 |
-|------|---------|------|
-| 框架 | Vue 3 + TypeScript | Composition API + `<script setup>` |
-| 构建 | Vite + electron-builder | 快速构建 + 跨平台打包 |
-| 包管理 | pnpm | 高效依赖管理 |
-| 状态管理 | Pinia | Vue 3 官方推荐 |
-| 路由 | Vue Router 4 | SPA 路由管理 |
-| 数据库 | better-sqlite3 | 嵌入式 SQLite，同步 API，性能好 |
-| UI 组件 | 自研组件 | 无第三方 UI 库，确保风格统一 |
-| 样式 | CSS 变量 + Scoped CSS | 绿色系主题，支持明暗切换 |
-| 图标 | @iconify/vue | 统一图标方案 |
-| 富文本 | 自研轻量编辑器 | 基于 contenteditable |
+| 类别     | 技术选型                | 说明                               |
+| -------- | ----------------------- | ---------------------------------- |
+| 框架     | Vue 3 + TypeScript      | Composition API + `<script setup>` |
+| 构建     | Vite + electron-builder | 快速构建 + 跨平台打包              |
+| 包管理   | pnpm                    | 高效依赖管理                       |
+| 状态管理 | Pinia                   | Vue 3 官方推荐                     |
+| 路由     | Vue Router 4            | SPA 路由管理                       |
+| 数据库   | better-sqlite3          | 嵌入式 SQLite，同步 API，性能好    |
+| UI 组件  | 自研组件                | 无第三方 UI 库，确保风格统一       |
+| 样式     | CSS 变量 + Scoped CSS   | 绿色系主题，支持明暗切换           |
+| 图标     | @iconify/vue            | 统一图标方案                       |
+| 富文本   | 自研轻量编辑器          | 基于 contenteditable               |
 
 ## 应用架构
 
@@ -274,6 +272,7 @@ CREATE TABLE tags (
 ### 默认数据
 
 应用首次启动时插入默认清单：
+
 - 收集箱（id: 'inbox', icon: 'inbox'）
 - 默认清单由用户创建
 
@@ -284,6 +283,7 @@ CREATE TABLE tags (
 **入口**: 侧边栏 "今天" 按钮，默认首页
 
 **功能**:
+
 - 显示今天到期的所有任务 + 已过期的未完成任务
 - 按优先级分组显示（高 → 中 → 低 → 无）
 - 快速添加任务（底部输入框，回车创建）
@@ -292,6 +292,7 @@ CREATE TABLE tags (
 - 支持拖拽调整任务顺序
 
 **交互**:
+
 - 左键点击任务 → 右侧展开详情面板
 - 复选框点击 → 标记完成（划线动画后移入已完成区）
 - 右键 → 上下文菜单（编辑/删除/设置优先级/移到清单/设为重复）
@@ -302,6 +303,7 @@ CREATE TABLE tags (
 **入口**: 侧边栏底部清单列表
 
 **功能**:
+
 - 点击清单名称 → 进入该清单的任务列表
 - 支持创建/删除/重命名/排序清单
 - 每个清单可设置颜色和图标
@@ -314,6 +316,7 @@ CREATE TABLE tags (
 **四种视图**:
 
 #### 月视图 (MonthView)
+
 - 顶部：月份切换（左右箭头）+ 年月显示 + "今天" 按钮
 - 主体：7 列（周一至周日）的日历网格
 - 每个日期格子显示：任务数量小圆点（按优先级着色）
@@ -321,6 +324,7 @@ CREATE TABLE tags (
 - 有任务的日期显示最多 2 个任务标题预览
 
 #### 周视图 (WeekView)
+
 - 顶部：周切换 + 日期范围显示
 - 左侧：0-24 小时时间轴刻度
 - 主体：7 列时间网格，任务以色块显示在对应时间段
@@ -328,6 +332,7 @@ CREATE TABLE tags (
 - 支持拖拽调整任务时间
 
 #### 日视图 (DayView)
+
 - 顶部：日期切换
 - 左侧：0-24 小时时间轴（大刻度）
 - 主体：任务以时间块展示，显示标题和时间段
@@ -335,6 +340,7 @@ CREATE TABLE tags (
 - 无时间段任务显示在顶部"全天任务"区域
 
 #### 多日视图 (MultiDayView)
+
 - 顶部：可自由选择天数（1-7 天）
 - 结合日视图的时间轴 + 多列展示
 - 适合查看连续几天的安排
@@ -361,6 +367,7 @@ CREATE TABLE tags (
 ```
 
 **功能**:
+
 - 任务自动根据优先级（高=重要）+ 是否过期/今日到期（=紧急）归入象限
 - 支持手动拖拽在象限间移动（修改 quadrant 值）
 - 每个象限可添加新任务（自动继承象限的优先级设置）
@@ -394,6 +401,7 @@ CREATE TABLE tags (
 ```
 
 **功能**:
+
 - 圆形计时器，动画显示倒计时进度
 - 可配置：专注时长（默认 25min）、短休息（5min）、长休息（15min）、长休息间隔（每 4 个番茄）
 - 工作模式：倒计时 / 正计时
@@ -432,6 +440,7 @@ CREATE TABLE tags (
 ```
 
 **功能**:
+
 - 习惯卡片：显示名称、图标、本周进度条、连续天数
 - 打卡：点击圆形按钮完成今日打卡
 - 习惯创建：名称、图标选择、频率（每日/每周几）
@@ -466,6 +475,7 @@ CREATE TABLE tags (
 ```
 
 **功能**:
+
 - 瀑布流布局展示所有便签
 - 支持设置便签背景色（黄/绿/蓝/粉/白）
 - 置顶便签显示在最前面
@@ -476,12 +486,14 @@ CREATE TABLE tags (
 ### 8. 提醒系统
 
 **实现方式**:
+
 - Electron 主进程维护一个定时器队列
 - 每分钟检查一次是否有需要触发的提醒
 - 触发时通过 Electron Notification API 发送系统通知
 - 应用最小化到托盘时，通过托盘气泡提醒
 
 **提醒类型**:
+
 - 一次性提醒：设定具体时间点
 - 重复提醒：每天/每周/每月/自定义
 - 提前提醒：任务开始前 N 分钟
@@ -489,14 +501,14 @@ CREATE TABLE tags (
 
 ### 9. 全局快捷键
 
-| 快捷键 | 功能 |
-|--------|------|
-| `Ctrl+N` | 快速添加任务 |
-| `Ctrl+Shift+N` | 新建便签 |
-| `Ctrl+1~7` | 切换侧边栏视图 |
-| `Ctrl+F` | 搜索 |
-| `Ctrl+,` | 设置 |
-| `Ctrl+Q` | 退出 |
+| 快捷键         | 功能            |
+| -------------- | --------------- |
+| `Ctrl+N`       | 快速添加任务    |
+| `Ctrl+Shift+N` | 新建便签        |
+| `Ctrl+1~7`     | 切换侧边栏视图  |
+| `Ctrl+F`       | 搜索            |
+| `Ctrl+,`       | 设置            |
+| `Ctrl+Q`       | 退出            |
 | `Ctrl+Shift+P` | 开始/暂停番茄钟 |
 
 ## UI 设计规范
@@ -506,30 +518,30 @@ CREATE TABLE tags (
 ```css
 :root {
   /* 主色 - 翡翠绿 */
-  --color-primary: #10B981;
+  --color-primary: #10b981;
   --color-primary-hover: #059669;
-  --color-primary-light: #D1FAE5;
-  --color-primary-bg: #ECFDF5;
+  --color-primary-light: #d1fae5;
+  --color-primary-bg: #ecfdf5;
 
   /* 背景 */
-  --color-bg: #F9FAFB;
-  --color-bg-white: #FFFFFF;
-  --color-bg-sidebar: #F3F4F6;
+  --color-bg: #f9fafb;
+  --color-bg-white: #ffffff;
+  --color-bg-sidebar: #f3f4f6;
 
   /* 文字 */
   --color-text-primary: #111827;
-  --color-text-secondary: #6B7280;
-  --color-text-muted: #9CA3AF;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
 
   /* 优先级 */
-  --color-priority-high: #EF4444;
-  --color-priority-medium: #F59E0B;
-  --color-priority-low: #3B82F6;
-  --color-priority-none: #D1D5DB;
+  --color-priority-high: #ef4444;
+  --color-priority-medium: #f59e0b;
+  --color-priority-low: #3b82f6;
+  --color-priority-none: #d1d5db;
 
   /* 边框 */
-  --color-border: #E5E7EB;
-  --color-border-hover: #D1D5DB;
+  --color-border: #e5e7eb;
+  --color-border-hover: #d1d5db;
 
   /* 圆角 */
   --radius-sm: 4px;
@@ -558,12 +570,12 @@ CREATE TABLE tags (
 ### 暗色主题
 
 ```css
-[data-theme="dark"] {
+[data-theme='dark'] {
   --color-bg: #111827;
-  --color-bg-white: #1F2937;
-  --color-bg-sidebar: #1F2937;
-  --color-text-primary: #F9FAFB;
-  --color-text-secondary: #9CA3AF;
+  --color-bg-white: #1f2937;
+  --color-bg-sidebar: #1f2937;
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #9ca3af;
   --color-border: #374151;
 }
 ```
@@ -632,6 +644,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 ## 项目范围边界
 
 **本次包含**:
+
 - 上述所有 7 大模块的完整功能
 - 绿色系 UI 主题（含暗色模式）
 - 本地 SQLite 数据存储
@@ -639,6 +652,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 - 全局快捷键
 
 **不包含（后续迭代）**:
+
 - 云同步 / 多设备同步
 - 多用户 / 协作功能
 - 移动端适配

@@ -27,73 +27,103 @@
             ></textarea>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">优先级</label>
-              <div class="priority-selector">
-                <button
-                  v-for="(p, index) in priorities"
-                  :key="index"
-                  :class="['priority-btn', `priority-${index}`, { active: form.priority === index }]"
-                  @click="form.priority = index"
-                >
-                  {{ p }}
-                </button>
-              </div>
+          <!-- Icon bar for quick actions -->
+          <div class="quick-actions">
+            <div class="action-item" title="优先级" @click="showPriorityMenu = !showPriorityMenu">
+              <span class="action-icon" :class="priorityClass">
+                {{ priorityIcon }}
+              </span>
+              <span
+                v-if="form.priority > 0"
+                class="action-badge-dot"
+                :class="priorityDotClass"
+              ></span>
+              <PriorityMenu
+                v-if="showPriorityMenu"
+                :value="form.priority"
+                @select="selectPriority"
+                @close="showPriorityMenu = false"
+              />
             </div>
 
-            <div class="form-group">
-              <label class="form-label">清单</label>
-              <select v-model="form.list_id" class="form-select">
-                <option v-for="list in lists" :key="list.id" :value="list.id">
-                  {{ list.name }}
-                </option>
-              </select>
+            <div class="action-item" title="清单" @click="showListMenu = !showListMenu">
+              <span class="action-icon list-icon">{{ listIcon }}</span>
+              <span class="action-label">{{ currentListName }}</span>
+              <ListMenu
+                v-if="showListMenu"
+                :value="form.list_id"
+                @select="selectList"
+                @close="showListMenu = false"
+              />
+            </div>
+
+            <div class="action-item" title="截止日期" @click="showDateMenu = !showDateMenu">
+              <span class="action-icon">📅</span>
+              <span v-if="form.due_date" class="action-label">{{
+                formatDateShort(form.due_date)
+              }}</span>
+              <DateMenu
+                v-if="showDateMenu"
+                :value="form.due_date"
+                @select="selectDate"
+                @close="showDateMenu = false"
+              />
+            </div>
+
+            <div class="action-item" title="时间" @click="showTimeMenu = !showTimeMenu">
+              <span class="action-icon">⏰</span>
+              <span v-if="form.start_time || form.end_time" class="action-label">
+                {{ formatTimeRange() }}
+              </span>
+              <TimeMenu
+                v-if="showTimeMenu"
+                :start-time="form.start_time"
+                :end-time="form.end_time"
+                @select="selectTime"
+                @close="showTimeMenu = false"
+              />
+            </div>
+
+            <div class="action-item" title="四象限" @click="showQuadrantMenu = !showQuadrantMenu">
+              <span class="action-icon quadrant-icon" :class="'quadrant-' + form.quadrant">
+                {{ quadrantIcon }}
+              </span>
+              <QuadrantMenu
+                v-if="showQuadrantMenu"
+                :value="form.quadrant"
+                @select="selectQuadrant"
+                @close="showQuadrantMenu = false"
+              />
+            </div>
+
+            <div class="action-item" title="重复" @click="showRepeatMenu = !showRepeatMenu">
+              <span class="action-icon">🔁</span>
+              <span v-if="form.repeat_rule" class="action-label">{{ repeatLabel }}</span>
+              <RepeatMenu
+                v-if="showRepeatMenu"
+                :value="form.repeat_rule"
+                @select="selectRepeat"
+                @close="showRepeatMenu = false"
+              />
+            </div>
+
+            <div class="action-item" title="提醒" @click="showRemindMenu = !showRemindMenu">
+              <span class="action-icon">🔔</span>
+              <RemindMenu
+                v-if="showRemindMenu"
+                :value="form.remind_at"
+                @select="selectRemind"
+                @close="showRemindMenu = false"
+              />
             </div>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">截止日期</label>
-              <input v-model="form.due_date" type="date" class="form-input" />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">提醒时间</label>
-              <input v-model="form.remind_at" type="datetime-local" class="form-input" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">开始时间</label>
-              <input v-model="form.start_time" type="time" class="form-input" />
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">结束时间</label>
-              <input v-model="form.end_time" type="time" class="form-input" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">四象限</label>
-            <div class="quadrant-selector">
-              <button
-                v-for="(q, index) in quadrants"
-                :key="index"
-                :class="['quadrant-btn', `quadrant-${index}`, { active: form.quadrant === index }]"
-                @click="form.quadrant = index"
-              >
-                {{ q }}
-              </button>
-            </div>
-          </div>
+          <SubtaskList v-if="form.id" :parent-id="form.id" />
         </div>
 
         <div class="modal-footer">
           <button class="btn btn-secondary" @click="close">取消</button>
-          <button class="btn btn-primary" @click="save" :disabled="!form.title.trim()">
+          <button class="btn btn-primary" :disabled="!form.title.trim()" @click="save">
             {{ isEditing ? '保存' : '创建' }}
           </button>
         </div>
@@ -103,10 +133,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, nextTick } from 'vue'
+import { ref, reactive, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useTaskStore } from '../../stores/task.store'
 import { useListStore } from '../../stores/list.store'
-import type { Task } from '../../electron/database/repositories/task.repo'
+import SubtaskList from './SubtaskList.vue'
+import PriorityMenu from './menus/PriorityMenu.vue'
+import ListMenu from './menus/ListMenu.vue'
+import DateMenu from './menus/DateMenu.vue'
+import TimeMenu from './menus/TimeMenu.vue'
+import QuadrantMenu from './menus/QuadrantMenu.vue'
+import RepeatMenu from './menus/RepeatMenu.vue'
+import RemindMenu from './menus/RemindMenu.vue'
+import { parseTaskInput } from '../../utils/smartParse'
+import type { Task } from '../../types/repositories'
 
 const taskStore = useTaskStore()
 const listStore = useListStore()
@@ -114,51 +153,196 @@ const listStore = useListStore()
 const visible = ref(false)
 const titleInput = ref<HTMLInputElement | null>(null)
 
+// Menu visibility states
+const showPriorityMenu = ref(false)
+const showListMenu = ref(false)
+const showDateMenu = ref(false)
+const showTimeMenu = ref(false)
+const showQuadrantMenu = ref(false)
+const showRepeatMenu = ref(false)
+const showRemindMenu = ref(false)
+
 const form = reactive({
   id: '',
   title: '',
   description: '',
-  priority: 0 as 0 | 1 | 2 | 3,
+  priority: 0 as number,
   list_id: 'inbox',
   due_date: '',
   start_time: '',
   end_time: '',
   remind_at: '',
-  quadrant: 0 as 0 | 1 | 2 | 3 | 4,
-  tags: '[]'
+  quadrant: 0 as number,
+  repeat_rule: '',
+  tags: '[]',
 })
 
+// Close menus on click outside
+const closeMenus = () => {
+  showPriorityMenu.value = false
+  showListMenu.value = false
+  showDateMenu.value = false
+  showTimeMenu.value = false
+  showQuadrantMenu.value = false
+  showRepeatMenu.value = false
+  showRemindMenu.value = false
+}
+
+onMounted(() => {
+  document.addEventListener('click', closeMenus)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeMenus)
+})
+
+// Watch title changes for smart parsing
+watch(
+  () => form.title,
+  (newTitle) => {
+    if (!newTitle.trim()) return
+    if (form.id) return
+    const parsed = parseTaskInput(newTitle)
+    if (parsed.due_date) form.due_date = parsed.due_date
+    if (parsed.start_time) form.start_time = parsed.start_time
+    if (parsed.end_time) form.end_time = parsed.end_time
+    if (parsed.priority !== undefined) form.priority = parsed.priority
+    if (parsed.quadrant !== undefined) form.quadrant = parsed.quadrant
+    if (parsed.tags) form.tags = parsed.tags
+    form.title = parsed.title
+  }
+)
+
+// Computed properties for display
 const priorities = ['无', '低', '中', '高']
 const quadrants = ['未分类', '重要紧急', '重要不紧急', '紧急不重要', '不紧急不重要']
-
 const lists = computed(() => listStore.lists)
 
 const isEditing = computed(() => !!form.id)
 
-watch(() => taskStore.editingTask, (task) => {
-  if (task) {
-    if (task.id) {
-      Object.assign(form, {
-        id: task.id,
-        title: task.title || '',
-        description: task.description || '',
-        priority: (task.priority || 0) as 0 | 1 | 2 | 3,
-        list_id: task.list_id || 'inbox',
-        due_date: task.due_date || '',
-        start_time: task.start_time || '',
-        end_time: task.end_time || '',
-        remind_at: task.remind_at || '',
-        quadrant: (task.quadrant || 0) as 0 | 1 | 2 | 3 | 4,
-        tags: task.tags || '[]'
-      })
-    } else {
-      resetForm()
-      form.list_id = (task as any).list_id || 'inbox'
-    }
-    visible.value = true
-    nextTick(() => titleInput.value?.focus())
+const priorityIcon = computed(() => {
+  const icons = ['⚪', '🔵', '🟡', '🔴']
+  return icons[form.priority] || '⚪'
+})
+
+const priorityClass = computed(() => {
+  return `priority-${form.priority}`
+})
+
+const priorityDotClass = computed(() => {
+  return `dot-${form.priority}`
+})
+
+const quadrantIcon = computed(() => {
+  const icons = ['⚪', '1️⃣', '2️⃣', '3️⃣', '4️⃣']
+  return icons[form.quadrant] || '⚪'
+})
+
+const listIcon = computed(() => {
+  const list = lists.value.find((l) => l.id === form.list_id)
+  return list?.icon || '📋'
+})
+
+const currentListName = computed(() => {
+  const list = lists.value.find((l) => l.id === form.list_id)
+  return list?.name || ''
+})
+
+const repeatLabel = computed(() => {
+  const labels: Record<string, string> = {
+    daily: '每天',
+    weekly: '每周',
+    monthly: '每月',
+    yearly: '每年',
   }
-}, { immediate: true })
+  return labels[form.repeat_rule] || ''
+})
+
+const formatDateShort = (dateStr: string) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  const today = new Date()
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  if (date.toDateString() === today.toDateString()) return '今天'
+  if (date.toDateString() === tomorrow.toDateString()) return '明天'
+  return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
+}
+
+const formatTimeRange = () => {
+  if (form.start_time && form.end_time) {
+    return `${form.start_time.slice(0, 5)}-${form.end_time.slice(0, 5)}`
+  }
+  if (form.start_time) return form.start_time.slice(0, 5)
+  return ''
+}
+
+// Menu selection handlers
+const selectPriority = (priority: number) => {
+  form.priority = priority
+  showPriorityMenu.value = false
+}
+
+const selectList = (listId: string) => {
+  form.list_id = listId
+  showListMenu.value = false
+}
+
+const selectDate = (date: string) => {
+  form.due_date = date
+  showDateMenu.value = false
+}
+
+const selectTime = (start: string, end: string) => {
+  form.start_time = start
+  form.end_time = end
+  showTimeMenu.value = false
+}
+
+const selectQuadrant = (quadrant: number) => {
+  form.quadrant = quadrant
+  showQuadrantMenu.value = false
+}
+
+const selectRepeat = (rule: string) => {
+  form.repeat_rule = rule
+  showRepeatMenu.value = false
+}
+
+const selectRemind = (remindAt: string) => {
+  form.remind_at = remindAt
+  showRemindMenu.value = false
+}
+
+watch(
+  () => taskStore.editingTask,
+  (task) => {
+    if (task) {
+      if (task.id) {
+        Object.assign(form, {
+          id: task.id,
+          title: task.title || '',
+          description: task.description || '',
+          priority: (task.priority || 0) as number,
+          list_id: task.list_id || 'inbox',
+          due_date: task.due_date || '',
+          start_time: task.start_time || '',
+          end_time: task.end_time || '',
+          remind_at: task.remind_at || '',
+          quadrant: (task.quadrant || 0) as number,
+          repeat_rule: task.repeat_rule || '',
+          tags: task.tags || '[]',
+        })
+      } else {
+        resetForm()
+        form.list_id = (task as any).list_id || 'inbox'
+      }
+      visible.value = true
+      nextTick(() => titleInput.value?.focus())
+    }
+  },
+  { immediate: true }
+)
 
 const resetForm = () => {
   form.id = ''
@@ -171,6 +355,7 @@ const resetForm = () => {
   form.end_time = ''
   form.remind_at = ''
   form.quadrant = 0
+  form.repeat_rule = ''
   form.tags = '[]'
 }
 
@@ -178,6 +363,7 @@ const close = () => {
   visible.value = false
   taskStore.closeTaskEditor()
   resetForm()
+  closeMenus()
 }
 
 const save = async () => {
@@ -193,7 +379,8 @@ const save = async () => {
     end_time: form.end_time || undefined,
     remind_at: form.remind_at || undefined,
     quadrant: form.quadrant,
-    tags: form.tags
+    repeat_rule: form.repeat_rule || undefined,
+    tags: form.tags,
   }
 
   try {
@@ -225,7 +412,7 @@ const save = async () => {
 
 .modal-container {
   background: var(--color-surface);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   width: 90%;
   max-width: 560px;
   max-height: 90vh;
@@ -238,14 +425,15 @@ const save = async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: var(--spacing-md) var(--spacing-lg);
   border-bottom: 1px solid var(--color-border);
 }
 
 .modal-title {
-  font-size: 18px;
+  font-size: var(--font-size-lg);
   font-weight: 600;
   margin: 0;
+  color: var(--color-text-primary);
 }
 
 .close-btn {
@@ -263,39 +451,25 @@ const save = async () => {
 }
 
 .modal-body {
-  padding: 20px;
+  padding: var(--spacing-lg);
   overflow-y: auto;
   flex: 1;
 }
 
 .form-group {
-  margin-bottom: 16px;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.form-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  margin-bottom: 8px;
+  margin-bottom: var(--spacing-md);
 }
 
 .form-input,
 .form-select {
   width: 100%;
-  padding: 10px 12px;
+  padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  font-size: 14px;
-  background: var(--color-background);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  background: var(--color-bg);
   color: var(--color-text-primary);
-  transition: border-color 0.2s;
+  transition: border-color var(--transition-fast);
 }
 
 .form-input:focus,
@@ -305,70 +479,136 @@ const save = async () => {
 }
 
 .title-input {
-  font-size: 16px;
+  font-size: var(--font-size-lg);
   font-weight: 500;
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.title-input:focus {
+  border: none;
 }
 
 .description-input {
   resize: vertical;
   min-height: 80px;
-}
-
-.priority-selector,
-.quadrant-selector {
-  display: flex;
-  gap: 8px;
-}
-
-.priority-btn,
-.quadrant-btn {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: var(--color-background);
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
+  border: none;
+  padding: 0;
+  background: transparent;
   color: var(--color-text-secondary);
 }
 
-.priority-btn:hover,
-.quadrant-btn:hover {
-  border-color: var(--color-border-hover);
+.description-input:focus {
+  border: none;
 }
 
-.priority-btn.active,
-.quadrant-btn.active {
-  border-width: 2px;
+/* Quick Actions Bar */
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md) 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  margin: var(--spacing-md) 0;
+  position: relative;
 }
 
-.priority-0.active { border-color: var(--color-priority-none); background: var(--color-priority-none); color: white; }
-.priority-1.active { border-color: var(--color-priority-low); background: var(--color-priority-low); color: white; }
-.priority-2.active { border-color: var(--color-priority-medium); background: var(--color-priority-medium); color: white; }
-.priority-3.active { border-color: var(--color-priority-high); background: var(--color-priority-high); color: white; }
+.action-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  user-select: none;
+}
 
-.quadrant-0.active { border-color: var(--color-text-muted); }
-.quadrant-1.active { border-color: #EF4444; background: #FEE2E2; color: #EF4444; }
-.quadrant-2.active { border-color: #10B981; background: #D1FAE5; color: #10B981; }
-.quadrant-3.active { border-color: #F59E0B; background: #FEF3C7; color: #F59E0B; }
-.quadrant-4.active { border-color: #6B7280; background: #F3F4F6; color: #6B7280; }
+.action-item:hover {
+  background-color: var(--color-primary-bg);
+}
 
+.action-icon {
+  font-size: var(--font-size-base);
+  width: 20px;
+  text-align: center;
+}
+
+.action-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.action-badge-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.dot-1 {
+  background-color: var(--color-priority-low);
+}
+.dot-2 {
+  background-color: var(--color-priority-medium);
+}
+.dot-3 {
+  background-color: var(--color-priority-high);
+}
+
+/* Priority icon colors */
+.priority-0 {
+  opacity: 0.5;
+}
+.priority-1 {
+  filter: hue-rotate(180deg) saturate(1.5);
+}
+.priority-2 {
+  filter: hue-rotate(30deg) saturate(1.5);
+}
+.priority-3 {
+  filter: hue-rotate(-30deg) saturate(1.5);
+}
+
+/* Quadrant icon colors */
+.quadrant-icon.quadrant-1 {
+  filter: hue-rotate(140deg) saturate(1.2);
+}
+.quadrant-icon.quadrant-2 {
+  filter: hue-rotate(200deg) saturate(1.2);
+}
+.quadrant-icon.quadrant-3 {
+  filter: hue-rotate(50deg) saturate(1.2);
+}
+.quadrant-icon.quadrant-4 {
+  opacity: 0.6;
+}
+
+/* Modal footer */
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  padding: 16px 20px;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
   border-top: 1px solid var(--color-border);
 }
 
 .btn {
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 }
 
 .btn-primary {
@@ -387,7 +627,7 @@ const save = async () => {
 }
 
 .btn-secondary {
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-primary);
   border: 1px solid var(--color-border);
 }

@@ -62,9 +62,7 @@
         <div class="empty-icon">📝</div>
         <h3 class="empty-title">清单为空</h3>
         <p class="empty-description">添加第一个任务开始使用</p>
-        <button class="btn btn-primary" @click="createTask">
-          创建新任务
-        </button>
+        <button class="btn btn-primary" @click="createTask">创建新任务</button>
       </div>
     </div>
   </div>
@@ -88,16 +86,16 @@ const listId = computed(() => route.params.id as string)
 // Computed properties
 const currentList = computed(() => list.getListById(listId.value))
 const pendingTasks = computed(() => {
-  return task.pendingTasks.filter(t => t.list_id === listId.value)
+  return task.pendingTasks.value.filter((t: any) => t.list_id === listId.value)
 })
 const completedTasks = computed(() => {
-  return task.completedTasks.filter(t => t.list_id === listId.value)
+  return task.completedTasks.value.filter((t: any) => t.list_id === listId.value)
 })
 const totalTasks = computed(() => pendingTasks.value.length + completedTasks.value.length)
 
 const pendingTaskList = computed({
   get: () => pendingTasks.value,
-  set: () => {}
+  set: () => {},
 })
 
 // Watch for list ID changes
@@ -128,7 +126,7 @@ const editList = () => {
 }
 
 const loadListTasks = () => {
-  task.loadTasks({ list_id: listId.value })
+  task.loadTasks({ listId: listId.value })
 }
 
 const onDragEnd = () => {

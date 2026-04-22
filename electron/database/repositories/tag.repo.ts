@@ -22,7 +22,10 @@ async function handleGetAllTags(): Promise<Tag[]> {
   return stmt.all() as Tag[]
 }
 
-async function handleCreateTag(_event: Electron.IpcMainInvokeEvent, tagData: Partial<Tag>): Promise<Tag> {
+async function handleCreateTag(
+  _event: Electron.IpcMainInvokeEvent,
+  tagData: Partial<Tag>
+): Promise<Tag> {
   const db = getDatabase()
   const now = new Date().toISOString()
   const id = uuidv4()
@@ -31,7 +34,7 @@ async function handleCreateTag(_event: Electron.IpcMainInvokeEvent, tagData: Par
     id,
     name: tagData.name || '',
     color: tagData.color || '#10B981',
-    created_at: now
+    created_at: now,
   }
 
   const stmt = db.prepare(`
@@ -44,7 +47,11 @@ async function handleCreateTag(_event: Electron.IpcMainInvokeEvent, tagData: Par
   return tag
 }
 
-async function handleUpdateTag(_event: Electron.IpcMainInvokeEvent, id: string, updates: Partial<Tag>): Promise<boolean> {
+async function handleUpdateTag(
+  _event: Electron.IpcMainInvokeEvent,
+  id: string,
+  updates: Partial<Tag>
+): Promise<boolean> {
   const db = getDatabase()
 
   const fields: string[] = []

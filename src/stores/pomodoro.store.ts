@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { PomodoroRecord, PomodoroStats } from '../../electron/database/repositories/pomodoro.repo'
+import type { PomodoroRecord, PomodoroStats } from '../types/repositories'
 
 export const usePomodoroStore = defineStore('pomodoro', () => {
   // State
@@ -9,7 +9,7 @@ export const usePomodoroStore = defineStore('pomodoro', () => {
     total_focus_minutes: 0,
     total_break_minutes: 0,
     daily_average: 0,
-    streak_days: 0
+    streak_days: 0,
   })
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -17,11 +17,15 @@ export const usePomodoroStore = defineStore('pomodoro', () => {
   // Getters
   const todayRecords = computed(() => {
     const today = new Date().toISOString().split('T')[0]
-    return pomodoroRecords.value.filter(record => record.completed_at.startsWith(today))
+    return pomodoroRecords.value.filter((record) => record.completed_at.startsWith(today))
   })
 
-  const focusRecords = computed(() => pomodoroRecords.value.filter(record => record.type === 'focus'))
-  const breakRecords = computed(() => pomodoroRecords.value.filter(record => record.type === 'break'))
+  const focusRecords = computed(() =>
+    pomodoroRecords.value.filter((record) => record.type === 'focus')
+  )
+  const breakRecords = computed(() =>
+    pomodoroRecords.value.filter((record) => record.type === 'break')
+  )
 
   // Actions
   const savePomodoro = async (recordData: Partial<PomodoroRecord>) => {
@@ -76,6 +80,6 @@ export const usePomodoroStore = defineStore('pomodoro', () => {
     // Actions
     savePomodoro,
     loadStats,
-    init
+    init,
   }
 })

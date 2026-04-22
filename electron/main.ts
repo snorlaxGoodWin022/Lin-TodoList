@@ -4,7 +4,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { initDatabase } from './database/init'
 import { registerShortcuts } from './services/shortcut'
-import { createTray } from './services/tray'
+import { createTray, setIsQuitting } from './services/tray'
 import { setupNotifications, setMainWindow } from './services/notification'
 
 // Import repository handlers
@@ -14,6 +14,8 @@ import { setupHabitHandlers } from './database/repositories/habit.repo'
 import { setupNoteHandlers } from './database/repositories/note.repo'
 import { setupPomodoroHandlers } from './database/repositories/pomodoro.repo'
 import { setupTagHandlers } from './database/repositories/tag.repo'
+import { setupFilterPresetHandlers } from './database/repositories/filterPreset.repo'
+import { setupSubtaskHandlers } from './database/repositories/subtask.repo'
 
 // Window state storage
 interface WindowState {
@@ -50,7 +52,7 @@ const saveWindowState = (window: BrowserWindow) => {
     const bounds = window.getBounds()
     const state: WindowState = {
       ...bounds,
-      isMaximized: window.isMaximized()
+      isMaximized: window.isMaximized(),
     }
     const configPath = getConfigPath()
     writeFileSync(configPath, JSON.stringify(state, null, 2))
@@ -81,8 +83,8 @@ function createWindow(): void {
       preload: join(__dirname, '../electron/preload.js'),
       sandbox: false,
       contextIsolation: true,
-      nodeIntegration: false
-    }
+      nodeIntegration: false,
+    },
   })
 
   // Restore maximized state
@@ -91,7 +93,7 @@ function createWindow(): void {
   }
 
   // Load the index.html of the app.
-  if (import.meta.env.DEV) {
+  if (!app.isPackaged) {
     mainWindow.loadURL('http://localhost:5173')
     mainWindow.webContents.openDevTools()
   } else {
@@ -148,11 +150,11 @@ function createMiniWindow(): void {
       preload: join(__dirname, '../electron/preload.js'),
       sandbox: false,
       contextIsolation: true,
-      nodeIntegration: false
-    }
+      nodeIntegration: false,
+    },
   })
 
-  if (import.meta.env.DEV) {
+  if (!app.isPackaged) {
     miniWindow.loadURL('http://localhost:5173/mini.html')
   } else {
     miniWindow.loadFile(join(__dirname, '../dist/mini.html'))
@@ -173,7 +175,6 @@ function createMiniWindow(): void {
 app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.lin.todolist')
-  ;(app as any).isQuitting = false
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -182,7 +183,7 @@ app.whenReady().then(async () => {
   })
 
   app.on('before-quit', () => {
-    ;(app as any).isQuitting = true
+    setIsQuitting(true)
   })
 
   // Initialize database
@@ -223,6 +224,8 @@ function setupIPCHandlers(): void {
   setupNoteHandlers()
   setupPomodoroHandlers()
   setupTagHandlers()
+  setupFilterPresetHandlers()
+  setupSubtaskHandlers()
 
   // System handlers
   ipcMain.handle('app:getVersion', () => app.getVersion())

@@ -57,7 +57,7 @@
           <button v-if="isEditing" class="btn btn-danger" @click="deleteHabit">删除</button>
           <div class="spacer"></div>
           <button class="btn btn-secondary" @click="close">取消</button>
-          <button class="btn btn-primary" @click="save" :disabled="!form.name.trim()">
+          <button class="btn btn-primary" :disabled="!form.name.trim()" @click="save">
             {{ isEditing ? '保存' : '创建' }}
           </button>
         </div>
@@ -69,7 +69,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useHabitStore } from '../../stores/habit.store'
-import type { Habit } from '../../electron/database/repositories/habit.repo'
+import type { Habit } from '../../types/repositories'
 
 const habitStore = useHabitStore()
 
@@ -81,35 +81,39 @@ const form = reactive({
   name: '',
   icon: '💪',
   frequency: 'daily',
-  remind_at: ''
+  remind_at: '',
 })
 
 const icons = ['💪', '📚', '🏃', '💧', '🧘', '🎯', '✍️', '🌅', '😴', '🍎', '🎨', '🎵', '💻', '🌱']
 const frequencies = [
   { value: 'daily', label: '每天' },
   { value: 'weekly', label: '每周' },
-  { value: 'monthly', label: '每月' }
+  { value: 'monthly', label: '每月' },
 ]
 
 const isEditing = computed(() => !!form.id)
 
-watch(() => habitStore.editingHabit, (habit) => {
-  if (habit) {
-    if (habit.id) {
-      Object.assign(form, {
-        id: habit.id,
-        name: habit.name || '',
-        icon: habit.icon || '💪',
-        frequency: habit.frequency || 'daily',
-        remind_at: habit.remind_at || ''
-      })
-    } else {
-      resetForm()
+watch(
+  () => habitStore.editingHabit,
+  (habit) => {
+    if (habit) {
+      if (habit.id) {
+        Object.assign(form, {
+          id: habit.id,
+          name: habit.name || '',
+          icon: habit.icon || '💪',
+          frequency: habit.frequency || 'daily',
+          remind_at: habit.remind_at || '',
+        })
+      } else {
+        resetForm()
+      }
+      visible.value = true
+      nextTick(() => nameInput.value?.focus())
     }
-    visible.value = true
-    nextTick(() => nameInput.value?.focus())
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+)
 
 const resetForm = () => {
   form.id = ''
@@ -132,7 +136,7 @@ const save = async () => {
     name: form.name,
     icon: form.icon,
     frequency: form.frequency,
-    remind_at: form.remind_at || undefined
+    remind_at: form.remind_at || undefined,
   }
 
   try {
@@ -236,7 +240,7 @@ const deleteHabit = async () => {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 14px;
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-primary);
 }
 
@@ -256,7 +260,7 @@ const deleteHabit = async () => {
   height: 40px;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: var(--color-background);
+  background: var(--color-bg);
   font-size: 20px;
   cursor: pointer;
   transition: all 0.2s;
@@ -281,7 +285,7 @@ const deleteHabit = async () => {
   padding: 10px;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: var(--color-background);
+  background: var(--color-bg);
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
@@ -331,13 +335,13 @@ const deleteHabit = async () => {
 }
 
 .btn-secondary {
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-primary);
   border: 1px solid var(--color-border);
 }
 
 .btn-danger {
-  background: #EF4444;
+  background: var(--color-priority-high);
   color: white;
   border: none;
 }

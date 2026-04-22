@@ -6,53 +6,71 @@ import QuadrantView from '../views/QuadrantView.vue'
 import PomodoroView from '../views/PomodoroView.vue'
 import HabitView from '../views/HabitView.vue'
 import NoteView from '../views/NoteView.vue'
+import KanbanView from '../views/KanbanView.vue'
+import DashboardView from '../views/DashboardView.vue'
+import SettingsView from '../views/SettingsView.vue'
 
 const routes = [
   {
     path: '/',
-    redirect: '/today'
+    redirect: '/today',
   },
   {
     path: '/today',
     name: 'Today',
-    component: TodayView
+    component: TodayView,
   },
   {
     path: '/calendar',
     name: 'Calendar',
-    component: CalendarPage
+    component: CalendarPage,
   },
   {
     path: '/lists/:id',
     name: 'List',
     component: ListView,
-    props: true
+    props: true,
   },
   {
     path: '/quadrant',
     name: 'Quadrant',
-    component: QuadrantView
+    component: QuadrantView,
   },
   {
     path: '/pomodoro',
     name: 'Pomodoro',
-    component: PomodoroView
+    component: PomodoroView,
+  },
+  {
+    path: '/kanban',
+    name: 'Kanban',
+    component: KanbanView,
   },
   {
     path: '/habits',
     name: 'Habits',
-    component: HabitView
+    component: HabitView,
   },
   {
     path: '/notes',
     name: 'Notes',
-    component: NoteView
-  }
+    component: NoteView,
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: DashboardView,
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: SettingsView,
+  },
 ]
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes,
 })
 
 export default router

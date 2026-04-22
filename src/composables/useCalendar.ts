@@ -1,6 +1,5 @@
 import { ref, computed } from 'vue'
 import { useTaskStore } from '../stores/task.store'
-import type { Task } from '../../electron/database/repositories/task.repo'
 
 export function useCalendar() {
   const taskStore = useTaskStore()
@@ -23,14 +22,14 @@ export function useCalendar() {
   // Get tasks for specific date
   const getTasksForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0]
-    return taskStore.tasks.filter(task => task.due_date === dateStr)
+    return taskStore.tasks.filter((task) => task.due_date === dateStr)
   }
 
   // Get tasks for date range
   const getTasksForDateRange = (startDate: Date, endDate: Date) => {
     const startStr = startDate.toISOString().split('T')[0]
     const endStr = endDate.toISOString().split('T')[0]
-    return taskStore.tasks.filter(task => {
+    return taskStore.tasks.filter((task) => {
       if (!task.due_date) return false
       return task.due_date >= startStr && task.due_date <= endStr
     })
@@ -51,7 +50,7 @@ export function useCalendar() {
       days.push({
         date,
         isCurrentMonth: false,
-        tasks: getTasksForDate(date)
+        tasks: getTasksForDate(date),
       })
     }
 
@@ -62,7 +61,7 @@ export function useCalendar() {
       days.push({
         date,
         isCurrentMonth: true,
-        tasks: getTasksForDate(date)
+        tasks: getTasksForDate(date),
       })
     }
 
@@ -75,7 +74,7 @@ export function useCalendar() {
       days.push({
         date: nextDate,
         isCurrentMonth: false,
-        tasks: getTasksForDate(nextDate)
+        tasks: getTasksForDate(nextDate),
       })
     }
 
@@ -95,7 +94,7 @@ export function useCalendar() {
       date.setDate(startDate.getDate() + i)
       days.push({
         date,
-        tasks: getTasksForDate(date)
+        tasks: getTasksForDate(date),
       })
     }
 
@@ -191,6 +190,6 @@ export function useCalendar() {
     goToPrevDay,
     goToNextDay,
     setViewMode,
-    formatDate
+    formatDate,
   }
 }

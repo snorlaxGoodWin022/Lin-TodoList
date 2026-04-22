@@ -146,3 +146,4 @@ temp/
 
 # Logs from electron main process
 logs/
+.gstack/

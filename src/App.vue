@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useAppStore } from './stores/app.store'
 import { useShortcuts } from './composables/useShortcuts'
 import AppHeader from './components/layout/AppHeader.vue'
@@ -28,7 +28,6 @@ import HabitEditor from './components/habit/HabitEditor.vue'
 import NoteEditor from './components/note/NoteEditor.vue'
 
 const route = useRoute()
-const router = useRouter()
 const appStore = useAppStore()
 const theme = computed(() => appStore.theme)
 

@@ -12,7 +12,7 @@
             v-for="mode in viewModes"
             :key="mode.value"
             class="btn btn-text"
-            :class="{ active: viewMode === mode.value }"
+            :class="{ active: viewModeValue === mode.value }"
             @click="setViewMode(mode.value)"
           >
             {{ mode.label }}
@@ -31,7 +31,7 @@
     </div>
 
     <div class="calendar-content">
-      <div v-if="viewMode === 'month'" class="month-view">
+      <div v-if="viewModeValue === 'month'" class="month-view">
         <div class="calendar-header">
           <div class="weekdays">
             <div v-for="day in weekdays" :key="day" class="weekday">
@@ -41,10 +41,10 @@
         </div>
         <div class="calendar-grid">
           <div
-            v-for="day in monthDays"
+            v-for="day in calendar.monthDays.value"
             :key="day.date.toISOString()"
             class="calendar-day"
-            :class="{ 'current-month': day.isCurrentMonth, 'today': isToday(day.date) }"
+            :class="{ 'current-month': day.isCurrentMonth, today: isToday(day.date) }"
           >
             <div class="day-header">
               <span class="day-number">{{ day.date.getDate() }}</span>
@@ -65,13 +65,13 @@
         </div>
       </div>
 
-      <div v-else-if="viewMode === 'week'" class="week-view">
+      <div v-else-if="viewModeValue === 'week'" class="week-view">
         <div class="week-grid">
           <div
-            v-for="day in weekDays"
+            v-for="day in calendar.weekDays.value"
             :key="day.date.toISOString()"
             class="week-day"
-            :class="{ 'today': isToday(day.date) }"
+            :class="{ today: isToday(day.date) }"
           >
             <div class="day-header">
               <div class="day-name">{{ formatDate(day.date, 'short') }}</div>
@@ -85,7 +85,7 @@
                 @click="selectTask(task)"
               >
                 <span class="task-title">{{ task.title }}</span>
-                <span class="task-time" v-if="task.start_time">
+                <span v-if="task.start_time" class="task-time">
                   {{ formatTime(task.start_time) }}
                 </span>
               </div>
@@ -96,10 +96,25 @@
 
       <div v-else class="day-view">
         <div class="day-header">
-          <h2 class="day-title">{{ formatDate(currentDate, 'long') }}</h2>
+          <h2 class="day-title">{{ formatDate(currentDateValue, 'long') }}</h2>
         </div>
-        <div class="time-slots">
-          <!-- Time slots would be implemented here -->
+        <div class="day-schedule">
+          <div v-for="hour in hours" :key="hour" class="time-slot-row">
+            <div class="time-label">{{ formatHour(hour) }}</div>
+            <div class="slot-content" @click="createTaskAtHour(hour)">
+              <div
+                v-for="task in getTasksAtHour(currentDateValue, hour)"
+                :key="task.id"
+                class="time-block-task"
+                :class="`priority-${task.priority}`"
+                :style="getTaskStyle(task)"
+                @click.stop="selectTask(task)"
+              >
+                <span class="task-title">{{ task.title }}</span>
+                <span v-if="task.end_time" class="task-end">{{ formatTime(task.end_time) }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -118,25 +133,26 @@ const task = useTask()
 const viewModes = [
   { value: 'month' as const, label: '月' },
   { value: 'week' as const, label: '周' },
-  { value: 'day' as const, label: '日' }
+  { value: 'day' as const, label: '日' },
 ]
 
 // Weekdays in Chinese
 const weekdays = ['日', '一', '二', '三', '四', '五', '六']
 
-// Computed properties
-const viewMode = computed(() => calendar.viewMode)
-const currentDate = computed(() => calendar.currentDate)
-const monthDays = computed(() => calendar.monthDays)
-const weekDays = computed(() => calendar.weekDays)
+// Hours for day view
+const hours = Array.from({ length: 24 }, (_, i) => i)
+
+// Computed properties that unwrap refs for template use
+const viewModeValue = computed(() => calendar.viewMode.value)
+const currentDateValue = computed(() => calendar.currentDate.value)
 
 const periodLabel = computed(() => {
-  if (viewMode.value === 'month') {
+  if (viewModeValue.value === 'month') {
     return calendar.monthName
-  } else if (viewMode.value === 'week') {
-    return `Week of ${calendar.formatDate(currentDate.value, 'medium')}`
+  } else if (viewModeValue.value === 'week') {
+    return `Week of ${calendar.formatDate(calendar.currentDate.value, 'medium')}`
   } else {
-    return calendar.formatDate(currentDate.value, 'long')
+    return calendar.formatDate(calendar.currentDate.value, 'long')
   }
 })
 
@@ -146,9 +162,9 @@ const goToToday = () => {
 }
 
 const goToPrev = () => {
-  if (viewMode.value === 'month') {
+  if (viewModeValue.value === 'month') {
     calendar.goToPrevMonth()
-  } else if (viewMode.value === 'week') {
+  } else if (viewModeValue.value === 'week') {
     calendar.goToPrevWeek()
   } else {
     calendar.goToPrevDay()
@@ -156,9 +172,9 @@ const goToPrev = () => {
 }
 
 const goToNext = () => {
-  if (viewMode.value === 'month') {
+  if (viewModeValue.value === 'month') {
     calendar.goToNextMonth()
-  } else if (viewMode.value === 'week') {
+  } else if (viewModeValue.value === 'week') {
     calendar.goToNextWeek()
   } else {
     calendar.goToNextDay()
@@ -171,9 +187,11 @@ const setViewMode = (mode: 'month' | 'week' | 'day') => {
 
 const isToday = (date: Date) => {
   const today = new Date()
-  return date.getDate() === today.getDate() &&
+  return (
+    date.getDate() === today.getDate() &&
     date.getMonth() === today.getMonth() &&
     date.getFullYear() === today.getFullYear()
+  )
 }
 
 const formatDate = (date: Date, format: 'short' | 'medium' | 'long') => {
@@ -185,8 +203,38 @@ const formatTime = (timeStr: string) => {
   return timeStr.substring(0, 5)
 }
 
-const selectTask = (task: any) => {
-  task.selectTask(task)
+const formatHour = (hour: number) => {
+  return `${hour.toString().padStart(2, '0')}:00`
+}
+
+const getTasksAtHour = (date: Date, hour: number) => {
+  const dateStr = date.toISOString().split('T')[0]
+  return calendar.getTasksForDate(date).filter((task: any) => {
+    if (!task.start_time) return false
+    const taskHour = parseInt(task.start_time.split(':')[0], 10)
+    return taskHour === hour
+  })
+}
+
+const getTaskStyle = (task: any) => {
+  if (!task.start_time || !task.end_time) return {}
+  const startHour = parseInt(task.start_time.split(':')[0], 10)
+  const endHour = parseInt(task.end_time.split(':')[0], 10)
+  const duration = Math.max(1, endHour - startHour)
+  return {
+    height: `${duration * 48 - 8}px`,
+  }
+}
+
+const createTaskAtHour = (hour: number) => {
+  // Pre-fill the due_date and start_time for new task
+  const dateStr = currentDateValue.value.toISOString().split('T')[0]
+  task.openTaskEditor()
+  // The task editor will handle the rest
+}
+
+const selectTask = (t: any) => {
+  task.selectTask(t)
 }
 </script>
 
@@ -370,10 +418,18 @@ const selectTask = (task: any) => {
   margin: 0 auto;
 }
 
-.task-dot.priority-0 { background-color: var(--color-priority-none); }
-.task-dot.priority-1 { background-color: var(--color-priority-low); }
-.task-dot.priority-2 { background-color: var(--color-priority-medium); }
-.task-dot.priority-3 { background-color: var(--color-priority-high); }
+.task-dot.priority-0 {
+  background-color: var(--color-priority-none);
+}
+.task-dot.priority-1 {
+  background-color: var(--color-priority-low);
+}
+.task-dot.priority-2 {
+  background-color: var(--color-priority-medium);
+}
+.task-dot.priority-3 {
+  background-color: var(--color-priority-high);
+}
 
 .more-tasks {
   font-size: var(--font-size-xs);
@@ -452,5 +508,99 @@ const selectTask = (task: any) => {
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   display: block;
+}
+
+/* Day view */
+.day-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.day-schedule {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.time-slot-row {
+  display: flex;
+  min-height: 48px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.time-slot-row:last-child {
+  border-bottom: none;
+}
+
+.time-label {
+  width: 60px;
+  flex-shrink: 0;
+  padding: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  border-right: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+}
+
+.slot-content {
+  flex: 1;
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  position: relative;
+  min-height: 48px;
+}
+
+.slot-content:hover {
+  background-color: var(--color-bg);
+}
+
+.time-block-task {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.time-block-task:hover {
+  opacity: 0.9;
+  transform: translateX(2px);
+}
+
+.time-block-task.priority-0 {
+  background-color: var(--color-priority-none);
+  color: white;
+}
+.time-block-task.priority-1 {
+  background-color: var(--color-priority-low);
+  color: white;
+}
+.time-block-task.priority-2 {
+  background-color: var(--color-priority-medium);
+  color: white;
+}
+.time-block-task.priority-3 {
+  background-color: var(--color-priority-high);
+  color: white;
+}
+
+.time-block-task .task-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.time-block-task .task-end {
+  font-size: var(--font-size-xs);
+  opacity: 0.8;
 }
 </style>

@@ -30,7 +30,10 @@ export function setupPomodoroHandlers(): void {
   ipcMain.handle('pomodoro:stats', handleGetPomodoroStats)
 }
 
-async function handleSavePomodoro(_event: Electron.IpcMainInvokeEvent, recordData: Partial<PomodoroRecord>): Promise<PomodoroRecord> {
+async function handleSavePomodoro(
+  _event: Electron.IpcMainInvokeEvent,
+  recordData: Partial<PomodoroRecord>
+): Promise<PomodoroRecord> {
   const db = getDatabase()
   const id = uuidv4()
 
@@ -40,7 +43,7 @@ async function handleSavePomodoro(_event: Electron.IpcMainInvokeEvent, recordDat
     duration: recordData.duration || 25,
     type: recordData.type || 'focus',
     started_at: recordData.started_at || new Date().toISOString(),
-    completed_at: recordData.completed_at || new Date().toISOString()
+    completed_at: recordData.completed_at || new Date().toISOString(),
   }
 
   const stmt = db.prepare(`
@@ -60,7 +63,10 @@ async function handleSavePomodoro(_event: Electron.IpcMainInvokeEvent, recordDat
   return record
 }
 
-async function handleGetPomodoroStats(_event: Electron.IpcMainInvokeEvent, range?: string): Promise<PomodoroStats> {
+async function handleGetPomodoroStats(
+  _event: Electron.IpcMainInvokeEvent,
+  _range?: string
+): Promise<PomodoroStats> {
   const db = getDatabase()
 
   // Default to last 30 days if no range specified
@@ -79,10 +85,21 @@ async function handleGetPomodoroStats(_event: Electron.IpcMainInvokeEvent, range
   const params: any[] = [startDateStr]
 
   const stmt = db.prepare(sql)
-  const result = stmt.get(...params) as {
-    total_focus_minutes: number | null
-    total_break_minutes: number | null
-    days_with_records: number
+  const result = stmt.get(...params) as
+    | {
+        total_focus_minutes: number | null
+        total_break_minutes: number | null
+        days_with_records: number
+      }
+    | undefined
+
+  if (!result) {
+    return {
+      total_focus_minutes: 0,
+      total_break_minutes: 0,
+      daily_average: 0,
+      streak_days: 0,
+    }
   }
 
   const totalFocus = result.total_focus_minutes || 0
@@ -109,13 +126,13 @@ async function handleGetPomodoroStats(_event: Electron.IpcMainInvokeEvent, range
     )
     SELECT MAX(streak) as streak_days
     FROM (
-      SELECT date,
-             ROW_NUMBER() OVER (ORDER BY date DESC) -
-             ROW_NUMBER() OVER (PARTITION BY focus_days.date IS NOT NULL ORDER BY date DESC) as streak_group
+      SELECT dates.date,
+             ROW_NUMBER() OVER (ORDER BY dates.date DESC) -
+             ROW_NUMBER() OVER (PARTITION BY focus_days.date IS NOT NULL ORDER BY dates.date DESC) as streak_group
       FROM dates
       LEFT JOIN focus_days ON dates.date = focus_days.date
     )
-    WHERE date IS NOT NULL
+    WHERE dates.date IS NOT NULL
     GROUP BY streak_group
     ORDER BY COUNT(*) DESC
     LIMIT 1
@@ -128,6 +145,6 @@ async function handleGetPomodoroStats(_event: Electron.IpcMainInvokeEvent, range
     total_focus_minutes: totalFocus,
     total_break_minutes: totalBreak,
     daily_average: dailyAverage,
-    streak_days: streakDays
+    streak_days: streakDays,
   }
 }

@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { useNoteStore } from '../stores/note.store'
-import type { Note, NoteFilters } from '../../electron/database/repositories/note.repo'
+import type { Note, NoteFilters } from '../types/repositories'
 
 export function useNote() {
   const noteStore = useNoteStore()
@@ -43,7 +43,7 @@ export function useNote() {
   }
 
   const togglePin = async (id: string) => {
-    const note = noteStore.notes.find(n => n.id === id)
+    const note = noteStore.notes.find((n) => n.id === id)
     if (note) {
       return noteStore.togglePin(id, !note.pinned)
     }
@@ -52,7 +52,7 @@ export function useNote() {
   // Note editor
   const openNoteEditor = (noteId?: string) => {
     if (noteId) {
-      const note = noteStore.notes.find(n => n.id === noteId)
+      const note = noteStore.notes.find((n) => n.id === noteId)
       editingNote.value = note ? { ...note } : { id: noteId }
     } else {
       editingNote.value = {
@@ -60,7 +60,7 @@ export function useNote() {
         content: '',
         color: '#FFFFFF',
         pinned: 0,
-        sort_order: Date.now()
+        sort_order: Date.now(),
       }
     }
   }
@@ -116,7 +116,7 @@ export function useNote() {
     '#FEF9C3', // Light Yellow
     '#D1FAE5', // Light Green
     '#CFFAFE', // Light Blue
-    '#FCE7F3'  // Light Pink
+    '#FCE7F3', // Light Pink
   ]
 
   const setNoteColor = async (noteId: string, color: string) => {
@@ -171,6 +171,6 @@ export function useNote() {
     clearSearch,
     setNoteColor,
     sortNotes,
-    init
+    init,
   }
 }

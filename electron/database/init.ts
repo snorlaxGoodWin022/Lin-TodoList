@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3'
 import { app } from 'electron'
 import { join } from 'path'
-import { existsSync, mkdirSync } from 'fs'
+import { existsSync, mkdirSync, readdirSync, unlinkSync, statSync } from 'fs'
 
 let db: Database.Database | null = null
 
@@ -58,6 +58,7 @@ function createTables(): void {
       list_id TEXT NOT NULL,
       tags TEXT DEFAULT '[]',
       quadrant INTEGER DEFAULT 0,
+      kanban_column INTEGER DEFAULT 0,
       completed INTEGER DEFAULT 0,
       completed_at TEXT,
       sort_order REAL DEFAULT 0,
@@ -70,16 +71,30 @@ function createTables(): void {
     )
   `)
 
-  // Lists table
+  // List groups table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS list_groups (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      color TEXT DEFAULT '#10B981',
+      sort_order REAL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  // Lists table (with group_id for grouping)
   db.exec(`
     CREATE TABLE IF NOT EXISTS lists (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       color TEXT DEFAULT '#10B981',
       icon TEXT DEFAULT 'folder',
+      group_id TEXT,
       sort_order REAL DEFAULT 0,
       created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (group_id) REFERENCES list_groups(id) ON DELETE SET NULL
     )
   `)
 
@@ -149,11 +164,39 @@ function createTables(): void {
     )
   `)
 
+  // Filter presets table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS filter_presets (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      filters TEXT NOT NULL,
+      is_default INTEGER DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  // Subtasks table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS subtasks (
+      id TEXT PRIMARY KEY,
+      parent_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      completed INTEGER DEFAULT 0,
+      sort_order REAL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (parent_id) REFERENCES tasks(id) ON DELETE CASCADE
+    )
+  `)
+
   // Create indexes for better performance
   db.exec('CREATE INDEX IF NOT EXISTS idx_tasks_list_id ON tasks(list_id)')
   db.exec('CREATE INDEX IF NOT EXISTS idx_tasks_due_date ON tasks(due_date)')
   db.exec('CREATE INDEX IF NOT EXISTS idx_tasks_completed ON tasks(completed)')
-  db.exec('CREATE INDEX IF NOT EXISTS idx_habit_records_habit_date ON habit_records(habit_id, date)')
+  db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_habit_records_habit_date ON habit_records(habit_id, date)'
+  )
 }
 
 function insertDefaultData(): void {
@@ -164,18 +207,12 @@ function insertDefaultData(): void {
 
   if (!inboxExists) {
     const now = new Date().toISOString()
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO lists (id, name, color, icon, sort_order, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      'inbox',
-      'Inbox',
-      '#10B981',
-      'inbox',
-      0,
-      now,
-      now
-    )
+    `
+    ).run('inbox', 'Inbox', '#10B981', 'inbox', 0, now, now)
     console.log('Default inbox list created')
   }
 }
@@ -190,24 +227,48 @@ export function closeDatabase(): void {
 // Backup database function
 export function backupDatabase(): string {
   const userDataPath = app.getPath('userData')
-  const dbDir = join(userDataPath, 'data')
   const backupDir = join(userDataPath, 'backup')
-  const dbPath = join(dbDir, 'todolist.db')
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
   const backupPath = join(backupDir, `todolist-backup-${timestamp}.db`)
 
-  const backupDb = new Database(backupPath)
   const mainDb = getDatabase()
 
   // Use backup API
   mainDb.backup(backupPath, {
-    progress: ({ totalPages, remainingPages }: { totalPages: number, remainingPages: number }) => {
-      const progress = ((totalPages - remainingPages) / totalPages * 100).toFixed(1)
+    progress: ({ totalPages, remainingPages }: { totalPages: number; remainingPages: number }) => {
+      const progress = (((totalPages - remainingPages) / totalPages) * 100).toFixed(1)
       console.log(`Backup progress: ${progress}%`)
       return 0
-    }
+    },
   })
 
   console.log(`Database backed up to ${backupPath}`)
+
+  // Clean up old backups (keep last 7)
+  cleanupOldBackups()
+
   return backupPath
+}
+
+// Clean up old backup files, keeping the most recent 7
+function cleanupOldBackups(): void {
+  const userDataPath = app.getPath('userData')
+  const backupDir = join(userDataPath, 'backup')
+
+  if (!existsSync(backupDir)) return
+
+  const files = readdirSync(backupDir)
+    .filter((f) => f.startsWith('todolist-backup-') && f.endsWith('.db'))
+    .map((f) => {
+      const filePath = join(backupDir, f)
+      return { name: f, path: filePath, time: statSync(filePath).mtime.getTime() }
+    })
+    .sort((a, b) => b.time - a.time)
+
+  // Keep the 7 most recent backups
+  const toDelete = files.slice(7)
+  for (const file of toDelete) {
+    unlinkSync(file.path)
+    console.log(`Deleted old backup: ${file.name}`)
+  }
 }

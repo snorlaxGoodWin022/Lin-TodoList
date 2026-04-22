@@ -38,34 +38,19 @@
         </div>
 
         <div class="timer-controls">
-          <button
-            v-if="!isRunning"
-            class="btn btn-primary"
-            @click="startTimer"
-          >
+          <button v-if="!isRunning" class="btn btn-primary" @click="startTimer">
             <Icon icon="mdi:play" class="btn-icon" />
             开始专注
           </button>
-          <button
-            v-else
-            class="btn btn-secondary"
-            @click="pauseTimer"
-          >
+          <button v-else class="btn btn-secondary" @click="pauseTimer">
             <Icon icon="mdi:pause" class="btn-icon" />
             暂停
           </button>
-          <button
-            class="btn btn-text"
-            @click="skipSession"
-            :disabled="!isRunning"
-          >
+          <button class="btn btn-text" :disabled="!isRunning" @click="skipSession">
             <Icon icon="mdi:skip-next" class="btn-icon" />
             跳过
           </button>
-          <button
-            class="btn btn-text"
-            @click="resetTimer"
-          >
+          <button class="btn btn-text" @click="resetTimer">
             <Icon icon="mdi:refresh" class="btn-icon" />
             重置
           </button>
@@ -75,19 +60,11 @@
           <div class="setting-item">
             <label class="setting-label">专注时长</label>
             <div class="setting-control">
-              <button
-                class="btn btn-icon"
-                @click="decrementFocusTime"
-                :disabled="isRunning"
-              >
+              <button class="btn btn-icon" :disabled="isRunning" @click="decrementFocusTime">
                 <Icon icon="mdi:minus" />
               </button>
               <span class="setting-value">{{ focusTime }}分钟</span>
-              <button
-                class="btn btn-icon"
-                @click="incrementFocusTime"
-                :disabled="isRunning"
-              >
+              <button class="btn btn-icon" :disabled="isRunning" @click="incrementFocusTime">
                 <Icon icon="mdi:plus" />
               </button>
             </div>
@@ -95,19 +72,11 @@
           <div class="setting-item">
             <label class="setting-label">休息时长</label>
             <div class="setting-control">
-              <button
-                class="btn btn-icon"
-                @click="decrementBreakTime"
-                :disabled="isRunning"
-              >
+              <button class="btn btn-icon" :disabled="isRunning" @click="decrementBreakTime">
                 <Icon icon="mdi:minus" />
               </button>
               <span class="setting-value">{{ breakTime }}分钟</span>
-              <button
-                class="btn btn-icon"
-                @click="incrementBreakTime"
-                :disabled="isRunning"
-              >
+              <button class="btn btn-icon" :disabled="isRunning" @click="incrementBreakTime">
                 <Icon icon="mdi:plus" />
               </button>
             </div>
@@ -129,13 +98,7 @@
           </div>
           <div v-if="currentSound" class="volume-control">
             <Icon icon="mdi:volume-high" />
-            <input
-              type="range"
-              min="0"
-              max="100"
-              v-model="volume"
-              class="volume-slider"
-            />
+            <input v-model="volume" type="range" min="0" max="100" class="volume-slider" />
           </div>
         </div>
 
@@ -144,6 +107,16 @@
             <Icon icon="mdi:open-in-new" />
             打开迷你窗口
           </button>
+        </div>
+
+        <div class="task-link-section">
+          <label class="setting-label">关联任务</label>
+          <select v-model="selectedTaskId" class="form-select">
+            <option value="">不关联任务</option>
+            <option v-for="task in pendingTasks" :key="task.id" :value="task.id">
+              {{ task.title }}
+            </option>
+          </select>
         </div>
       </div>
 
@@ -204,7 +177,9 @@
           <div v-else class="sessions-list">
             <div v-for="record in todayRecords" :key="record.id" class="session-item">
               <div class="session-type" :class="`type-${record.type}`">
-                <Icon :icon="record.type === 'focus' ? 'mdi:timer-outline' : 'mdi:coffee-outline'" />
+                <Icon
+                  :icon="record.type === 'focus' ? 'mdi:timer-outline' : 'mdi:coffee-outline'"
+                />
                 {{ record.type === 'focus' ? '专注' : '休息' }}
               </div>
               <div class="session-duration">{{ record.duration }}分钟</div>
@@ -221,7 +196,7 @@
             <div class="chart-bars">
               <div v-for="(day, index) in weekDays" :key="index" class="chart-bar-wrapper">
                 <div class="chart-bar" :style="{ height: getBarHeight(day.minutes) + 'px' }">
-                  <span class="bar-value" v-if="day.minutes > 0">{{ day.minutes }}</span>
+                  <span v-if="day.minutes > 0" class="bar-value">{{ day.minutes }}</span>
                 </div>
                 <span class="bar-label">{{ day.label }}</span>
               </div>
@@ -237,8 +212,10 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { usePomodoroStore } from '../stores/pomodoro.store'
+import { useTaskStore } from '../stores/task.store'
 
 const pomodoroStore = usePomodoroStore()
+const taskStore = useTaskStore()
 
 // Audio context for white noise
 let audioContext: AudioContext | null = null
@@ -253,6 +230,10 @@ const focusTime = ref(25) // 分钟
 const breakTime = ref(5) // 分钟
 const timerInterval = ref<NodeJS.Timeout | null>(null)
 
+// Task linking
+const selectedTaskId = ref('')
+const pendingTasks = computed(() => taskStore.pendingTasks)
+
 // White noise
 const currentSound = ref<string | null>(null)
 const volume = ref(50)
@@ -262,7 +243,7 @@ const sounds = [
   { id: 'forest', name: '森林', icon: 'mdi:tree' },
   { id: 'ocean', name: '海浪', icon: 'mdi:waves' },
   { id: 'fire', name: '篝火', icon: 'mdi:fire' },
-  { id: 'wind', name: '风声', icon: 'mdi:weather-windy' }
+  { id: 'wind', name: '风声', icon: 'mdi:weather-windy' },
 ]
 
 // Initialize audio context
@@ -299,13 +280,13 @@ const generateNoise = (type: string) => {
         data[i] = (Math.random() * 2 - 1) * 0.15 + Math.sin(i / 500) * 0.1
         break
       case 'ocean':
-        data[i] = (Math.random() * 2 - 1) * 0.4 * (1 + Math.sin(i / 1000)) / 2
+        data[i] = ((Math.random() * 2 - 1) * 0.4 * (1 + Math.sin(i / 1000))) / 2
         break
       case 'fire':
         data[i] = (Math.random() * 2 - 1) * 0.25 + (Math.random() > 0.98 ? 0.3 : 0)
         break
       case 'wind':
-        data[i] = (Math.random() * 2 - 1) * 0.35 * (1 + Math.sin(i / 2000)) / 2
+        data[i] = ((Math.random() * 2 - 1) * 0.35 * (1 + Math.sin(i / 2000))) / 2
         break
       default:
         data[i] = Math.random() * 2 - 1
@@ -407,7 +388,8 @@ const sessionComplete = async () => {
     await pomodoroStore.savePomodoro({
       type: isFocusMode.value ? 'focus' : 'break',
       duration: isFocusMode.value ? focusTime.value : breakTime.value,
-      completed_at: new Date().toISOString()
+      task_id: selectedTaskId.value || null,
+      completed_at: new Date().toISOString(),
     })
   } catch (err) {
     console.error('Error saving pomodoro record:', err)
@@ -477,19 +459,19 @@ const weekDays = computed(() => {
     date.setDate(date.getDate() - date.getDay() + i)
     const dateStr = date.toISOString().split('T')[0]
     const dayMinutes = todayRecords.value
-      .filter(r => r.type === 'focus' && r.completed_at?.startsWith(dateStr))
+      .filter((r) => r.type === 'focus' && r.completed_at?.startsWith(dateStr))
       .reduce((sum, r) => sum + (r.duration || 0), 0)
     days.push({
       label: labels[i],
       date: dateStr,
-      minutes: i === new Date().getDay() ? stats.value.total_focus_minutes : dayMinutes
+      minutes: i === new Date().getDay() ? stats.value.total_focus_minutes : dayMinutes,
     })
   }
   return days
 })
 
 const maxMinutes = computed(() => {
-  return Math.max(...weekDays.value.map(d => d.minutes), 60)
+  return Math.max(...weekDays.value.map((d) => d.minutes), 60)
 })
 
 const getBarHeight = (minutes: number) => {
@@ -652,7 +634,7 @@ onUnmounted(() => {
   padding: 8px 12px;
   border: 1px solid var(--color-border);
   border-radius: 20px;
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-secondary);
   font-size: 13px;
   cursor: pointer;
@@ -688,6 +670,20 @@ onUnmounted(() => {
 
 .mini-window-section {
   margin-top: 8px;
+}
+
+.task-link-section {
+  margin-top: 16px;
+}
+
+.task-link-section .form-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
 }
 
 .volume-slider::-webkit-slider-thumb {
@@ -735,7 +731,9 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 16px;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .stat-card:hover {
@@ -816,7 +814,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  background: var(--color-background);
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: 8px;
 }
@@ -832,13 +830,13 @@ onUnmounted(() => {
 }
 
 .session-type.type-focus {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10B981;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
 }
 
 .session-type.type-break {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3B82F6;
+  background: var(--color-primary-light);
+  color: var(--color-priority-low);
 }
 
 .session-duration {

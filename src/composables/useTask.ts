@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { useTaskStore } from '../stores/task.store'
 import { useListStore } from '../stores/list.store'
-import type { Task, TaskFilters } from '../../electron/database/repositories/task.repo'
+import type { Task, TaskFilters } from '../types/repositories'
 
 export function useTask() {
   const taskStore = useTaskStore()
@@ -20,9 +20,12 @@ export function useTask() {
   const pendingTasks = computed(() => taskStore.pendingTasks)
   const highPriorityTasks = computed(() => taskStore.highPriorityTasks)
   const todayTasks = computed(() => taskStore.todayTasks)
+  const tomorrowTasks = computed(() => taskStore.tomorrowTasks)
+  const thisWeekTasks = computed(() => taskStore.thisWeekTasks)
+  const allTasks = computed(() => taskStore.allTasks)
   const overdueTasks = computed(() => {
     const today = new Date().toISOString().split('T')[0]
-    return taskStore.pendingTasks.filter(t => t.due_date && t.due_date < today)
+    return taskStore.pendingTasks.filter((t) => t.due_date && t.due_date < today)
   })
 
   // Task selection
@@ -73,23 +76,13 @@ export function useTask() {
     taskStore.clearSearch()
   }
 
-  // Task editor
+  // Task editor - delegate to store
   const openTaskEditor = (taskId?: string) => {
-    if (taskId) {
-      const task = taskStore.tasks.find(t => t.id === taskId)
-      editingTask.value = task ? { ...task } : { id: taskId }
-    } else {
-      editingTask.value = {
-        title: '',
-        description: '',
-        priority: 1,
-        list_id: currentList.value?.id || 'inbox'
-      }
-    }
+    taskStore.openTaskEditor(taskId)
   }
 
   const closeTaskEditor = () => {
-    editingTask.value = null
+    taskStore.closeTaskEditor()
   }
 
   const saveTask = async () => {
@@ -121,6 +114,9 @@ export function useTask() {
     pendingTasks,
     highPriorityTasks,
     todayTasks,
+    tomorrowTasks,
+    thisWeekTasks,
+    allTasks,
     overdueTasks,
     selectedTask,
     detailPanelCollapsed,
@@ -142,6 +138,6 @@ export function useTask() {
     openTaskEditor,
     closeTaskEditor,
     saveTask,
-    init
+    init,
   }
 }

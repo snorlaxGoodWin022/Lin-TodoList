@@ -1,21 +1,24 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { Task, TaskFilters } from './database/repositories/task.repo'
-import type { List } from './database/repositories/list.repo'
-import type { Habit, HabitRecord, HabitFilters } from './database/repositories/habit.repo'
-import type { Note, NoteFilters } from './database/repositories/note.repo'
-import type { PomodoroRecord, PomodoroStats } from './database/repositories/pomodoro.repo'
+import type { List, ListGroup } from './database/repositories/list.repo'
+import type { Habit } from './database/repositories/habit.repo'
+import type { Note } from './database/repositories/note.repo'
+import type { PomodoroRecord } from './database/repositories/pomodoro.repo'
 import type { Tag } from './database/repositories/tag.repo'
+import type { FilterPreset } from './database/repositories/filterPreset.repo'
+import type { Subtask } from './database/repositories/subtask.repo'
 import type { NotificationOptions } from './services/notification'
 
 // Custom APIs for renderer
 const api = {
   // Task operations
-  getTasks: (filters: TaskFilters) => ipcRenderer.invoke('task:all', filters),
+  getTasks: (filters: TaskFilters) => ipcRenderer.invoke('task:list', filters),
   createTask: (data: Partial<Task>) => ipcRenderer.invoke('task:create', data),
   updateTask: (id: string, data: Partial<Task>) => ipcRenderer.invoke('task:update', id, data),
   deleteTask: (id: string) => ipcRenderer.invoke('task:delete', id),
-  toggleTaskCompletion: (id: string, completed: boolean) => ipcRenderer.invoke('task:toggle', id, completed),
+  toggleTaskCompletion: (id: string, completed: boolean) =>
+    ipcRenderer.invoke('task:toggle', id, completed),
 
   // List operations
   getLists: () => ipcRenderer.invoke('list:all'),
@@ -23,13 +26,21 @@ const api = {
   updateList: (id: string, data: Partial<List>) => ipcRenderer.invoke('list:update', id, data),
   deleteList: (id: string) => ipcRenderer.invoke('list:delete', id),
 
+  // List group operations
+  getListGroups: () => ipcRenderer.invoke('listGroup:all'),
+  createListGroup: (data: Partial<ListGroup>) => ipcRenderer.invoke('listGroup:create', data),
+  updateListGroup: (id: string, data: Partial<ListGroup>) =>
+    ipcRenderer.invoke('listGroup:update', id, data),
+  deleteListGroup: (id: string) => ipcRenderer.invoke('listGroup:delete', id),
+
   // Habit operations
   getHabits: () => ipcRenderer.invoke('habit:all'),
   createHabit: (data: Partial<Habit>) => ipcRenderer.invoke('habit:create', data),
   updateHabit: (id: string, data: Partial<Habit>) => ipcRenderer.invoke('habit:update', id, data),
   deleteHabit: (id: string) => ipcRenderer.invoke('habit:delete', id),
   toggleHabit: (id: string, date: string) => ipcRenderer.invoke('habit:toggle', id, date),
-  getHabitRecords: (habitId: string, month?: string) => ipcRenderer.invoke('habit:records', habitId, month),
+  getHabitRecords: (habitId: string, month?: string) =>
+    ipcRenderer.invoke('habit:records', habitId, month),
 
   // Note operations
   getNotes: () => ipcRenderer.invoke('note:all'),
@@ -47,14 +58,32 @@ const api = {
   updateTag: (id: string, data: Partial<Tag>) => ipcRenderer.invoke('tag:update', id, data),
   deleteTag: (id: string) => ipcRenderer.invoke('tag:delete', id),
 
+  // Filter preset operations
+  getFilterPresets: () => ipcRenderer.invoke('filterPreset:all'),
+  createFilterPreset: (data: Partial<FilterPreset>) =>
+    ipcRenderer.invoke('filterPreset:create', data),
+  updateFilterPreset: (id: string, data: Partial<FilterPreset>) =>
+    ipcRenderer.invoke('filterPreset:update', id, data),
+  deleteFilterPreset: (id: string) => ipcRenderer.invoke('filterPreset:delete', id),
+
+  // Subtask operations
+  getSubtasks: (filters: { parentId?: string }) => ipcRenderer.invoke('subtask:all', filters),
+  createSubtask: (data: Partial<Subtask>) => ipcRenderer.invoke('subtask:create', data),
+  updateSubtask: (id: string, data: Partial<Subtask>) =>
+    ipcRenderer.invoke('subtask:update', id, data),
+  deleteSubtask: (id: string) => ipcRenderer.invoke('subtask:delete', id),
+
   // System operations
-  showNotification: (options: NotificationOptions) => ipcRenderer.invoke('notification:show', options),
+  showNotification: (options: NotificationOptions) =>
+    ipcRenderer.invoke('notification:show', options),
   getAppVersion: () => ipcRenderer.invoke('app:getVersion'),
   getUserDataPath: () => ipcRenderer.invoke('app:getPath', 'userData'),
 
   // Event listeners
-  onReminder: (callback) => ipcRenderer.on('reminder:trigger', (_, data) => callback(data)),
-  onDatabaseChange: (callback) => ipcRenderer.on('database:change', (_, data) => callback(data)),
+  onReminder: (callback: (data: any) => void) =>
+    ipcRenderer.on('reminder:trigger', (_, _data: any) => callback(_data)),
+  onDatabaseChange: (callback: (data: any) => void) =>
+    ipcRenderer.on('database:change', (_, _data: any) => callback(_data)),
 
   // Shortcut listeners
   onShortcut: (action: string, callback: () => void) => {
@@ -67,20 +96,24 @@ const api = {
   closeWindow: () => ipcRenderer.send('window:close'),
 
   // Mini window
-  openMiniWindow: () => ipcRenderer.invoke('mini-window:create')
+  openMiniWindow: () => ipcRenderer.invoke('mini-window:create'),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
+console.log('[Preload] Starting, contextIsolated:', process.contextIsolated)
 if (process.contextIsolated) {
   try {
+    console.log('[Preload] Exposing APIs with contextBridge')
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('electronAPI', api)
+    console.log('[Preload] APIs exposed successfully')
   } catch (error) {
-    console.error(error)
+    console.error('[Preload] Error:', error)
   }
 } else {
+  console.log('[Preload] Context isolation disabled, adding to window directly')
   // @ts-ignore (define in dts)
   window.electron = electronAPI
   // @ts-ignore (define in dts)

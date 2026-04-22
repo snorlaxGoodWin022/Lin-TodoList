@@ -1,6 +1,6 @@
 import { ref, computed, onUnmounted } from 'vue'
 import { usePomodoroStore } from '../stores/pomodoro.store'
-import type { PomodoroRecord } from '../../electron/database/repositories/pomodoro.repo'
+import type { PomodoroRecord } from '../types/repositories'
 
 export function usePomodoro() {
   const pomodoroStore = usePomodoroStore()
@@ -23,9 +23,8 @@ export function usePomodoro() {
 
   // Computed values
   const progressPercentage = computed(() => {
-    const totalSeconds = timerType.value === 'focus'
-      ? focusDuration.value * 60
-      : breakDuration.value * 60
+    const totalSeconds =
+      timerType.value === 'focus' ? focusDuration.value * 60 : breakDuration.value * 60
     return ((totalSeconds - remainingSeconds.value) / totalSeconds) * 100
   })
 
@@ -36,7 +35,10 @@ export function usePomodoro() {
   })
 
   const isLongBreak = computed(() => {
-    return focusSessionsCompleted.value % longBreakInterval.value === 0 && focusSessionsCompleted.value > 0
+    return (
+      focusSessionsCompleted.value % longBreakInterval.value === 0 &&
+      focusSessionsCompleted.value > 0
+    )
   })
 
   // Timer actions
@@ -77,10 +79,15 @@ export function usePomodoro() {
     // Save the completed session
     const record: Partial<PomodoroRecord> = {
       task_id: currentSessionTaskId.value || null,
-      duration: timerType.value === 'focus' ? focusDuration.value : (isLongBreak.value ? longBreakDuration.value : breakDuration.value),
+      duration:
+        timerType.value === 'focus'
+          ? focusDuration.value
+          : isLongBreak.value
+            ? longBreakDuration.value
+            : breakDuration.value,
       type: timerType.value,
-      started_at: new Date(Date.now() - (remainingSeconds.value * 1000)).toISOString(),
-      completed_at: new Date().toISOString()
+      started_at: new Date(Date.now() - remainingSeconds.value * 1000).toISOString(),
+      completed_at: new Date().toISOString(),
     }
 
     await pomodoroStore.savePomodoro(record)
@@ -103,9 +110,10 @@ export function usePomodoro() {
 
   const setTimerType = (type: 'focus' | 'break') => {
     timerType.value = type
-    remainingSeconds.value = type === 'focus'
-      ? focusDuration.value * 60
-      : (isLongBreak.value ? longBreakDuration.value : breakDuration.value) * 60
+    remainingSeconds.value =
+      type === 'focus'
+        ? focusDuration.value * 60
+        : (isLongBreak.value ? longBreakDuration.value : breakDuration.value) * 60
   }
 
   const setFocusDuration = (minutes: number) => {
@@ -172,6 +180,6 @@ export function usePomodoro() {
     setBreakDuration,
     setLongBreakDuration,
     setLongBreakInterval,
-    loadStats
+    loadStats,
   }
 }
