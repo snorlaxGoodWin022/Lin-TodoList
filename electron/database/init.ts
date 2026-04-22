@@ -71,16 +71,30 @@ function createTables(): void {
     )
   `)
 
-  // Lists table
+  // List groups table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS list_groups (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      color TEXT DEFAULT '#10B981',
+      sort_order REAL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  // Lists table (with group_id for grouping)
   db.exec(`
     CREATE TABLE IF NOT EXISTS lists (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       color TEXT DEFAULT '#10B981',
       icon TEXT DEFAULT 'folder',
+      group_id TEXT,
       sort_order REAL DEFAULT 0,
       created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (group_id) REFERENCES list_groups(id) ON DELETE SET NULL
     )
   `)
 

@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { Task, TaskFilters } from './database/repositories/task.repo'
-import type { List } from './database/repositories/list.repo'
+import type { List, ListGroup } from './database/repositories/list.repo'
 import type { Habit } from './database/repositories/habit.repo'
 import type { Note } from './database/repositories/note.repo'
 import type { PomodoroRecord } from './database/repositories/pomodoro.repo'
@@ -25,6 +25,13 @@ const api = {
   createList: (data: Partial<List>) => ipcRenderer.invoke('list:create', data),
   updateList: (id: string, data: Partial<List>) => ipcRenderer.invoke('list:update', id, data),
   deleteList: (id: string) => ipcRenderer.invoke('list:delete', id),
+
+  // List group operations
+  getListGroups: () => ipcRenderer.invoke('listGroup:all'),
+  createListGroup: (data: Partial<ListGroup>) => ipcRenderer.invoke('listGroup:create', data),
+  updateListGroup: (id: string, data: Partial<ListGroup>) =>
+    ipcRenderer.invoke('listGroup:update', id, data),
+  deleteListGroup: (id: string) => ipcRenderer.invoke('listGroup:delete', id),
 
   // Habit operations
   getHabits: () => ipcRenderer.invoke('habit:all'),

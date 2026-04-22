@@ -43,6 +43,16 @@ export interface List {
   name: string
   icon: string
   color: string
+  group_id: string | null
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
+export interface ListGroup {
+  id: string
+  name: string
+  color: string
   sort_order: number
   created_at: string
   updated_at: string

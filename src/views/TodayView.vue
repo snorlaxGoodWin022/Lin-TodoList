@@ -172,18 +172,28 @@ const onDragEnd = async (event: any) => {
   // If nothing moved, skip
   if (oldIndex === newIndex && from === to) return
 
-  const section = from.dataset?.section
-  if (!section) return
+  const fromSection = from.dataset?.section
+  const toSection = to.dataset?.section
+  if (!fromSection) return
 
   try {
-    // Get the tasks array for this section
-    const tasks = section === 'overdue' ? overdueTasks.value : todayTasks.value
-
-    // Update sort_order for all tasks in the section based on their current order
-    for (let i = 0; i < tasks.length; i++) {
+    // Update source section tasks
+    const fromTasks = fromSection === 'overdue' ? overdueTasks.value : todayTasks.value
+    for (let i = 0; i < fromTasks.length; i++) {
       const sortOrder = (i + 1) * 1000
-      if (tasks[i].sort_order !== sortOrder) {
-        await task.updateTask(tasks[i].id, { sort_order: sortOrder })
+      if (fromTasks[i].sort_order !== sortOrder) {
+        await task.updateTask(fromTasks[i].id, { sort_order: sortOrder })
+      }
+    }
+
+    // If moved between different sections, also update destination section
+    if (fromSection !== toSection && toSection) {
+      const toTasks = toSection === 'overdue' ? overdueTasks.value : todayTasks.value
+      for (let i = 0; i < toTasks.length; i++) {
+        const sortOrder = (i + 1) * 1000
+        if (toTasks[i].sort_order !== sortOrder) {
+          await task.updateTask(toTasks[i].id, { sort_order: sortOrder })
+        }
       }
     }
   } catch (err) {

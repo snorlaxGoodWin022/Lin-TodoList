@@ -254,7 +254,8 @@ async function handleUpdateTask(
       fields.push('completed_at = ?')
       values.push(new Date().toISOString())
     } else {
-      fields.push('completed_at = NULL')
+      fields.push('completed_at = ?')
+      values.push(null)
     }
   }
 

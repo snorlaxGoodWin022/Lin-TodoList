@@ -1,7 +1,7 @@
 // Type definitions for Electron API exposed via preload script
 
 import type { Task, TaskFilters } from '../../electron/database/repositories/task.repo'
-import type { List } from '../../electron/database/repositories/list.repo'
+import type { List, ListGroup } from '../../electron/database/repositories/list.repo'
 import type {
   Habit,
   HabitFilters,
@@ -29,6 +29,12 @@ export interface ElectronAPI {
   createList: (data: Partial<List>) => Promise<List>
   updateList: (id: string, data: Partial<List>) => Promise<boolean>
   deleteList: (id: string) => Promise<boolean>
+
+  // List group operations
+  getListGroups: () => Promise<ListGroup[]>
+  createListGroup: (data: Partial<ListGroup>) => Promise<ListGroup>
+  updateListGroup: (id: string, data: Partial<ListGroup>) => Promise<boolean>
+  deleteListGroup: (id: string) => Promise<boolean>
 
   // Habit operations
   getHabits: (filters?: HabitFilters) => Promise<Habit[]>

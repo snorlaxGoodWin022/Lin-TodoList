@@ -8,14 +8,17 @@ export interface SubtaskCreateData {
 }
 
 export const useSubtaskStore = defineStore('subtask', () => {
-  // State
-  const subtasks = ref<Subtask[]>([])
+  // State - use Map keyed by parent_id to avoid race conditions
+  const subtasksByParent = ref<Map<string, Subtask[]>>(new Map())
   const loading = ref(false)
   const error = ref<string | null>(null)
 
+  // Track which parentIds have been loaded
+  const loadedParents = ref<Set<string>>(new Set())
+
   // Getters
   const getSubtasksByParentId = computed(() => {
-    return (parentId: string) => subtasks.value.filter((s) => s.parent_id === parentId)
+    return (parentId: string) => subtasksByParent.value.get(parentId) || []
   })
 
   // Actions
@@ -23,7 +26,8 @@ export const useSubtaskStore = defineStore('subtask', () => {
     try {
       loading.value = true
       const result = await window.electronAPI.getSubtasks({ parentId })
-      subtasks.value = result
+      subtasksByParent.value.set(parentId, result)
+      loadedParents.value.add(parentId)
       error.value = null
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load subtasks'
@@ -37,7 +41,9 @@ export const useSubtaskStore = defineStore('subtask', () => {
     try {
       loading.value = true
       const newSubtask = await window.electronAPI.createSubtask(data)
-      subtasks.value.unshift(newSubtask)
+      // Add to the parent's subtasks list
+      const parentSubtasks = subtasksByParent.value.get(data.parent_id) || []
+      subtasksByParent.value.set(data.parent_id, [newSubtask, ...parentSubtasks])
       error.value = null
       return newSubtask
     } catch (err) {
@@ -54,9 +60,14 @@ export const useSubtaskStore = defineStore('subtask', () => {
       loading.value = true
       const success = await window.electronAPI.updateSubtask(id, updates)
       if (success) {
-        const index = subtasks.value.findIndex((s) => s.id === id)
-        if (index !== -1) {
-          subtasks.value[index] = { ...subtasks.value[index], ...updates }
+        // Find and update in the map
+        for (const [parentId, subtasks] of subtasksByParent.value.entries()) {
+          const index = subtasks.findIndex((s) => s.id === id)
+          if (index !== -1) {
+            subtasks[index] = { ...subtasks[index], ...updates }
+            subtasksByParent.value.set(parentId, [...subtasks])
+            break
+          }
         }
       }
       error.value = null
@@ -75,7 +86,14 @@ export const useSubtaskStore = defineStore('subtask', () => {
       loading.value = true
       const success = await window.electronAPI.deleteSubtask(id)
       if (success) {
-        subtasks.value = subtasks.value.filter((s) => s.id !== id)
+        // Find and remove from the map
+        for (const [parentId, subtasks] of subtasksByParent.value.entries()) {
+          const filtered = subtasks.filter((s) => s.id !== id)
+          if (filtered.length !== subtasks.length) {
+            subtasksByParent.value.set(parentId, filtered)
+            break
+          }
+        }
       }
       error.value = null
       return success
@@ -94,7 +112,7 @@ export const useSubtaskStore = defineStore('subtask', () => {
 
   return {
     // State
-    subtasks,
+    subtasksByParent,
     loading,
     error,
 
