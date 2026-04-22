@@ -93,7 +93,7 @@ function createWindow(): void {
   }
 
   // Load the index.html of the app.
-  if (import.meta.env.DEV) {
+  if (!app.isPackaged) {
     mainWindow.loadURL('http://localhost:5173')
     mainWindow.webContents.openDevTools()
   } else {
@@ -154,7 +154,7 @@ function createMiniWindow(): void {
     },
   })
 
-  if (import.meta.env.DEV) {
+  if (!app.isPackaged) {
     miniWindow.loadURL('http://localhost:5173/mini.html')
   } else {
     miniWindow.loadFile(join(__dirname, '../dist/mini.html'))
