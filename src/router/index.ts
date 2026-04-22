@@ -10,49 +10,49 @@ import NoteView from '../views/NoteView.vue'
 const routes = [
   {
     path: '/',
-    redirect: '/today'
+    redirect: '/today',
   },
   {
     path: '/today',
     name: 'Today',
-    component: TodayView
+    component: TodayView,
   },
   {
     path: '/calendar',
     name: 'Calendar',
-    component: CalendarPage
+    component: CalendarPage,
   },
   {
     path: '/lists/:id',
     name: 'List',
     component: ListView,
-    props: true
+    props: true,
   },
   {
     path: '/quadrant',
     name: 'Quadrant',
-    component: QuadrantView
+    component: QuadrantView,
   },
   {
     path: '/pomodoro',
     name: 'Pomodoro',
-    component: PomodoroView
+    component: PomodoroView,
   },
   {
     path: '/habits',
     name: 'Habits',
-    component: HabitView
+    component: HabitView,
   },
   {
     path: '/notes',
     name: 'Notes',
-    component: NoteView
-  }
+    component: NoteView,
+  },
 ]
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes,
 })
 
 export default router

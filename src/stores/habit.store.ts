@@ -12,8 +12,8 @@ export const useHabitStore = defineStore('habit', () => {
   const error = ref<string | null>(null)
 
   // Getters
-  const activeHabits = computed(() => habits.value.filter(habit => habit.archived === 0))
-  const archivedHabits = computed(() => habits.value.filter(habit => habit.archived === 1))
+  const activeHabits = computed(() => habits.value.filter((habit) => habit.archived === 0))
+  const archivedHabits = computed(() => habits.value.filter((habit) => habit.archived === 1))
 
   // Actions
   const loadHabits = async (newFilters?: HabitFilters) => {
@@ -54,7 +54,7 @@ export const useHabitStore = defineStore('habit', () => {
       loading.value = true
       const success = await window.electronAPI.updateHabit(id, updates)
       if (success) {
-        const index = habits.value.findIndex(habit => habit.id === id)
+        const index = habits.value.findIndex((habit) => habit.id === id)
         if (index !== -1) {
           habits.value[index] = { ...habits.value[index], ...updates }
         }
@@ -75,7 +75,7 @@ export const useHabitStore = defineStore('habit', () => {
       loading.value = true
       const success = await window.electronAPI.deleteHabit(id)
       if (success) {
-        habits.value = habits.value.filter(habit => habit.id !== id)
+        habits.value = habits.value.filter((habit) => habit.id !== id)
       }
       error.value = null
       return success
@@ -129,7 +129,7 @@ export const useHabitStore = defineStore('habit', () => {
 
   const openHabitEditor = (habitId?: string) => {
     if (habitId) {
-      const habit = habits.value.find(h => h.id === habitId)
+      const habit = habits.value.find((h) => h.id === habitId)
       editingHabit.value = habit ? { ...habit } : null
     } else {
       editingHabit.value = {}
@@ -168,6 +168,6 @@ export const useHabitStore = defineStore('habit', () => {
     getHabitRecords,
     openHabitEditor,
     closeHabitEditor,
-    init
+    init,
   }
 })

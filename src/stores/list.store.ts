@@ -12,7 +12,7 @@ export const useListStore = defineStore('list', () => {
 
   // Getters
   const selectedList = computed(() => {
-    return lists.value.find(list => list.id === selectedListId.value)
+    return lists.value.find((list) => list.id === selectedListId.value)
   })
 
   // Actions
@@ -51,7 +51,7 @@ export const useListStore = defineStore('list', () => {
       loading.value = true
       const success = await window.electronAPI.updateList(id, updates)
       if (success) {
-        const index = lists.value.findIndex(list => list.id === id)
+        const index = lists.value.findIndex((list) => list.id === id)
         if (index !== -1) {
           lists.value[index] = { ...lists.value[index], ...updates }
         }
@@ -72,7 +72,7 @@ export const useListStore = defineStore('list', () => {
       loading.value = true
       const success = await window.electronAPI.deleteList(id)
       if (success) {
-        lists.value = lists.value.filter(list => list.id !== id)
+        lists.value = lists.value.filter((list) => list.id !== id)
         if (selectedListId.value === id) {
           selectedListId.value = 'inbox'
         }
@@ -94,7 +94,7 @@ export const useListStore = defineStore('list', () => {
 
   const openListEditor = (listId?: string) => {
     if (listId) {
-      const list = lists.value.find(l => l.id === listId)
+      const list = lists.value.find((l) => l.id === listId)
       editingList.value = list ? { ...list } : null
     } else {
       editingList.value = {}
@@ -106,7 +106,7 @@ export const useListStore = defineStore('list', () => {
   }
 
   const getListById = (listId: string) => {
-    return lists.value.find(l => l.id === listId)
+    return lists.value.find((l) => l.id === listId)
   }
 
   // Initial load
@@ -134,6 +134,6 @@ export const useListStore = defineStore('list', () => {
     openListEditor,
     closeListEditor,
     getListById,
-    init
+    init,
   }
 })

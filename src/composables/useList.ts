@@ -16,7 +16,7 @@ export function useList() {
 
   // Get list by ID
   const getListById = (id: string) => {
-    return listStore.lists.find(list => list.id === id)
+    return listStore.lists.find((list) => list.id === id)
   }
 
   // Actions
@@ -44,13 +44,13 @@ export function useList() {
   // List editor
   const openListEditor = (listId?: string) => {
     if (listId) {
-      const list = listStore.lists.find(l => l.id === listId)
+      const list = listStore.lists.find((l) => l.id === listId)
       editingList.value = list ? { ...list } : { id: listId }
     } else {
       editingList.value = {
         name: '',
         color: '#10B981',
-        icon: 'list'
+        icon: 'list',
       }
     }
   }
@@ -98,6 +98,6 @@ export function useList() {
     closeListEditor,
     saveList,
     getListById,
-    init
+    init,
   }
 }

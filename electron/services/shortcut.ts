@@ -1,4 +1,4 @@
-import { BrowserWindow, globalShortcut, ipcMain, app } from 'electron'
+import { BrowserWindow, globalShortcut } from 'electron'
 
 export function registerShortcuts(mainWindow: BrowserWindow | null): void {
   if (!mainWindow) return
@@ -8,14 +8,14 @@ export function registerShortcuts(mainWindow: BrowserWindow | null): void {
     { accelerator: 'CmdOrCtrl+N', action: 'shortcut:new-task' },
     { accelerator: 'CmdOrCtrl+Shift+N', action: 'shortcut:new-note' },
     { accelerator: 'CmdOrCtrl+F', action: 'shortcut:search' },
-    { accelerator: 'CmdOrCtrl+Shift+P', action: 'shortcut:pomodoro' }
+    { accelerator: 'CmdOrCtrl+Shift+P', action: 'shortcut:pomodoro' },
   ]
 
   // View switching shortcuts (Ctrl+1~6)
   for (let i = 1; i <= 6; i++) {
     shortcuts.push({
       accelerator: `CmdOrCtrl+${i}`,
-      action: `shortcut:switch-view:${i}`
+      action: `shortcut:switch-view:${i}`,
     })
   }
 

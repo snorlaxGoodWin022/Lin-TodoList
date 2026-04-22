@@ -153,7 +153,9 @@ function createTables(): void {
   db.exec('CREATE INDEX IF NOT EXISTS idx_tasks_list_id ON tasks(list_id)')
   db.exec('CREATE INDEX IF NOT EXISTS idx_tasks_due_date ON tasks(due_date)')
   db.exec('CREATE INDEX IF NOT EXISTS idx_tasks_completed ON tasks(completed)')
-  db.exec('CREATE INDEX IF NOT EXISTS idx_habit_records_habit_date ON habit_records(habit_id, date)')
+  db.exec(
+    'CREATE INDEX IF NOT EXISTS idx_habit_records_habit_date ON habit_records(habit_id, date)'
+  )
 }
 
 function insertDefaultData(): void {
@@ -164,18 +166,12 @@ function insertDefaultData(): void {
 
   if (!inboxExists) {
     const now = new Date().toISOString()
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO lists (id, name, color, icon, sort_order, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      'inbox',
-      'Inbox',
-      '#10B981',
-      'inbox',
-      0,
-      now,
-      now
-    )
+    `
+    ).run('inbox', 'Inbox', '#10B981', 'inbox', 0, now, now)
     console.log('Default inbox list created')
   }
 }
@@ -190,22 +186,19 @@ export function closeDatabase(): void {
 // Backup database function
 export function backupDatabase(): string {
   const userDataPath = app.getPath('userData')
-  const dbDir = join(userDataPath, 'data')
   const backupDir = join(userDataPath, 'backup')
-  const dbPath = join(dbDir, 'todolist.db')
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
   const backupPath = join(backupDir, `todolist-backup-${timestamp}.db`)
 
-  const backupDb = new Database(backupPath)
   const mainDb = getDatabase()
 
   // Use backup API
   mainDb.backup(backupPath, {
-    progress: ({ totalPages, remainingPages }: { totalPages: number, remainingPages: number }) => {
-      const progress = ((totalPages - remainingPages) / totalPages * 100).toFixed(1)
+    progress: ({ totalPages, remainingPages }: { totalPages: number; remainingPages: number }) => {
+      const progress = (((totalPages - remainingPages) / totalPages) * 100).toFixed(1)
       console.log(`Backup progress: ${progress}%`)
       return 0
-    }
+    },
   })
 
   console.log(`Database backed up to ${backupPath}`)
@@ -224,8 +217,8 @@ function cleanupOldBackups(): void {
   if (!existsSync(backupDir)) return
 
   const files = readdirSync(backupDir)
-    .filter(f => f.startsWith('todolist-backup-') && f.endsWith('.db'))
-    .map(f => {
+    .filter((f) => f.startsWith('todolist-backup-') && f.endsWith('.db'))
+    .map((f) => {
       const filePath = join(backupDir, f)
       return { name: f, path: filePath, time: statSync(filePath).mtime.getTime() }
     })

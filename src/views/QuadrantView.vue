@@ -99,19 +99,19 @@ const taskStore = useTaskStore()
 
 // 计算各个象限的任务
 const quadrant1Tasks = computed(() => {
-  return taskStore.tasks.filter(task => task.quadrant === 1 && !task.completed)
+  return taskStore.tasks.filter((task) => task.quadrant === 1 && !task.completed)
 })
 
 const quadrant2Tasks = computed(() => {
-  return taskStore.tasks.filter(task => task.quadrant === 2 && !task.completed)
+  return taskStore.tasks.filter((task) => task.quadrant === 2 && !task.completed)
 })
 
 const quadrant3Tasks = computed(() => {
-  return taskStore.tasks.filter(task => task.quadrant === 3 && !task.completed)
+  return taskStore.tasks.filter((task) => task.quadrant === 3 && !task.completed)
 })
 
 const quadrant4Tasks = computed(() => {
-  return taskStore.tasks.filter(task => task.quadrant === 4 && !task.completed)
+  return taskStore.tasks.filter((task) => task.quadrant === 4 && !task.completed)
 })
 
 const selectTask = (task: any) => {
@@ -158,7 +158,9 @@ const selectTask = (task: any) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .quadrant:hover {
@@ -226,34 +228,34 @@ const selectTask = (task: any) => {
 
 /* 象限特定样式 */
 .quadrant-1 {
-  border-top: 4px solid #EF4444;
+  border-top: 4px solid #ef4444;
 }
 
 .quadrant-2 {
-  border-top: 4px solid #10B981;
+  border-top: 4px solid #10b981;
 }
 
 .quadrant-3 {
-  border-top: 4px solid #F59E0B;
+  border-top: 4px solid #f59e0b;
 }
 
 .quadrant-4 {
-  border-top: 4px solid #6B7280;
+  border-top: 4px solid #6b7280;
 }
 
 .quadrant-1 .quadrant-title {
-  color: #EF4444;
+  color: #ef4444;
 }
 
 .quadrant-2 .quadrant-title {
-  color: #10B981;
+  color: #10b981;
 }
 
 .quadrant-3 .quadrant-title {
-  color: #F59E0B;
+  color: #f59e0b;
 }
 
 .quadrant-4 .quadrant-title {
-  color: #6B7280;
+  color: #6b7280;
 }
 </style>

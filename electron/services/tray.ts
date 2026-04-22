@@ -41,7 +41,7 @@ export function createTray(mainWindow: BrowserWindow | null): void {
           mainWindow.show()
           mainWindow.focus()
         }
-      }
+      },
     },
     {
       label: '新建任务',
@@ -50,7 +50,7 @@ export function createTray(mainWindow: BrowserWindow | null): void {
         if (mainWindow && !mainWindow.isDestroyed()) {
           mainWindow.webContents.send('shortcut:new-task')
         }
-      }
+      },
     },
     {
       label: '开始番茄钟',
@@ -59,7 +59,7 @@ export function createTray(mainWindow: BrowserWindow | null): void {
         if (mainWindow && !mainWindow.isDestroyed()) {
           mainWindow.webContents.send('shortcut:pomodoro')
         }
-      }
+      },
     },
     { type: 'separator' },
     {
@@ -69,15 +69,15 @@ export function createTray(mainWindow: BrowserWindow | null): void {
         if (mainWindow && !mainWindow.isDestroyed()) {
           mainWindow.webContents.send('app:show-about')
         }
-      }
+      },
     },
     { type: 'separator' },
     {
       label: '退出',
       click: () => {
         app.quit()
-      }
-    }
+      },
+    },
   ])
 
   tray.setContextMenu(contextMenu)

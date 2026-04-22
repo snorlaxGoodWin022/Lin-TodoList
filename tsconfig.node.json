@@ -1,10 +1,6 @@
 {
   "extends": "@tsconfig/node20/tsconfig.json",
-  "include": [
-    "electron/**/*",
-    "vite.config.*",
-    "env.d.ts"
-  ],
+  "include": ["electron/**/*", "vite.config.*", "env.d.ts"],
   "compilerOptions": {
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",

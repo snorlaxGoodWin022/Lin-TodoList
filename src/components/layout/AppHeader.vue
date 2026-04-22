@@ -19,9 +19,7 @@
           placeholder="搜索任务、便签..."
           @keyup.enter="performSearch"
         />
-        <button v-if="searchQuery" class="clear-search" @click="clearSearch">
-          ×
-        </button>
+        <button v-if="searchQuery" class="clear-search" @click="clearSearch">×</button>
       </div>
     </div>
 
@@ -38,12 +36,7 @@
         <span class="action-icon">🍅</span>
       </button>
       <div class="user-avatar">
-        <img
-          v-if="userAvatar"
-          :src="userAvatar"
-          alt="用户头像"
-          class="avatar-image"
-        />
+        <img v-if="userAvatar" :src="userAvatar" alt="用户头像" class="avatar-image" />
         <div v-else class="avatar-placeholder">
           {{ userInitials }}
         </div>
@@ -74,7 +67,7 @@ const currentTitle = computed(() => {
     pomodoro: '番茄钟',
     note: '便签',
     quadrant: '四象限',
-    habit: '习惯'
+    habit: '习惯',
   }
   return titles[route] || 'Lin TodoList'
 })
@@ -173,7 +166,8 @@ const openPomodoro = () => {
 
 .search-input {
   width: 100%;
-  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) calc(var(--spacing-md) * 2 + var(--spacing-sm));
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm)
+    calc(var(--spacing-md) * 2 + var(--spacing-sm));
   background-color: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-full);

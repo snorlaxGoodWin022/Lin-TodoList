@@ -44,7 +44,7 @@ export const useTagStore = defineStore('tag', () => {
       loading.value = true
       const success = await window.electronAPI.updateTag(id, updates)
       if (success) {
-        const index = tags.value.findIndex(tag => tag.id === id)
+        const index = tags.value.findIndex((tag) => tag.id === id)
         if (index !== -1) {
           tags.value[index] = { ...tags.value[index], ...updates }
         }
@@ -65,7 +65,7 @@ export const useTagStore = defineStore('tag', () => {
       loading.value = true
       const success = await window.electronAPI.deleteTag(id)
       if (success) {
-        tags.value = tags.value.filter(tag => tag.id !== id)
+        tags.value = tags.value.filter((tag) => tag.id !== id)
       }
       error.value = null
       return success
@@ -94,6 +94,6 @@ export const useTagStore = defineStore('tag', () => {
     createTag,
     updateTag,
     deleteTag,
-    init
+    init,
   }
 })

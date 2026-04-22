@@ -1,904 +1,990 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lin TodoList - Design System Preview</title>
     <style>
-        /* Design Tokens from DESIGN.md */
-        :root {
-            /* Primary Palette */
-            --color-primary: #10B981;
-            --color-primary-hover: #059669;
-            --color-primary-light: #D1FAE5;
-            --color-primary-bg: #ECFDF5;
-
-            /* Neutral Palette */
-            --color-bg: #F9FAFB;
-            --color-surface: #FFFFFF;
-            --color-bg-sidebar: #F3F4F6;
-            --color-border: #E5E7EB;
-            --color-border-hover: #D1D5DB;
-
-            /* Text Palette */
-            --color-text-primary: #111827;
-            --color-text-secondary: #6B7280;
-            --color-text-muted: #9CA3AF;
-            --color-on-primary: #FFFFFF;
-
-            /* Priority Colors */
-            --color-priority-high: #EF4444;
-            --color-priority-medium: #F59E0B;
-            --color-priority-low: #3B82F6;
-            --color-priority-none: #D1D5DB;
-
-            /* Status Colors */
-            --color-success: #10B981;
-            --color-warning: #F59E0B;
-            --color-error: #EF4444;
-            --color-info: #3B82F6;
-
-            /* Spacing */
-            --spacing-xs: 0.25rem;
-            --spacing-sm: 0.5rem;
-            --spacing-md: 0.75rem;
-            --spacing-lg: 1rem;
-            --spacing-xl: 1.5rem;
-            --spacing-2xl: 2rem;
-            --spacing-3xl: 3rem;
-
-            /* Border Radius */
-            --radius-sm: 4px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --radius-full: 9999px;
-
-            /* Shadows */
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-
-            /* Animation */
-            --transition-fast: 0.15s ease;
-            --transition-normal: 0.2s ease;
-            --transition-slow: 0.3s ease;
-
-            /* Typography */
-            --text-xs: 0.75rem;
-            --text-sm: 0.875rem;
-            --text-base: 1rem;
-            --text-lg: 1.125rem;
-            --text-xl: 1.25rem;
-            --text-2xl: 1.5rem;
-            --text-3xl: 1.875rem;
-            --text-4xl: 2.25rem;
-
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-
-        [data-theme="dark"] {
-            --color-bg: #111827;
-            --color-surface: #1F2937;
-            --color-bg-sidebar: #1F2937;
-            --color-text-primary: #F9FAFB;
-            --color-text-secondary: #9CA3AF;
-            --color-text-muted: #6B7280;
-            --color-border: #374151;
-            --color-border-hover: #4B5563;
-        }
-
-        /* Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: var(--color-bg);
-            color: var(--color-text-primary);
-            line-height: 1.5;
-            padding: var(--spacing-xl);
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Layout */
-        .container {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-2xl);
-        }
-
-        .section {
-            background-color: var(--color-surface);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .section-header {
-            margin-bottom: var(--spacing-lg);
-            padding-bottom: var(--spacing-md);
-            border-bottom: 1px solid var(--color-border);
-        }
-
-        .section-title {
-            font-size: var(--text-2xl);
-            font-weight: 600;
-            color: var(--color-text-primary);
-            margin: 0;
-        }
-
-        .section-subtitle {
-            font-size: var(--text-base);
-            color: var(--color-text-secondary);
-            margin-top: var(--spacing-xs);
-        }
-
-        .grid {
-            display: grid;
-            gap: var(--spacing-lg);
-        }
-
-        .grid-2 {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .grid-3 {
-            grid-template-columns: repeat(3, 1fr);
-        }
-
-        .grid-4 {
-            grid-template-columns: repeat(4, 1fr);
-        }
-
-        /* Color Palette */
-        .color-card {
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            border: 1px solid var(--color-border);
-        }
-
-        .color-swatch {
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 500;
-        }
-
-        .color-info {
-            padding: var(--spacing-md);
-            background-color: var(--color-surface);
-        }
-
-        .color-name {
-            font-weight: 600;
-            font-size: var(--text-sm);
-            margin-bottom: var(--spacing-xs);
-        }
-
-        .color-value {
-            font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", monospace;
-            font-size: var(--text-xs);
-            color: var(--color-text-secondary);
-        }
-
-        /* Buttons */
-        .button-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--spacing-md);
-            align-items: center;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: var(--spacing-sm) var(--spacing-lg);
-            border-radius: var(--radius-md);
-            font-weight: 500;
-            font-size: var(--text-base);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            border: none;
-            text-decoration: none;
-            user-select: none;
-        }
-
-        .btn-primary {
-            background-color: var(--color-primary);
-            color: var(--color-on-primary);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--color-primary-hover);
-        }
-
-        .btn-secondary {
-            background-color: transparent;
-            color: var(--color-text-primary);
-            border: 1px solid var(--color-border);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--color-bg-sidebar);
-            border-color: var(--color-border-hover);
-        }
-
-        .btn-text {
-            background-color: transparent;
-            color: var(--color-primary);
-            padding: var(--spacing-sm) var(--spacing-md);
-        }
-
-        .btn-text:hover {
-            color: var(--color-primary-hover);
-        }
-
-        .btn-icon {
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            border-radius: var(--radius-md);
-            background-color: transparent;
-            color: var(--color-text-secondary);
-        }
-
-        .btn-icon:hover {
-            background-color: var(--color-bg-sidebar);
-            color: var(--color-text-primary);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Inputs */
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-sm);
-        }
-
-        .input-label {
-            font-size: var(--text-sm);
-            font-weight: 500;
-            color: var(--color-text-secondary);
-        }
-
-        .input {
-            padding: var(--spacing-sm) var(--spacing-md);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            background-color: var(--color-surface);
-            color: var(--color-text-primary);
-            font-size: var(--text-base);
-            transition: border-color var(--transition-fast);
-        }
-
-        .input:hover {
-            border-color: var(--color-border-hover);
-        }
-
-        .input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-        }
-
-        .input::placeholder {
-            color: var(--color-text-muted);
-        }
-
-        /* Checkbox & Radio */
-        .checkbox-group,
-        .radio-group {
-            display: flex;
-            gap: var(--spacing-md);
-            align-items: center;
-        }
-
-        .checkbox,
-        .radio {
-            width: 18px;
-            height: 18px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--color-border);
-            background-color: var(--color-surface);
-            appearance: none;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .checkbox:checked,
-        .radio:checked {
-            background-color: var(--color-primary);
-            border-color: var(--color-primary);
-        }
-
-        .checkbox:checked::after {
-            content: "✓";
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .radio {
-            border-radius: 50%;
-        }
-
-        .radio:checked::after {
-            content: "";
-            width: 8px;
-            height: 8px;
-            background-color: white;
-            border-radius: 50%;
-        }
-
-        /* Cards */
-        .card {
-            background-color: var(--color-surface);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-lg);
-            box-shadow: var(--shadow-sm);
-            transition: box-shadow var(--transition-normal);
-        }
-
-        .card:hover {
-            box-shadow: var(--shadow-md);
-        }
-
-        .task-card {
-            display: flex;
-            align-items: flex-start;
-            gap: var(--spacing-md);
-            padding: var(--spacing-md);
-            border-radius: var(--radius-md);
-            background-color: var(--color-surface);
-            border-left: 4px solid transparent;
-            transition: all var(--transition-normal);
-        }
-
-        .task-card:hover {
-            background-color: var(--color-bg-sidebar);
-        }
-
-        .task-card--priority-high {
-            border-left-color: var(--color-priority-high);
-        }
-
-        .task-card--priority-medium {
-            border-left-color: var(--color-priority-medium);
-        }
-
-        .task-card--priority-low {
-            border-left-color: var(--color-priority-low);
-        }
-
-        .task-card--completed {
-            opacity: 0.6;
-            text-decoration: line-through;
-        }
-
-        /* Navigation */
-        .sidebar-preview {
-            background-color: var(--color-bg-sidebar);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-md);
-            width: 220px;
-        }
-
-        .sidebar-item {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-md);
-            padding: var(--spacing-sm) var(--spacing-md);
-            border-radius: var(--radius-md);
-            color: var(--color-text-secondary);
-            text-decoration: none;
-            transition: all var(--transition-fast);
-            margin-bottom: var(--spacing-xs);
-        }
-
-        .sidebar-item:hover {
-            background-color: var(--color-bg);
-            color: var(--color-text-primary);
-        }
-
-        .sidebar-item--active {
-            background-color: var(--color-primary-bg);
-            color: var(--color-primary);
-            border-left: 3px solid var(--color-primary);
-        }
-
-        /* Progress & Badges */
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background-color: var(--color-border);
-            border-radius: var(--radius-full);
-            overflow: hidden;
-        }
-
-        .progress-bar__fill {
-            height: 100%;
-            background-color: var(--color-primary);
-            border-radius: var(--radius-full);
-            transition: width 0.3s ease;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 2px 8px;
-            border-radius: var(--radius-full);
-            font-size: var(--text-xs);
-            font-weight: 500;
-            line-height: 1;
-        }
-
-        .badge--primary {
-            background-color: var(--color-primary-light);
-            color: var(--color-primary);
-        }
-
-        .badge--priority-high {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: var(--color-priority-high);
-        }
-
-        .badge--priority-medium {
-            background-color: rgba(245, 158, 11, 0.1);
-            color: var(--color-priority-medium);
-        }
-
-        .badge--priority-low {
-            background-color: rgba(59, 130, 246, 0.1);
-            color: var(--color-priority-low);
-        }
-
-        /* Theme Toggle */
-        .theme-toggle {
-            position: fixed;
-            top: var(--spacing-lg);
-            right: var(--spacing-lg);
-            z-index: 100;
-        }
-
-        .theme-btn {
-            background-color: var(--color-surface);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-sm) var(--spacing-md);
-            cursor: pointer;
-            font-size: var(--text-sm);
-            color: var(--color-text-secondary);
-            transition: all var(--transition-fast);
-        }
-
-        .theme-btn:hover {
-            background-color: var(--color-bg-sidebar);
-            color: var(--color-text-primary);
-        }
-
-        /* Utility Classes */
-        .mt-sm { margin-top: var(--spacing-sm); }
-        .mt-md { margin-top: var(--spacing-md); }
-        .mt-lg { margin-top: var(--spacing-lg); }
-        .mt-xl { margin-top: var(--spacing-xl); }
-
-        .mb-sm { margin-bottom: var(--spacing-sm); }
-        .mb-md { margin-bottom: var(--spacing-md); }
-        .mb-lg { margin-bottom: var(--spacing-lg); }
-        .mb-xl { margin-bottom: var(--spacing-xl); }
-
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .gap-sm { gap: var(--spacing-sm); }
-        .gap-md { gap: var(--spacing-md); }
-        .gap-lg { gap: var(--spacing-lg); }
-
-        .text-xs { font-size: var(--text-xs); }
-        .text-sm { font-size: var(--text-sm); }
-        .text-base { font-size: var(--text-base); }
-        .text-lg { font-size: var(--text-lg); }
-        .text-xl { font-size: var(--text-xl); }
-
-        .font-light { font-weight: 300; }
-        .font-regular { font-weight: 400; }
-        .font-medium { font-weight: 500; }
-        .font-semibold { font-weight: 600; }
-        .font-bold { font-weight: 700; }
+      /* Design Tokens from DESIGN.md */
+      :root {
+        /* Primary Palette */
+        --color-primary: #10b981;
+        --color-primary-hover: #059669;
+        --color-primary-light: #d1fae5;
+        --color-primary-bg: #ecfdf5;
+
+        /* Neutral Palette */
+        --color-bg: #f9fafb;
+        --color-surface: #ffffff;
+        --color-bg-sidebar: #f3f4f6;
+        --color-border: #e5e7eb;
+        --color-border-hover: #d1d5db;
+
+        /* Text Palette */
+        --color-text-primary: #111827;
+        --color-text-secondary: #6b7280;
+        --color-text-muted: #9ca3af;
+        --color-on-primary: #ffffff;
+
+        /* Priority Colors */
+        --color-priority-high: #ef4444;
+        --color-priority-medium: #f59e0b;
+        --color-priority-low: #3b82f6;
+        --color-priority-none: #d1d5db;
+
+        /* Status Colors */
+        --color-success: #10b981;
+        --color-warning: #f59e0b;
+        --color-error: #ef4444;
+        --color-info: #3b82f6;
+
+        /* Spacing */
+        --spacing-xs: 0.25rem;
+        --spacing-sm: 0.5rem;
+        --spacing-md: 0.75rem;
+        --spacing-lg: 1rem;
+        --spacing-xl: 1.5rem;
+        --spacing-2xl: 2rem;
+        --spacing-3xl: 3rem;
+
+        /* Border Radius */
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-full: 9999px;
+
+        /* Shadows */
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+        /* Animation */
+        --transition-fast: 0.15s ease;
+        --transition-normal: 0.2s ease;
+        --transition-slow: 0.3s ease;
+
+        /* Typography */
+        --text-xs: 0.75rem;
+        --text-sm: 0.875rem;
+        --text-base: 1rem;
+        --text-lg: 1.125rem;
+        --text-xl: 1.25rem;
+        --text-2xl: 1.5rem;
+        --text-3xl: 1.875rem;
+        --text-4xl: 2.25rem;
+
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      }
+
+      [data-theme='dark'] {
+        --color-bg: #111827;
+        --color-surface: #1f2937;
+        --color-bg-sidebar: #1f2937;
+        --color-text-primary: #f9fafb;
+        --color-text-secondary: #9ca3af;
+        --color-text-muted: #6b7280;
+        --color-border: #374151;
+        --color-border-hover: #4b5563;
+      }
+
+      /* Base Styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--color-bg);
+        color: var(--color-text-primary);
+        line-height: 1.5;
+        padding: var(--spacing-xl);
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      /* Layout */
+      .container {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-2xl);
+      }
+
+      .section {
+        background-color: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-xl);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .section-header {
+        margin-bottom: var(--spacing-lg);
+        padding-bottom: var(--spacing-md);
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .section-title {
+        font-size: var(--text-2xl);
+        font-weight: 600;
+        color: var(--color-text-primary);
+        margin: 0;
+      }
+
+      .section-subtitle {
+        font-size: var(--text-base);
+        color: var(--color-text-secondary);
+        margin-top: var(--spacing-xs);
+      }
+
+      .grid {
+        display: grid;
+        gap: var(--spacing-lg);
+      }
+
+      .grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .grid-4 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      /* Color Palette */
+      .color-card {
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        border: 1px solid var(--color-border);
+      }
+
+      .color-swatch {
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 500;
+      }
+
+      .color-info {
+        padding: var(--spacing-md);
+        background-color: var(--color-surface);
+      }
+
+      .color-name {
+        font-weight: 600;
+        font-size: var(--text-sm);
+        margin-bottom: var(--spacing-xs);
+      }
+
+      .color-value {
+        font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+        font-size: var(--text-xs);
+        color: var(--color-text-secondary);
+      }
+
+      /* Buttons */
+      .button-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-md);
+        align-items: center;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--spacing-sm) var(--spacing-lg);
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        font-size: var(--text-base);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        border: none;
+        text-decoration: none;
+        user-select: none;
+      }
+
+      .btn-primary {
+        background-color: var(--color-primary);
+        color: var(--color-on-primary);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--color-primary-hover);
+      }
+
+      .btn-secondary {
+        background-color: transparent;
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border);
+      }
+
+      .btn-secondary:hover {
+        background-color: var(--color-bg-sidebar);
+        border-color: var(--color-border-hover);
+      }
+
+      .btn-text {
+        background-color: transparent;
+        color: var(--color-primary);
+        padding: var(--spacing-sm) var(--spacing-md);
+      }
+
+      .btn-text:hover {
+        color: var(--color-primary-hover);
+      }
+
+      .btn-icon {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: var(--radius-md);
+        background-color: transparent;
+        color: var(--color-text-secondary);
+      }
+
+      .btn-icon:hover {
+        background-color: var(--color-bg-sidebar);
+        color: var(--color-text-primary);
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Inputs */
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+      }
+
+      .input-label {
+        font-size: var(--text-sm);
+        font-weight: 500;
+        color: var(--color-text-secondary);
+      }
+
+      .input {
+        padding: var(--spacing-sm) var(--spacing-md);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        background-color: var(--color-surface);
+        color: var(--color-text-primary);
+        font-size: var(--text-base);
+        transition: border-color var(--transition-fast);
+      }
+
+      .input:hover {
+        border-color: var(--color-border-hover);
+      }
+
+      .input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+      }
+
+      .input::placeholder {
+        color: var(--color-text-muted);
+      }
+
+      /* Checkbox & Radio */
+      .checkbox-group,
+      .radio-group {
+        display: flex;
+        gap: var(--spacing-md);
+        align-items: center;
+      }
+
+      .checkbox,
+      .radio {
+        width: 18px;
+        height: 18px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-border);
+        background-color: var(--color-surface);
+        appearance: none;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .checkbox:checked,
+      .radio:checked {
+        background-color: var(--color-primary);
+        border-color: var(--color-primary);
+      }
+
+      .checkbox:checked::after {
+        content: '✓';
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .radio {
+        border-radius: 50%;
+      }
+
+      .radio:checked::after {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background-color: white;
+        border-radius: 50%;
+      }
+
+      /* Cards */
+      .card {
+        background-color: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-lg);
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow var(--transition-normal);
+      }
+
+      .card:hover {
+        box-shadow: var(--shadow-md);
+      }
+
+      .task-card {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+        border-radius: var(--radius-md);
+        background-color: var(--color-surface);
+        border-left: 4px solid transparent;
+        transition: all var(--transition-normal);
+      }
+
+      .task-card:hover {
+        background-color: var(--color-bg-sidebar);
+      }
+
+      .task-card--priority-high {
+        border-left-color: var(--color-priority-high);
+      }
+
+      .task-card--priority-medium {
+        border-left-color: var(--color-priority-medium);
+      }
+
+      .task-card--priority-low {
+        border-left-color: var(--color-priority-low);
+      }
+
+      .task-card--completed {
+        opacity: 0.6;
+        text-decoration: line-through;
+      }
+
+      /* Navigation */
+      .sidebar-preview {
+        background-color: var(--color-bg-sidebar);
+        border-radius: var(--radius-lg);
+        padding: var(--spacing-md);
+        width: 220px;
+      }
+
+      .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: var(--radius-md);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        transition: all var(--transition-fast);
+        margin-bottom: var(--spacing-xs);
+      }
+
+      .sidebar-item:hover {
+        background-color: var(--color-bg);
+        color: var(--color-text-primary);
+      }
+
+      .sidebar-item--active {
+        background-color: var(--color-primary-bg);
+        color: var(--color-primary);
+        border-left: 3px solid var(--color-primary);
+      }
+
+      /* Progress & Badges */
+      .progress-bar {
+        width: 100%;
+        height: 6px;
+        background-color: var(--color-border);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+      }
+
+      .progress-bar__fill {
+        height: 100%;
+        background-color: var(--color-primary);
+        border-radius: var(--radius-full);
+        transition: width 0.3s ease;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 8px;
+        border-radius: var(--radius-full);
+        font-size: var(--text-xs);
+        font-weight: 500;
+        line-height: 1;
+      }
+
+      .badge--primary {
+        background-color: var(--color-primary-light);
+        color: var(--color-primary);
+      }
+
+      .badge--priority-high {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: var(--color-priority-high);
+      }
+
+      .badge--priority-medium {
+        background-color: rgba(245, 158, 11, 0.1);
+        color: var(--color-priority-medium);
+      }
+
+      .badge--priority-low {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: var(--color-priority-low);
+      }
+
+      /* Theme Toggle */
+      .theme-toggle {
+        position: fixed;
+        top: var(--spacing-lg);
+        right: var(--spacing-lg);
+        z-index: 100;
+      }
+
+      .theme-btn {
+        background-color: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: var(--spacing-sm) var(--spacing-md);
+        cursor: pointer;
+        font-size: var(--text-sm);
+        color: var(--color-text-secondary);
+        transition: all var(--transition-fast);
+      }
+
+      .theme-btn:hover {
+        background-color: var(--color-bg-sidebar);
+        color: var(--color-text-primary);
+      }
+
+      /* Utility Classes */
+      .mt-sm {
+        margin-top: var(--spacing-sm);
+      }
+      .mt-md {
+        margin-top: var(--spacing-md);
+      }
+      .mt-lg {
+        margin-top: var(--spacing-lg);
+      }
+      .mt-xl {
+        margin-top: var(--spacing-xl);
+      }
+
+      .mb-sm {
+        margin-bottom: var(--spacing-sm);
+      }
+      .mb-md {
+        margin-bottom: var(--spacing-md);
+      }
+      .mb-lg {
+        margin-bottom: var(--spacing-lg);
+      }
+      .mb-xl {
+        margin-bottom: var(--spacing-xl);
+      }
+
+      .flex {
+        display: flex;
+      }
+      .flex-col {
+        flex-direction: column;
+      }
+      .items-center {
+        align-items: center;
+      }
+      .justify-between {
+        justify-content: space-between;
+      }
+      .gap-sm {
+        gap: var(--spacing-sm);
+      }
+      .gap-md {
+        gap: var(--spacing-md);
+      }
+      .gap-lg {
+        gap: var(--spacing-lg);
+      }
+
+      .text-xs {
+        font-size: var(--text-xs);
+      }
+      .text-sm {
+        font-size: var(--text-sm);
+      }
+      .text-base {
+        font-size: var(--text-base);
+      }
+      .text-lg {
+        font-size: var(--text-lg);
+      }
+      .text-xl {
+        font-size: var(--text-xl);
+      }
+
+      .font-light {
+        font-weight: 300;
+      }
+      .font-regular {
+        font-weight: 400;
+      }
+      .font-medium {
+        font-weight: 500;
+      }
+      .font-semibold {
+        font-weight: 600;
+      }
+      .font-bold {
+        font-weight: 700;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="theme-toggle">
-        <button class="theme-btn" id="themeToggle">Switch to Dark Theme</button>
+      <button class="theme-btn" id="themeToggle">Switch to Dark Theme</button>
     </div>
 
     <div class="container">
-        <!-- Header Section -->
-        <header class="section">
-            <h1 class="section-title">Lin TodoList Design System</h1>
-            <p class="section-subtitle">Based on the DESIGN.md specification. Open this file in a browser to preview the UI components.</p>
-        </header>
+      <!-- Header Section -->
+      <header class="section">
+        <h1 class="section-title">Lin TodoList Design System</h1>
+        <p class="section-subtitle">
+          Based on the DESIGN.md specification. Open this file in a browser to preview the UI
+          components.
+        </p>
+      </header>
 
-        <!-- Color Palette Section -->
-        <section class="section">
-            <div class="section-header">
-                <h2 class="section-title">Color Palette</h2>
-                <p class="section-subtitle">Primary, neutral, priority, and status colors</p>
+      <!-- Color Palette Section -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Color Palette</h2>
+          <p class="section-subtitle">Primary, neutral, priority, and status colors</p>
+        </div>
+
+        <div class="grid grid-4">
+          <!-- Primary Colors -->
+          <div class="color-card">
+            <div class="color-swatch" style="background-color: var(--color-primary)">
+              <span style="color: var(--color-on-primary)">Primary</span>
+            </div>
+            <div class="color-info">
+              <div class="color-name">Primary</div>
+              <div class="color-value">#10B981</div>
+            </div>
+          </div>
+
+          <div class="color-card">
+            <div class="color-swatch" style="background-color: var(--color-primary-hover)">
+              <span style="color: var(--color-on-primary)">Primary Hover</span>
+            </div>
+            <div class="color-info">
+              <div class="color-name">Primary Hover</div>
+              <div class="color-value">#059669</div>
+            </div>
+          </div>
+
+          <div class="color-card">
+            <div class="color-swatch" style="background-color: var(--color-primary-light)">
+              <span style="color: var(--color-text-primary)">Primary Light</span>
+            </div>
+            <div class="color-info">
+              <div class="color-name">Primary Light</div>
+              <div class="color-value">#D1FAE5</div>
+            </div>
+          </div>
+
+          <div class="color-card">
+            <div class="color-swatch" style="background-color: var(--color-primary-bg)">
+              <span style="color: var(--color-text-primary)">Primary Background</span>
+            </div>
+            <div class="color-info">
+              <div class="color-name">Primary Background</div>
+              <div class="color-value">#ECFDF5</div>
+            </div>
+          </div>
+
+          <!-- Priority Colors -->
+          <div class="color-card">
+            <div class="color-swatch" style="background-color: var(--color-priority-high)">
+              <span style="color: white">Priority High</span>
+            </div>
+            <div class="color-info">
+              <div class="color-name">Priority High</div>
+              <div class="color-value">#EF4444</div>
+            </div>
+          </div>
+
+          <div class="color-card">
+            <div class="color-swatch" style="background-color: var(--color-priority-medium)">
+              <span style="color: white">Priority Medium</span>
+            </div>
+            <div class="color-info">
+              <div class="color-name">Priority Medium</div>
+              <div class="color-value">#F59E0B</div>
+            </div>
+          </div>
+
+          <div class="color-card">
+            <div class="color-swatch" style="background-color: var(--color-priority-low)">
+              <span style="color: white">Priority Low</span>
+            </div>
+            <div class="color-info">
+              <div class="color-name">Priority Low</div>
+              <div class="color-value">#3B82F6</div>
+            </div>
+          </div>
+
+          <div class="color-card">
+            <div class="color-swatch" style="background-color: var(--color-priority-none)">
+              <span style="color: var(--color-text-primary)">Priority None</span>
+            </div>
+            <div class="color-info">
+              <div class="color-name">Priority None</div>
+              <div class="color-value">#D1D5DB</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Buttons Section -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Buttons</h2>
+          <p class="section-subtitle">
+            Primary, secondary, text, and icon buttons with hover states
+          </p>
+        </div>
+
+        <div class="button-group">
+          <button class="btn btn-primary">Primary Button</button>
+          <button class="btn btn-primary" disabled>Disabled</button>
+          <button class="btn btn-secondary">Secondary Button</button>
+          <button class="btn btn-secondary" disabled>Disabled</button>
+          <button class="btn btn-text">Text Button</button>
+          <button class="btn btn-icon">✏️</button>
+          <button class="btn btn-icon">🗑️</button>
+          <button class="btn btn-icon">⭐</button>
+        </div>
+      </section>
+
+      <!-- Form Elements Section -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Form Elements</h2>
+          <p class="section-subtitle">Inputs, checkboxes, and radio buttons</p>
+        </div>
+
+        <div class="grid grid-2">
+          <div>
+            <div class="input-group">
+              <label class="input-label" for="textInput">Text Input</label>
+              <input type="text" class="input" id="textInput" placeholder="Enter some text..." />
             </div>
 
-            <div class="grid grid-4">
-                <!-- Primary Colors -->
-                <div class="color-card">
-                    <div class="color-swatch" style="background-color: var(--color-primary);">
-                        <span style="color: var(--color-on-primary);">Primary</span>
-                    </div>
-                    <div class="color-info">
-                        <div class="color-name">Primary</div>
-                        <div class="color-value">#10B981</div>
-                    </div>
-                </div>
-
-                <div class="color-card">
-                    <div class="color-swatch" style="background-color: var(--color-primary-hover);">
-                        <span style="color: var(--color-on-primary);">Primary Hover</span>
-                    </div>
-                    <div class="color-info">
-                        <div class="color-name">Primary Hover</div>
-                        <div class="color-value">#059669</div>
-                    </div>
-                </div>
-
-                <div class="color-card">
-                    <div class="color-swatch" style="background-color: var(--color-primary-light);">
-                        <span style="color: var(--color-text-primary);">Primary Light</span>
-                    </div>
-                    <div class="color-info">
-                        <div class="color-name">Primary Light</div>
-                        <div class="color-value">#D1FAE5</div>
-                    </div>
-                </div>
-
-                <div class="color-card">
-                    <div class="color-swatch" style="background-color: var(--color-primary-bg);">
-                        <span style="color: var(--color-text-primary);">Primary Background</span>
-                    </div>
-                    <div class="color-info">
-                        <div class="color-name">Primary Background</div>
-                        <div class="color-value">#ECFDF5</div>
-                    </div>
-                </div>
-
-                <!-- Priority Colors -->
-                <div class="color-card">
-                    <div class="color-swatch" style="background-color: var(--color-priority-high);">
-                        <span style="color: white;">Priority High</span>
-                    </div>
-                    <div class="color-info">
-                        <div class="color-name">Priority High</div>
-                        <div class="color-value">#EF4444</div>
-                    </div>
-                </div>
-
-                <div class="color-card">
-                    <div class="color-swatch" style="background-color: var(--color-priority-medium);">
-                        <span style="color: white;">Priority Medium</span>
-                    </div>
-                    <div class="color-info">
-                        <div class="color-name">Priority Medium</div>
-                        <div class="color-value">#F59E0B</div>
-                    </div>
-                </div>
-
-                <div class="color-card">
-                    <div class="color-swatch" style="background-color: var(--color-priority-low);">
-                        <span style="color: white;">Priority Low</span>
-                    </div>
-                    <div class="color-info">
-                        <div class="color-name">Priority Low</div>
-                        <div class="color-value">#3B82F6</div>
-                    </div>
-                </div>
-
-                <div class="color-card">
-                    <div class="color-swatch" style="background-color: var(--color-priority-none);">
-                        <span style="color: var(--color-text-primary);">Priority None</span>
-                    </div>
-                    <div class="color-info">
-                        <div class="color-name">Priority None</div>
-                        <div class="color-value">#D1D5DB</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Buttons Section -->
-        <section class="section">
-            <div class="section-header">
-                <h2 class="section-title">Buttons</h2>
-                <p class="section-subtitle">Primary, secondary, text, and icon buttons with hover states</p>
+            <div class="input-group mt-md">
+              <label class="input-label" for="emailInput">Email Input</label>
+              <input type="email" class="input" id="emailInput" placeholder="email@example.com" />
             </div>
 
-            <div class="button-group">
-                <button class="btn btn-primary">Primary Button</button>
-                <button class="btn btn-primary" disabled>Disabled</button>
-                <button class="btn btn-secondary">Secondary Button</button>
-                <button class="btn btn-secondary" disabled>Disabled</button>
-                <button class="btn btn-text">Text Button</button>
-                <button class="btn btn-icon">✏️</button>
-                <button class="btn btn-icon">🗑️</button>
-                <button class="btn btn-icon">⭐</button>
+            <div class="input-group mt-md">
+              <label class="input-label" for="disabledInput">Disabled Input</label>
+              <input
+                type="text"
+                class="input"
+                id="disabledInput"
+                placeholder="Disabled field"
+                disabled
+              />
             </div>
-        </section>
+          </div>
 
-        <!-- Form Elements Section -->
-        <section class="section">
-            <div class="section-header">
-                <h2 class="section-title">Form Elements</h2>
-                <p class="section-subtitle">Inputs, checkboxes, and radio buttons</p>
+          <div>
+            <div class="checkbox-group">
+              <input type="checkbox" class="checkbox" id="checkbox1" />
+              <label for="checkbox1">Checkbox option 1</label>
             </div>
 
-            <div class="grid grid-2">
-                <div>
-                    <div class="input-group">
-                        <label class="input-label" for="textInput">Text Input</label>
-                        <input type="text" class="input" id="textInput" placeholder="Enter some text...">
-                    </div>
+            <div class="checkbox-group mt-sm">
+              <input type="checkbox" class="checkbox" id="checkbox2" checked />
+              <label for="checkbox2">Checkbox option 2 (checked)</label>
+            </div>
 
-                    <div class="input-group mt-md">
-                        <label class="input-label" for="emailInput">Email Input</label>
-                        <input type="email" class="input" id="emailInput" placeholder="email@example.com">
-                    </div>
+            <div class="radio-group mt-md">
+              <input type="radio" class="radio" id="radio1" name="radioGroup" />
+              <label for="radio1">Radio option 1</label>
+            </div>
 
-                    <div class="input-group mt-md">
-                        <label class="input-label" for="disabledInput">Disabled Input</label>
-                        <input type="text" class="input" id="disabledInput" placeholder="Disabled field" disabled>
-                    </div>
+            <div class="radio-group mt-sm">
+              <input type="radio" class="radio" id="radio2" name="radioGroup" checked />
+              <label for="radio2">Radio option 2 (selected)</label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cards Section -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Cards & Task Items</h2>
+          <p class="section-subtitle">Regular cards and task cards with priority indicators</p>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <h3 class="font-semibold text-lg mb-sm">Regular Card</h3>
+            <p class="text-sm text-secondary">
+              This is a standard card component with subtle shadow and border.
+            </p>
+            <div class="flex items-center justify-between mt-md">
+              <span class="text-xs text-muted">Card footer</span>
+              <button class="btn btn-text text-sm">Action</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="task-card task-card--priority-high">
+              <input type="checkbox" class="checkbox" />
+              <div class="flex flex-col gap-sm">
+                <div class="font-medium">Fix critical bug in production</div>
+                <div class="text-sm text-secondary">Due today • Work project</div>
+                <div class="flex gap-sm">
+                  <span class="badge badge--priority-high">High Priority</span>
                 </div>
-
-                <div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" class="checkbox" id="checkbox1">
-                        <label for="checkbox1">Checkbox option 1</label>
-                    </div>
-
-                    <div class="checkbox-group mt-sm">
-                        <input type="checkbox" class="checkbox" id="checkbox2" checked>
-                        <label for="checkbox2">Checkbox option 2 (checked)</label>
-                    </div>
-
-                    <div class="radio-group mt-md">
-                        <input type="radio" class="radio" id="radio1" name="radioGroup">
-                        <label for="radio1">Radio option 1</label>
-                    </div>
-
-                    <div class="radio-group mt-sm">
-                        <input type="radio" class="radio" id="radio2" name="radioGroup" checked>
-                        <label for="radio2">Radio option 2 (selected)</label>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Cards Section -->
-        <section class="section">
-            <div class="section-header">
-                <h2 class="section-title">Cards & Task Items</h2>
-                <p class="section-subtitle">Regular cards and task cards with priority indicators</p>
+              </div>
             </div>
 
-            <div class="grid grid-2">
-                <div class="card">
-                    <h3 class="font-semibold text-lg mb-sm">Regular Card</h3>
-                    <p class="text-sm text-secondary">This is a standard card component with subtle shadow and border.</p>
-                    <div class="flex items-center justify-between mt-md">
-                        <span class="text-xs text-muted">Card footer</span>
-                        <button class="btn btn-text text-sm">Action</button>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="task-card task-card--priority-high">
-                        <input type="checkbox" class="checkbox">
-                        <div class="flex flex-col gap-sm">
-                            <div class="font-medium">Fix critical bug in production</div>
-                            <div class="text-sm text-secondary">Due today • Work project</div>
-                            <div class="flex gap-sm">
-                                <span class="badge badge--priority-high">High Priority</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="task-card task-card--priority-medium mt-sm">
-                        <input type="checkbox" class="checkbox" checked>
-                        <div class="flex flex-col gap-sm">
-                            <div class="font-medium task-card--completed">Plan weekly team meeting</div>
-                            <div class="text-sm text-secondary">Completed • Today 2:00 PM</div>
-                        </div>
-                    </div>
-
-                    <div class="task-card task-card--priority-low mt-sm">
-                        <input type="checkbox" class="checkbox">
-                        <div class="flex flex-col gap-sm">
-                            <div class="font-medium">Read documentation</div>
-                            <div class="text-sm text-secondary">Due tomorrow • Learning</div>
-                            <div class="flex gap-sm">
-                                <span class="badge badge--priority-low">Low Priority</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Navigation & Progress Section -->
-        <section class="section">
-            <div class="section-header">
-                <h2 class="section-title">Navigation & Progress</h2>
-                <p class="section-subtitle">Sidebar navigation and progress indicators</p>
+            <div class="task-card task-card--priority-medium mt-sm">
+              <input type="checkbox" class="checkbox" checked />
+              <div class="flex flex-col gap-sm">
+                <div class="font-medium task-card--completed">Plan weekly team meeting</div>
+                <div class="text-sm text-secondary">Completed • Today 2:00 PM</div>
+              </div>
             </div>
 
-            <div class="grid grid-2">
-                <div class="sidebar-preview">
-                    <div class="sidebar-item sidebar-item--active">
-                        <span>📋</span>
-                        <span>Today</span>
-                    </div>
-                    <div class="sidebar-item">
-                        <span>📅</span>
-                        <span>Calendar</span>
-                    </div>
-                    <div class="sidebar-item">
-                        <span>✅</span>
-                        <span>Lists</span>
-                    </div>
-                    <div class="sidebar-item">
-                        <span>🍅</span>
-                        <span>Pomodoro</span>
-                    </div>
-                    <div class="sidebar-item">
-                        <span>📝</span>
-                        <span>Notes</span>
-                    </div>
-                    <div class="sidebar-item">
-                        <span>📊</span>
-                        <span>Quadrant</span>
-                    </div>
-                    <div class="sidebar-item">
-                        <span>🔖</span>
-                        <span>Habits</span>
-                    </div>
+            <div class="task-card task-card--priority-low mt-sm">
+              <input type="checkbox" class="checkbox" />
+              <div class="flex flex-col gap-sm">
+                <div class="font-medium">Read documentation</div>
+                <div class="text-sm text-secondary">Due tomorrow • Learning</div>
+                <div class="flex gap-sm">
+                  <span class="badge badge--priority-low">Low Priority</span>
                 </div>
-
-                <div>
-                    <div class="mb-lg">
-                        <div class="flex justify-between mb-sm">
-                            <span class="text-sm font-medium">Task Completion</span>
-                            <span class="text-sm text-secondary">75%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-bar__fill" style="width: 75%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="mb-lg">
-                        <div class="flex justify-between mb-sm">
-                            <span class="text-sm font-medium">Weekly Goal</span>
-                            <span class="text-sm text-secondary">40%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-bar__fill" style="width: 40%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap gap-sm">
-                        <span class="badge badge--primary">Today</span>
-                        <span class="badge">Work</span>
-                        <span class="badge">Personal</span>
-                        <span class="badge badge--priority-high">Urgent</span>
-                        <span class="badge badge--priority-medium">Important</span>
-                        <span class="badge badge--priority-low">Later</span>
-                    </div>
-                </div>
+              </div>
             </div>
-        </section>
+          </div>
+        </div>
+      </section>
 
-        <!-- Typography Section -->
-        <section class="section">
-            <div class="section-header">
-                <h2 class="section-title">Typography</h2>
-                <p class="section-subtitle">Type scale and font weights</p>
+      <!-- Navigation & Progress Section -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Navigation & Progress</h2>
+          <p class="section-subtitle">Sidebar navigation and progress indicators</p>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="sidebar-preview">
+            <div class="sidebar-item sidebar-item--active">
+              <span>📋</span>
+              <span>Today</span>
+            </div>
+            <div class="sidebar-item">
+              <span>📅</span>
+              <span>Calendar</span>
+            </div>
+            <div class="sidebar-item">
+              <span>✅</span>
+              <span>Lists</span>
+            </div>
+            <div class="sidebar-item">
+              <span>🍅</span>
+              <span>Pomodoro</span>
+            </div>
+            <div class="sidebar-item">
+              <span>📝</span>
+              <span>Notes</span>
+            </div>
+            <div class="sidebar-item">
+              <span>📊</span>
+              <span>Quadrant</span>
+            </div>
+            <div class="sidebar-item">
+              <span>🔖</span>
+              <span>Habits</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="mb-lg">
+              <div class="flex justify-between mb-sm">
+                <span class="text-sm font-medium">Task Completion</span>
+                <span class="text-sm text-secondary">75%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-bar__fill" style="width: 75%"></div>
+              </div>
             </div>
 
-            <div class="grid grid-2">
-                <div>
-                    <h1 class="text-4xl font-bold mb-sm">Heading 1 (2.25rem)</h1>
-                    <h2 class="text-3xl font-semibold mb-sm">Heading 2 (1.875rem)</h2>
-                    <h3 class="text-2xl font-semibold mb-sm">Heading 3 (1.5rem)</h3>
-                    <h4 class="text-xl font-semibold mb-sm">Heading 4 (1.25rem)</h4>
-                    <p class="text-lg mb-sm">Lead text (1.125rem)</p>
-                    <p class="text-base mb-sm">Body text (1rem) - The main content font size used for paragraphs and most UI text.</p>
-                    <p class="text-sm text-secondary mb-sm">Small text (0.875rem) - Used for labels, captions, and helper text.</p>
-                    <p class="text-xs text-muted">Extra small text (0.75rem) - For metadata and fine print.</p>
-                </div>
-
-                <div>
-                    <p class="font-light text-lg mb-sm">Light weight (300) - For fine print and subtle emphasis</p>
-                    <p class="font-regular text-lg mb-sm">Regular weight (400) - Default body text weight</p>
-                    <p class="font-medium text-lg mb-sm">Medium weight (500) - Labels and interactive elements</p>
-                    <p class="font-semibold text-lg mb-sm">Semibold weight (600) - Headings and important labels</p>
-                    <p class="font-bold text-lg mb-sm">Bold weight (700) - Strong emphasis and call-to-action</p>
-
-                    <div class="mt-xl">
-                        <div class="text-base mb-sm" style="line-height: 1.25;">Tight line height (1.25) - For headings and short lines</div>
-                        <div class="text-base mb-sm" style="line-height: 1.5;">Normal line height (1.5) - Default for body text</div>
-                        <div class="text-base mb-sm" style="line-height: 1.75;">Relaxed line height (1.75) - For long-form content</div>
-                    </div>
-                </div>
+            <div class="mb-lg">
+              <div class="flex justify-between mb-sm">
+                <span class="text-sm font-medium">Weekly Goal</span>
+                <span class="text-sm text-secondary">40%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-bar__fill" style="width: 40%"></div>
+              </div>
             </div>
-        </section>
+
+            <div class="flex flex-wrap gap-sm">
+              <span class="badge badge--primary">Today</span>
+              <span class="badge">Work</span>
+              <span class="badge">Personal</span>
+              <span class="badge badge--priority-high">Urgent</span>
+              <span class="badge badge--priority-medium">Important</span>
+              <span class="badge badge--priority-low">Later</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Typography Section -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Typography</h2>
+          <p class="section-subtitle">Type scale and font weights</p>
+        </div>
+
+        <div class="grid grid-2">
+          <div>
+            <h1 class="text-4xl font-bold mb-sm">Heading 1 (2.25rem)</h1>
+            <h2 class="text-3xl font-semibold mb-sm">Heading 2 (1.875rem)</h2>
+            <h3 class="text-2xl font-semibold mb-sm">Heading 3 (1.5rem)</h3>
+            <h4 class="text-xl font-semibold mb-sm">Heading 4 (1.25rem)</h4>
+            <p class="text-lg mb-sm">Lead text (1.125rem)</p>
+            <p class="text-base mb-sm">
+              Body text (1rem) - The main content font size used for paragraphs and most UI text.
+            </p>
+            <p class="text-sm text-secondary mb-sm">
+              Small text (0.875rem) - Used for labels, captions, and helper text.
+            </p>
+            <p class="text-xs text-muted">
+              Extra small text (0.75rem) - For metadata and fine print.
+            </p>
+          </div>
+
+          <div>
+            <p class="font-light text-lg mb-sm">
+              Light weight (300) - For fine print and subtle emphasis
+            </p>
+            <p class="font-regular text-lg mb-sm">
+              Regular weight (400) - Default body text weight
+            </p>
+            <p class="font-medium text-lg mb-sm">
+              Medium weight (500) - Labels and interactive elements
+            </p>
+            <p class="font-semibold text-lg mb-sm">
+              Semibold weight (600) - Headings and important labels
+            </p>
+            <p class="font-bold text-lg mb-sm">
+              Bold weight (700) - Strong emphasis and call-to-action
+            </p>
+
+            <div class="mt-xl">
+              <div class="text-base mb-sm" style="line-height: 1.25">
+                Tight line height (1.25) - For headings and short lines
+              </div>
+              <div class="text-base mb-sm" style="line-height: 1.5">
+                Normal line height (1.5) - Default for body text
+              </div>
+              <div class="text-base mb-sm" style="line-height: 1.75">
+                Relaxed line height (1.75) - For long-form content
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <script>
-        // Theme toggle functionality
-        const themeToggle = document.getElementById('themeToggle');
-        const htmlElement = document.documentElement;
+      // Theme toggle functionality
+      const themeToggle = document.getElementById('themeToggle')
+      const htmlElement = document.documentElement
 
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = htmlElement.getAttribute('data-theme');
-            if (currentTheme === 'dark') {
-                htmlElement.setAttribute('data-theme', 'light');
-                themeToggle.textContent = 'Switch to Dark Theme';
-            } else {
-                htmlElement.setAttribute('data-theme', 'dark');
-                themeToggle.textContent = 'Switch to Light Theme';
+      themeToggle.addEventListener('click', () => {
+        const currentTheme = htmlElement.getAttribute('data-theme')
+        if (currentTheme === 'dark') {
+          htmlElement.setAttribute('data-theme', 'light')
+          themeToggle.textContent = 'Switch to Dark Theme'
+        } else {
+          htmlElement.setAttribute('data-theme', 'dark')
+          themeToggle.textContent = 'Switch to Light Theme'
+        }
+      })
+
+      // Add some interactive behaviors
+      document.querySelectorAll('.task-card').forEach((card) => {
+        card.addEventListener('click', (e) => {
+          // Don't trigger if checkbox was clicked
+          if (e.target.type !== 'checkbox') {
+            const checkbox = card.querySelector('.checkbox')
+            if (checkbox) {
+              checkbox.checked = !checkbox.checked
+              if (checkbox.checked) {
+                card.classList.add('task-card--completed')
+              } else {
+                card.classList.remove('task-card--completed')
+              }
             }
-        });
+          }
+        })
+      })
 
-        // Add some interactive behaviors
-        document.querySelectorAll('.task-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                // Don't trigger if checkbox was clicked
-                if (e.target.type !== 'checkbox') {
-                    const checkbox = card.querySelector('.checkbox');
-                    if (checkbox) {
-                        checkbox.checked = !checkbox.checked;
-                        if (checkbox.checked) {
-                            card.classList.add('task-card--completed');
-                        } else {
-                            card.classList.remove('task-card--completed');
-                        }
-                    }
-                }
-            });
-        });
-
-        // Button click effects
-        document.querySelectorAll('.btn:not(:disabled)').forEach(btn => {
-            btn.addEventListener('click', function() {
-                if (!this.classList.contains('btn-text') && !this.classList.contains('btn-icon')) {
-                    this.style.transform = 'scale(0.98)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 150);
-                }
-            });
-        });
+      // Button click effects
+      document.querySelectorAll('.btn:not(:disabled)').forEach((btn) => {
+        btn.addEventListener('click', function () {
+          if (!this.classList.contains('btn-text') && !this.classList.contains('btn-icon')) {
+            this.style.transform = 'scale(0.98)'
+            setTimeout(() => {
+              this.style.transform = ''
+            }, 150)
+          }
+        })
+      })
     </script>
-</body>
+  </body>
 </html>

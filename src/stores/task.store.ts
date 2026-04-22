@@ -16,21 +16,21 @@ export const useTaskStore = defineStore('task', () => {
   const selectedTaskIds = ref<Set<string>>(new Set())
 
   // Getters
-  const completedTasks = computed(() => tasks.value.filter(task => task.completed))
-  const pendingTasks = computed(() => tasks.value.filter(task => !task.completed))
-  const highPriorityTasks = computed(() => tasks.value.filter(task => task.priority === 3))
+  const completedTasks = computed(() => tasks.value.filter((task) => task.completed))
+  const pendingTasks = computed(() => tasks.value.filter((task) => !task.completed))
+  const highPriorityTasks = computed(() => tasks.value.filter((task) => task.priority === 3))
 
   // Built-in special lists
   const todayTasks = computed(() => {
     const today = new Date().toISOString().split('T')[0]
-    return tasks.value.filter(task => task.due_date === today && !task.completed)
+    return tasks.value.filter((task) => task.due_date === today && !task.completed)
   })
 
   const tomorrowTasks = computed(() => {
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
     const tomorrowStr = tomorrow.toISOString().split('T')[0]
-    return tasks.value.filter(task => task.due_date === tomorrowStr && !task.completed)
+    return tasks.value.filter((task) => task.due_date === tomorrowStr && !task.completed)
   })
 
   const thisWeekTasks = computed(() => {
@@ -44,7 +44,7 @@ export const useTaskStore = defineStore('task', () => {
     const startStr = startOfWeek.toISOString().split('T')[0]
     const endStr = endOfWeek.toISOString().split('T')[0]
 
-    return tasks.value.filter(task => {
+    return tasks.value.filter((task) => {
       if (!task.due_date || task.completed) return false
       return task.due_date >= startStr && task.due_date <= endStr
     })
@@ -91,7 +91,7 @@ export const useTaskStore = defineStore('task', () => {
       loading.value = true
       const success = await window.electronAPI.updateTask(id, updates)
       if (success) {
-        const index = tasks.value.findIndex(task => task.id === id)
+        const index = tasks.value.findIndex((task) => task.id === id)
         if (index !== -1) {
           tasks.value[index] = { ...tasks.value[index], ...updates }
         }
@@ -115,7 +115,7 @@ export const useTaskStore = defineStore('task', () => {
       loading.value = true
       const success = await window.electronAPI.deleteTask(id)
       if (success) {
-        tasks.value = tasks.value.filter(task => task.id !== id)
+        tasks.value = tasks.value.filter((task) => task.id !== id)
         if (selectedTask.value?.id === id) {
           selectedTask.value = null
         }
@@ -136,13 +136,17 @@ export const useTaskStore = defineStore('task', () => {
       loading.value = true
       const success = await window.electronAPI.toggleTaskCompletion(id, completed)
       if (success) {
-        const task = tasks.value.find(task => task.id === id)
+        const task = tasks.value.find((task) => task.id === id)
         if (task) {
           task.completed = completed ? 1 : 0
           task.completed_at = completed ? new Date().toISOString() : null
         }
         if (selectedTask.value?.id === id) {
-          selectedTask.value = { ...selectedTask.value, completed: completed ? 1 : 0, completed_at: completed ? new Date().toISOString() : null }
+          selectedTask.value = {
+            ...selectedTask.value,
+            completed: completed ? 1 : 0,
+            completed_at: completed ? new Date().toISOString() : null,
+          }
         }
       }
       error.value = null
@@ -179,7 +183,7 @@ export const useTaskStore = defineStore('task', () => {
 
   const openTaskEditor = (taskId?: string) => {
     if (taskId) {
-      const task = tasks.value.find(t => t.id === taskId)
+      const task = tasks.value.find((t) => t.id === taskId)
       editingTask.value = task ? { ...task } : null
     } else {
       editingTask.value = {}
@@ -211,7 +215,7 @@ export const useTaskStore = defineStore('task', () => {
   }
 
   const selectAllTasks = () => {
-    tasks.value.forEach(task => {
+    tasks.value.forEach((task) => {
       if (!task.completed) {
         selectedTaskIds.value.add(task.id)
       }
@@ -227,7 +231,7 @@ export const useTaskStore = defineStore('task', () => {
       loading.value = true
       for (const id of ids) {
         await window.electronAPI.deleteTask(id)
-        tasks.value = tasks.value.filter(task => task.id !== id)
+        tasks.value = tasks.value.filter((task) => task.id !== id)
       }
       selectedTaskIds.value.clear()
       batchSelectMode.value = false
@@ -249,7 +253,7 @@ export const useTaskStore = defineStore('task', () => {
       loading.value = true
       for (const id of ids) {
         await window.electronAPI.updateTask(id, { list_id: targetListId })
-        const task = tasks.value.find(t => t.id === id)
+        const task = tasks.value.find((t) => t.id === id)
         if (task) {
           task.list_id = targetListId
         }
@@ -274,7 +278,7 @@ export const useTaskStore = defineStore('task', () => {
       loading.value = true
       for (const id of ids) {
         await window.electronAPI.toggleTaskCompletion(id, completed)
-        const task = tasks.value.find(t => t.id === id)
+        const task = tasks.value.find((t) => t.id === id)
         if (task) {
           task.completed = completed ? 1 : 0
           task.completed_at = completed ? new Date().toISOString() : null
@@ -339,6 +343,6 @@ export const useTaskStore = defineStore('task', () => {
     selectAllTasks,
     batchDeleteTasks,
     batchMoveTasks,
-    batchCompleteTasks
+    batchCompleteTasks,
   }
 })

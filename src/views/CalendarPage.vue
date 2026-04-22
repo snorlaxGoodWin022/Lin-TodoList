@@ -44,7 +44,7 @@
             v-for="day in calendar.monthDays.value"
             :key="day.date.toISOString()"
             class="calendar-day"
-            :class="{ 'current-month': day.isCurrentMonth, 'today': isToday(day.date) }"
+            :class="{ 'current-month': day.isCurrentMonth, today: isToday(day.date) }"
           >
             <div class="day-header">
               <span class="day-number">{{ day.date.getDate() }}</span>
@@ -71,7 +71,7 @@
             v-for="day in calendar.weekDays.value"
             :key="day.date.toISOString()"
             class="week-day"
-            :class="{ 'today': isToday(day.date) }"
+            :class="{ today: isToday(day.date) }"
           >
             <div class="day-header">
               <div class="day-name">{{ formatDate(day.date, 'short') }}</div>
@@ -85,7 +85,7 @@
                 @click="selectTask(task)"
               >
                 <span class="task-title">{{ task.title }}</span>
-                <span class="task-time" v-if="task.start_time">
+                <span v-if="task.start_time" class="task-time">
                   {{ formatTime(task.start_time) }}
                 </span>
               </div>
@@ -118,7 +118,7 @@ const task = useTask()
 const viewModes = [
   { value: 'month' as const, label: '月' },
   { value: 'week' as const, label: '周' },
-  { value: 'day' as const, label: '日' }
+  { value: 'day' as const, label: '日' },
 ]
 
 // Weekdays in Chinese
@@ -169,9 +169,11 @@ const setViewMode = (mode: 'month' | 'week' | 'day') => {
 
 const isToday = (date: Date) => {
   const today = new Date()
-  return date.getDate() === today.getDate() &&
+  return (
+    date.getDate() === today.getDate() &&
     date.getMonth() === today.getMonth() &&
     date.getFullYear() === today.getFullYear()
+  )
 }
 
 const formatDate = (date: Date, format: 'short' | 'medium' | 'long') => {
@@ -183,8 +185,8 @@ const formatTime = (timeStr: string) => {
   return timeStr.substring(0, 5)
 }
 
-const selectTask = (task: any) => {
-  task.selectTask(task)
+const selectTask = (t: any) => {
+  task.selectTask(t)
 }
 </script>
 
@@ -368,10 +370,18 @@ const selectTask = (task: any) => {
   margin: 0 auto;
 }
 
-.task-dot.priority-0 { background-color: var(--color-priority-none); }
-.task-dot.priority-1 { background-color: var(--color-priority-low); }
-.task-dot.priority-2 { background-color: var(--color-priority-medium); }
-.task-dot.priority-3 { background-color: var(--color-priority-high); }
+.task-dot.priority-0 {
+  background-color: var(--color-priority-none);
+}
+.task-dot.priority-1 {
+  background-color: var(--color-priority-low);
+}
+.task-dot.priority-2 {
+  background-color: var(--color-priority-medium);
+}
+.task-dot.priority-3 {
+  background-color: var(--color-priority-high);
+}
 
 .more-tasks {
   font-size: var(--font-size-xs);

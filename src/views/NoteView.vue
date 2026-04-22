@@ -27,11 +27,7 @@
     </div>
 
     <div class="note-tabs">
-      <button
-        class="tab-btn"
-        :class="{ active: activeTab === 'all' }"
-        @click="activeTab = 'all'"
-      >
+      <button class="tab-btn" :class="{ active: activeTab === 'all' }" @click="activeTab = 'all'">
         <Icon icon="mdi:note-multiple-outline" class="tab-icon" />
         全部便签
         <span class="tab-count">{{ allNotes.length }}</span>
@@ -69,9 +65,7 @@
           <Icon icon="mdi:plus" class="btn-icon" />
           新建便签
         </button>
-        <button v-else class="btn btn-text" @click="clearSearch">
-          清除搜索
-        </button>
+        <button v-else class="btn btn-text" @click="clearSearch">清除搜索</button>
       </div>
 
       <div v-else class="note-grid">
@@ -86,58 +80,58 @@
               class="note-card"
               :style="{
                 '--note-color': getNoteColor(note.color),
-                'background': getNoteColor(note.color)
+                background: getNoteColor(note.color),
               }"
               @click="selectNote(note)"
             >
-          <div class="note-card-header">
-            <div class="note-title">
-              <h4 class="title-text">{{ note.title || '无标题' }}</h4>
-              <span v-if="note.pinned" class="pinned-badge">
-                <Icon icon="mdi:pin" />
-              </span>
-            </div>
-            <div class="note-actions">
-              <button
-                class="btn btn-icon"
-                @click.stop="toggleNotePin(note)"
-                :title="note.pinned ? '取消置顶' : '置顶'"
-              >
-                <Icon :icon="note.pinned ? 'mdi:pin-off' : 'mdi:pin'" />
-              </button>
-              <button class="btn btn-icon" @click.stop="editNote(note)" title="编辑">
-                <Icon icon="mdi:pencil-outline" />
-              </button>
-              <button class="btn btn-icon" @click.stop="deleteNote(note.id)" title="删除">
-                <Icon icon="mdi:delete-outline" />
-              </button>
-            </div>
-          </div>
-
-          <div class="note-card-content">
-            <div class="note-preview" v-html="formatNoteContent(note.content)"></div>
-          </div>
-
-          <div class="note-card-footer">
-            <div class="note-meta">
-              <div class="meta-item">
-                <Icon icon="mdi:calendar" class="meta-icon" />
-                <span class="meta-text">{{ formatDate(note.updated_at) }}</span>
+              <div class="note-card-header">
+                <div class="note-title">
+                  <h4 class="title-text">{{ note.title || '无标题' }}</h4>
+                  <span v-if="note.pinned" class="pinned-badge">
+                    <Icon icon="mdi:pin" />
+                  </span>
+                </div>
+                <div class="note-actions">
+                  <button
+                    class="btn btn-icon"
+                    :title="note.pinned ? '取消置顶' : '置顶'"
+                    @click.stop="toggleNotePin(note)"
+                  >
+                    <Icon :icon="note.pinned ? 'mdi:pin-off' : 'mdi:pin'" />
+                  </button>
+                  <button class="btn btn-icon" title="编辑" @click.stop="editNote(note)">
+                    <Icon icon="mdi:pencil-outline" />
+                  </button>
+                  <button class="btn btn-icon" title="删除" @click.stop="deleteNote(note.id)">
+                    <Icon icon="mdi:delete-outline" />
+                  </button>
+                </div>
               </div>
-              <div v-if="note.tags && note.tags.length > 0" class="meta-item">
-                <Icon icon="mdi:tag-outline" class="meta-icon" />
-                <div class="note-tags">
-                  <span v-for="tag in note.tags.slice(0, 2)" :key="tag" class="note-tag">
-                    {{ tag }}
-                  </span>
-                  <span v-if="note.tags.length > 2" class="note-tag-more">
-                    +{{ note.tags.length - 2 }}
-                  </span>
+
+              <div class="note-card-content">
+                <div class="note-preview" v-html="formatNoteContent(note.content)"></div>
+              </div>
+
+              <div class="note-card-footer">
+                <div class="note-meta">
+                  <div class="meta-item">
+                    <Icon icon="mdi:calendar" class="meta-icon" />
+                    <span class="meta-text">{{ formatDate(note.updated_at) }}</span>
+                  </div>
+                  <div v-if="note.tags && note.tags.length > 0" class="meta-item">
+                    <Icon icon="mdi:tag-outline" class="meta-icon" />
+                    <div class="note-tags">
+                      <span v-for="tag in note.tags.slice(0, 2)" :key="tag" class="note-tag">
+                        {{ tag }}
+                      </span>
+                      <span v-if="note.tags.length > 2" class="note-tag-more">
+                        +{{ note.tags.length - 2 }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          </div>
           </template>
         </draggable>
       </div>
@@ -145,7 +139,7 @@
 
     <!-- 便签编辑器模态框 -->
     <div v-if="showNoteEditor" class="modal-overlay" @click.self="closeNoteEditor">
-      <div class="note-editor" :style="{ 'background': getNoteColor(editingNote?.color) }">
+      <div class="note-editor" :style="{ background: getNoteColor(editingNote?.color) }">
         <div class="editor-header">
           <input
             v-model="editingNote.title"
@@ -159,56 +153,56 @@
                 v-for="color in noteColors"
                 :key="color"
                 class="color-option"
-                :style="{ 'background': color }"
+                :style="{ background: color }"
                 :class="{ active: editingNote?.color === color }"
-                @click="setNoteColor(color)"
                 :title="color"
+                @click="setNoteColor(color)"
               />
             </div>
             <button
               class="btn btn-icon"
-              @click="toggleEditingNotePin"
               :title="editingNote?.pinned ? '取消置顶' : '置顶'"
+              @click="toggleEditingNotePin"
             >
               <Icon :icon="editingNote?.pinned ? 'mdi:pin' : 'mdi:pin-outline'" />
             </button>
-            <button class="btn btn-icon" @click="saveNote" title="保存">
+            <button class="btn btn-icon" title="保存" @click="saveNote">
               <Icon icon="mdi:content-save-outline" />
             </button>
-            <button class="btn btn-icon" @click="closeNoteEditor" title="关闭">
+            <button class="btn btn-icon" title="关闭" @click="closeNoteEditor">
               <Icon icon="mdi:close" />
             </button>
           </div>
         </div>
 
         <div class="editor-toolbar">
-          <button class="btn btn-icon" @click="formatText('bold')" title="加粗">
+          <button class="btn btn-icon" title="加粗" @click="formatText('bold')">
             <Icon icon="mdi:format-bold" />
           </button>
-          <button class="btn btn-icon" @click="formatText('italic')" title="斜体">
+          <button class="btn btn-icon" title="斜体" @click="formatText('italic')">
             <Icon icon="mdi:format-italic" />
           </button>
-          <button class="btn btn-icon" @click="formatText('underline')" title="下划线">
+          <button class="btn btn-icon" title="下划线" @click="formatText('underline')">
             <Icon icon="mdi:format-underline" />
           </button>
           <div class="toolbar-divider"></div>
-          <button class="btn btn-icon" @click="formatText('h1')" title="标题1">
+          <button class="btn btn-icon" title="标题1" @click="formatText('h1')">
             <Icon icon="mdi:format-header-1" />
           </button>
-          <button class="btn btn-icon" @click="formatText('h2')" title="标题2">
+          <button class="btn btn-icon" title="标题2" @click="formatText('h2')">
             <Icon icon="mdi:format-header-2" />
           </button>
-          <button class="btn btn-icon" @click="formatText('h3')" title="标题3">
+          <button class="btn btn-icon" title="标题3" @click="formatText('h3')">
             <Icon icon="mdi:format-header-3" />
           </button>
           <div class="toolbar-divider"></div>
-          <button class="btn btn-icon" @click="formatText('ul')" title="无序列表">
+          <button class="btn btn-icon" title="无序列表" @click="formatText('ul')">
             <Icon icon="mdi:format-list-bulleted" />
           </button>
-          <button class="btn btn-icon" @click="formatText('ol')" title="有序列表">
+          <button class="btn btn-icon" title="有序列表" @click="formatText('ol')">
             <Icon icon="mdi:format-list-numbered" />
           </button>
-          <button class="btn btn-icon" @click="formatText('blockquote')" title="引用">
+          <button class="btn btn-icon" title="引用" @click="formatText('blockquote')">
             <Icon icon="mdi:format-quote-close" />
           </button>
         </div>
@@ -262,12 +256,8 @@
           <p class="modal-text">新建便签模态框将在后续实现...</p>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-text" @click="showNewNoteModal = false">
-            取消
-          </button>
-          <button class="btn btn-primary" @click="showNewNoteModal = false">
-            确定
-          </button>
+          <button class="btn btn-text" @click="showNewNoteModal = false">取消</button>
+          <button class="btn btn-primary" @click="showNewNoteModal = false">确定</button>
         </div>
       </div>
     </div>
@@ -293,7 +283,7 @@ const editingNote = ref<any>({
   title: '',
   content: '',
   color: '#FFFFFF',
-  pinned: 0
+  pinned: 0,
 })
 const tagInput = ref('')
 const editorContent = ref<HTMLElement | null>(null)
@@ -315,9 +305,11 @@ const noteColors = ref([
 const allNotes = noteStore.notes
 const pinnedNotes = computed(() => noteStore.pinnedNotes)
 const recentNotes = computed(() => {
-  return [...noteStore.notes].sort((a, b) => {
-    return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-  }).slice(0, 10)
+  return [...noteStore.notes]
+    .sort((a, b) => {
+      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+    })
+    .slice(0, 10)
 })
 
 // For drag and drop
@@ -348,7 +340,7 @@ const displayNotesList = computed({
       note.sort_order = index
       noteStore.updateNote(note.id, { sort_order: index })
     })
-  }
+  },
 })
 
 const displayNotes = computed(() => {
@@ -396,7 +388,7 @@ const formatNoteContent = (content: string) => {
 
   // 包裹列表项
   if (formatted.includes('<li>')) {
-    formatted = formatted.replace(/<li>.*?<\/li>/g, match => {
+    formatted = formatted.replace(/<li>.*?<\/li>/g, (match) => {
       if (match.match(/^<li>\d/)) {
         return `<ol>${match}</ol>`
       }
@@ -470,25 +462,6 @@ const deleteNote = async (noteId: string) => {
   }
 }
 
-// 编辑器方法
-const openNewNote = () => {
-  editingNote.value = {
-    id: '',
-    title: '',
-    content: '',
-    color: '#FFFFFF',
-    pinned: 0
-  }
-  showNoteEditor.value = true
-
-  nextTick(() => {
-    if (editorContent.value) {
-      editorContent.value.innerHTML = ''
-      editorContent.value.focus()
-    }
-  })
-}
-
 const closeNoteEditor = () => {
   showNoteEditor.value = false
 }
@@ -512,7 +485,7 @@ const saveNote = async () => {
         content: editingNote.value.content,
         color: editingNote.value.color,
         pinned: editingNote.value.pinned,
-        tags: editingNote.value.tags
+        tags: editingNote.value.tags,
       })
     } else {
       // 创建新便签
@@ -521,7 +494,7 @@ const saveNote = async () => {
         content: editingNote.value.content,
         color: editingNote.value.color,
         pinned: editingNote.value.pinned,
-        tags: editingNote.value.tags
+        tags: editingNote.value.tags,
       })
     }
 
@@ -791,7 +764,9 @@ onMounted(() => {
   border-radius: 12px;
   padding: 20px;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
   min-height: 200px;
@@ -1024,7 +999,9 @@ onMounted(() => {
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .color-option:hover {

@@ -66,6 +66,6 @@ export const useAppStore = defineStore('app', () => {
     setLoading,
     setError,
     clearError,
-    initTheme
+    initTheme,
   }
 })

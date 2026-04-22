@@ -43,9 +43,15 @@
             {{ activeTab === 'active' ? '还没有习惯' : '没有已归档的习惯' }}
           </h3>
           <p class="empty-text">
-            {{ activeTab === 'active' ? '创建你的第一个习惯，开始追踪吧！' : '归档的习惯将在这里显示' }}
+            {{
+              activeTab === 'active' ? '创建你的第一个习惯，开始追踪吧！' : '归档的习惯将在这里显示'
+            }}
           </p>
-          <button v-if="activeTab === 'active'" class="btn btn-primary" @click="showNewHabitModal = true">
+          <button
+            v-if="activeTab === 'active'"
+            class="btn btn-primary"
+            @click="showNewHabitModal = true"
+          >
             <Icon icon="mdi:plus" class="btn-icon" />
             新建习惯
           </button>
@@ -63,7 +69,9 @@
               </div>
               <div class="habit-actions">
                 <button class="btn btn-icon" @click="toggleHabitArchive(habit)">
-                  <Icon :icon="habit.archived ? 'mdi:archive-arrow-up-outline' : 'mdi:archive-outline'" />
+                  <Icon
+                    :icon="habit.archived ? 'mdi:archive-arrow-up-outline' : 'mdi:archive-outline'"
+                  />
                 </button>
                 <button class="btn btn-icon" @click="editHabit(habit)">
                   <Icon icon="mdi:pencil-outline" />
@@ -103,7 +111,9 @@
               <div class="month-heatmap">
                 <div class="month-header">
                   <span class="month-title">月度记录</span>
-                  <span class="month-stats">{{ getMonthCompletion(habit.id) }}/{{ currentMonthDays }}</span>
+                  <span class="month-stats"
+                    >{{ getMonthCompletion(habit.id) }}/{{ currentMonthDays }}</span
+                  >
                 </div>
                 <div class="heatmap-grid">
                   <div
@@ -149,7 +159,11 @@
           <h3 class="calendar-title">本月日历</h3>
           <div class="calendar-grid">
             <div class="calendar-weekdays">
-              <span v-for="weekday in ['日', '一', '二', '三', '四', '五', '六']" :key="weekday" class="weekday">
+              <span
+                v-for="weekday in ['日', '一', '二', '三', '四', '五', '六']"
+                :key="weekday"
+                class="weekday"
+              >
                 {{ weekday }}
               </span>
             </div>
@@ -160,8 +174,8 @@
                 class="calendar-day"
                 :class="{
                   'current-month': day.isCurrentMonth,
-                  'today': day.isToday,
-                  'has-record': hasAnyHabitRecord(day.date)
+                  today: day.isToday,
+                  'has-record': hasAnyHabitRecord(day.date),
                 }"
                 :title="day.date"
               >
@@ -186,12 +200,8 @@
           <p class="modal-text">新建习惯模态框将在后续实现...</p>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-text" @click="showNewHabitModal = false">
-            取消
-          </button>
-          <button class="btn btn-primary" @click="showNewHabitModal = false">
-            确定
-          </button>
+          <button class="btn btn-text" @click="showNewHabitModal = false">取消</button>
+          <button class="btn btn-primary" @click="showNewHabitModal = false">确定</button>
         </div>
       </div>
     </div>
@@ -224,12 +234,11 @@ const weekDays = computed(() => {
   for (let i = 0; i < 7; i++) {
     const date = new Date(today)
     date.setDate(today.getDate() - today.getDay() + i)
-    const day = date.getDate()
     const dayLabels = ['日', '一', '二', '三', '四', '五', '六']
     days.push({
       day: dayLabels[i],
       date: date.toISOString().split('T')[0],
-      isToday: i === today.getDay()
+      isToday: i === today.getDay(),
     })
   }
   return days
@@ -248,7 +257,7 @@ const monthDays = computed(() => {
   for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
     days.push({
       date: d.toISOString().split('T')[0],
-      day: d.getDate()
+      day: d.getDate(),
     })
   }
   return days
@@ -283,7 +292,7 @@ const calendarDays = computed(() => {
       day: date.getDate(),
       date: date.toISOString().split('T')[0],
       isCurrentMonth: false,
-      isToday: false
+      isToday: false,
     })
   }
 
@@ -295,7 +304,7 @@ const calendarDays = computed(() => {
       day: i,
       date: date.toISOString().split('T')[0],
       isCurrentMonth: true,
-      isToday
+      isToday,
     })
   }
 
@@ -308,7 +317,7 @@ const calendarDays = computed(() => {
       day: i,
       date: date.toISOString().split('T')[0],
       isCurrentMonth: false,
-      isToday: false
+      isToday: false,
     })
   }
 
@@ -318,16 +327,16 @@ const calendarDays = computed(() => {
 // 方法
 const getFrequencyText = (frequency: string) => {
   const freqMap: Record<string, string> = {
-    'daily': '每天',
-    'weekly': '每周',
-    'monthly': '每月'
+    daily: '每天',
+    weekly: '每周',
+    monthly: '每月',
   }
   return freqMap[frequency] || frequency
 }
 
 const isHabitCompletedToday = (habitId: string, date: string) => {
   const records = habitStore.getHabitRecords(habitId)
-  return records.some(record => record.date === date && record.completed === 1)
+  return records.some((record) => record.date === date && record.completed === 1)
 }
 
 const isHabitCompletedOnDate = (habitId: string, date: string) => {
@@ -343,18 +352,16 @@ const getHeatmapClass = (habitId: string, date: string) => {
 
 const getWeekCompletion = (habitId: string) => {
   const records = habitStore.getHabitRecords(habitId)
-  const weekDates = weekDays.value.map(d => d.date)
-  return records.filter(record =>
-    weekDates.includes(record.date) && record.completed === 1
-  ).length
+  const weekDates = weekDays.value.map((d) => d.date)
+  return records.filter((record) => weekDates.includes(record.date) && record.completed === 1)
+    .length
 }
 
 const getMonthCompletion = (habitId: string) => {
   const records = habitStore.getHabitRecords(habitId)
-  const monthDates = monthDays.value.map(d => d.date)
-  return records.filter(record =>
-    monthDates.includes(record.date) && record.completed === 1
-  ).length
+  const monthDates = monthDays.value.map((d) => d.date)
+  return records.filter((record) => monthDates.includes(record.date) && record.completed === 1)
+    .length
 }
 
 const toggleHabitRecord = async (habitId: string, date: string) => {
@@ -391,7 +398,7 @@ const deleteHabit = async (habitId: string) => {
 const getTotalCompletionRate = () => {
   if (activeHabits.value.length === 0) return 0
   let totalRate = 0
-  activeHabits.value.forEach(habit => {
+  activeHabits.value.forEach((habit) => {
     const monthCompletion = getMonthCompletion(habit.id)
     totalRate += (monthCompletion / currentMonthDays.value) * 100
   })
@@ -405,18 +412,18 @@ const getCurrentStreak = () => {
 
 const getTotalCompletions = () => {
   let total = 0
-  activeHabits.value.forEach(habit => {
+  activeHabits.value.forEach((habit) => {
     const records = habitStore.getHabitRecords(habit.id)
-    total += records.filter(r => r.completed === 1).length
+    total += records.filter((r) => r.completed === 1).length
   })
   return total
 }
 
 const hasAnyHabitRecord = (date: string) => {
-  return activeHabits.value.some(habit =>
-    habitStore.getHabitRecords(habit.id).some(record =>
-      record.date === date && record.completed === 1
-    )
+  return activeHabits.value.some((habit) =>
+    habitStore
+      .getHabitRecords(habit.id)
+      .some((record) => record.date === date && record.completed === 1)
   )
 }
 
@@ -425,7 +432,7 @@ onMounted(() => {
   habitStore.init()
   // 加载当月记录
   const currentMonth = new Date().toISOString().slice(0, 7) // YYYY-MM
-  activeHabits.value.forEach(habit => {
+  activeHabits.value.forEach((habit) => {
     habitStore.loadHabitRecords(habit.id, currentMonth)
   })
 })
@@ -563,7 +570,9 @@ onMounted(() => {
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 20px;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .habit-card:hover {

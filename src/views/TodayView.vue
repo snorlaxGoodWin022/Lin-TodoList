@@ -19,7 +19,7 @@
     </div>
 
     <div class="view-content">
-      <div class="overdue-section" v-if="overdueTasks.length > 0">
+      <div v-if="overdueTasks.length > 0" class="overdue-section">
         <h2 class="section-title">过期任务</h2>
         <draggable
           v-model="overdueTasks"
@@ -41,7 +41,11 @@
       <div class="today-section">
         <div class="section-header">
           <h2 class="section-title">今天到期</h2>
-          <button v-if="!batchSelectMode && pendingTasks.length > 0" class="btn btn-text" @click="startBatchSelect">
+          <button
+            v-if="!batchSelectMode && pendingTasks.length > 0"
+            class="btn btn-text"
+            @click="startBatchSelect"
+          >
             多选
           </button>
         </div>
@@ -62,7 +66,7 @@
         </draggable>
       </div>
 
-      <div class="completed-section" v-if="completedTasks.length > 0">
+      <div v-if="completedTasks.length > 0" class="completed-section">
         <h2 class="section-title">已完成</h2>
         <div class="task-list">
           <TaskCard
@@ -75,13 +79,11 @@
         </div>
       </div>
 
-      <div class="empty-state" v-if="totalTasks === 0">
+      <div v-if="totalTasks === 0" class="empty-state">
         <div class="empty-icon">📅</div>
         <h3 class="empty-title">没有任务</h3>
         <p class="empty-description">今天很轻松，享受你的时间！</p>
-        <button class="btn btn-primary" @click="createTask">
-          创建新任务
-        </button>
+        <button class="btn btn-primary" @click="createTask">创建新任务</button>
       </div>
     </div>
   </div>
@@ -139,7 +141,7 @@ const formattedDate = computed(() => {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   })
 })
 
@@ -332,13 +334,13 @@ onMounted(() => {
 }
 
 .btn-danger {
-  background-color: #EF4444;
+  background-color: #ef4444;
   color: white;
   border: none;
 }
 
 .btn-danger:hover {
-  background-color: #DC2626;
+  background-color: #dc2626;
 }
 
 .btn-text {

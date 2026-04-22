@@ -51,7 +51,7 @@
           <button v-if="isEditing" class="btn btn-danger" @click="deleteList">删除</button>
           <div class="spacer"></div>
           <button class="btn btn-secondary" @click="close">取消</button>
-          <button class="btn btn-primary" @click="save" :disabled="!form.name.trim()">
+          <button class="btn btn-primary" :disabled="!form.name.trim()" @click="save">
             {{ isEditing ? '保存' : '创建' }}
           </button>
         </div>
@@ -74,30 +74,62 @@ const form = reactive({
   id: '',
   name: '',
   icon: '📁',
-  color: '#10B981'
+  color: '#10B981',
 })
 
-const icons = ['📁', '📋', '📝', '📌', '📎', '💼', '💡', '🎯', '⭐', '❤️', '🔥', '🚀', '📚', '🎨', '🎵', '🏠', '✈️', '🍕']
-const colors = ['#10B981', '#3B82F6', '#EF4444', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16']
+const icons = [
+  '📁',
+  '📋',
+  '📝',
+  '📌',
+  '📎',
+  '💼',
+  '💡',
+  '🎯',
+  '⭐',
+  '❤️',
+  '🔥',
+  '🚀',
+  '📚',
+  '🎨',
+  '🎵',
+  '🏠',
+  '✈️',
+  '🍕',
+]
+const colors = [
+  '#10B981',
+  '#3B82F6',
+  '#EF4444',
+  '#F59E0B',
+  '#8B5CF6',
+  '#EC4899',
+  '#06B6D4',
+  '#84CC16',
+]
 
 const isEditing = computed(() => !!form.id)
 
-watch(() => listStore.editingList, (list) => {
-  if (list) {
-    if (list.id) {
-      Object.assign(form, {
-        id: list.id,
-        name: list.name || '',
-        icon: list.icon || '📁',
-        color: list.color || '#10B981'
-      })
-    } else {
-      resetForm()
+watch(
+  () => listStore.editingList,
+  (list) => {
+    if (list) {
+      if (list.id) {
+        Object.assign(form, {
+          id: list.id,
+          name: list.name || '',
+          icon: list.icon || '📁',
+          color: list.color || '#10B981',
+        })
+      } else {
+        resetForm()
+      }
+      visible.value = true
+      nextTick(() => nameInput.value?.focus())
     }
-    visible.value = true
-    nextTick(() => nameInput.value?.focus())
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+)
 
 const resetForm = () => {
   form.id = ''
@@ -118,7 +150,7 @@ const save = async () => {
   const listData: Partial<List> = {
     name: form.name,
     icon: form.icon,
-    color: form.color
+    color: form.color,
   }
 
   try {
@@ -320,7 +352,7 @@ const deleteList = async () => {
 }
 
 .btn-danger {
-  background: #EF4444;
+  background: #ef4444;
   color: white;
   border: none;
 }

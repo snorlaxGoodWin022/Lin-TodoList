@@ -1,6 +1,6 @@
 <template>
   <main class="app-content">
-    <div class="content-header" v-if="showContentHeader">
+    <div v-if="showContentHeader" class="content-header">
       <div class="header-actions">
         <slot name="header-actions"></slot>
       </div>

@@ -105,6 +105,7 @@ Pinia stores in `src/stores/` manage local UI state and cache data fetched via I
 Colors are defined as CSS variables in `src/assets/styles/variables.css`. The primary color is emerald green (`#10B981`). Dark theme toggled via `data-theme="dark"`.
 
 Priority colors:
+
 - High: `#EF4444` (red)
 - Medium: `#F59E0B` (amber)
 - Low: `#3B82F6` (blue)
@@ -147,6 +148,7 @@ All cards have white background, 1px border, `shadow-sm` on hover. Buttons are c
 ## Project Initialization
 
 To begin implementation:
+
 1. Create `package.json` with the expected pnpm scripts
 2. Set up Vite + Electron + TypeScript configuration
 3. Create the directory structure outlined above

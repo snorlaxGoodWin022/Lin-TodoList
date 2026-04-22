@@ -25,7 +25,10 @@ async function handleGetAllLists(): Promise<List[]> {
   return stmt.all() as List[]
 }
 
-async function handleCreateList(_event: Electron.IpcMainInvokeEvent, listData: Partial<List>): Promise<List> {
+async function handleCreateList(
+  _event: Electron.IpcMainInvokeEvent,
+  listData: Partial<List>
+): Promise<List> {
   const db = getDatabase()
   const now = new Date().toISOString()
   const id = uuidv4()
@@ -37,7 +40,7 @@ async function handleCreateList(_event: Electron.IpcMainInvokeEvent, listData: P
     icon: listData.icon || 'folder',
     sort_order: listData.sort_order || Date.now(),
     created_at: now,
-    updated_at: now
+    updated_at: now,
   }
 
   const stmt = db.prepare(`
@@ -58,7 +61,11 @@ async function handleCreateList(_event: Electron.IpcMainInvokeEvent, listData: P
   return list
 }
 
-async function handleUpdateList(_event: Electron.IpcMainInvokeEvent, id: string, updates: Partial<List>): Promise<boolean> {
+async function handleUpdateList(
+  _event: Electron.IpcMainInvokeEvent,
+  id: string,
+  updates: Partial<List>
+): Promise<boolean> {
   const db = getDatabase()
 
   const fields: string[] = []

@@ -25,7 +25,7 @@ export function useTask() {
   const allTasks = computed(() => taskStore.allTasks)
   const overdueTasks = computed(() => {
     const today = new Date().toISOString().split('T')[0]
-    return taskStore.pendingTasks.filter(t => t.due_date && t.due_date < today)
+    return taskStore.pendingTasks.filter((t) => t.due_date && t.due_date < today)
   })
 
   // Task selection
@@ -79,14 +79,14 @@ export function useTask() {
   // Task editor
   const openTaskEditor = (taskId?: string) => {
     if (taskId) {
-      const task = taskStore.tasks.find(t => t.id === taskId)
+      const task = taskStore.tasks.find((t) => t.id === taskId)
       editingTask.value = task ? { ...task } : { id: taskId }
     } else {
       editingTask.value = {
         title: '',
         description: '',
         priority: 1,
-        list_id: currentList.value?.id || 'inbox'
+        list_id: currentList.value?.id || 'inbox',
       }
     }
   }
@@ -148,6 +148,6 @@ export function useTask() {
     openTaskEditor,
     closeTaskEditor,
     saveTask,
-    init
+    init,
   }
 }

@@ -63,7 +63,7 @@ const form = reactive({
   title: '',
   content: '',
   color: '#FEF3C7',
-  pinned: 0
+  pinned: 0,
 })
 
 const colors = [
@@ -73,28 +73,32 @@ const colors = [
   { value: '#FCE7F3', label: '粉色' },
   { value: '#F3E8FF', label: '紫色' },
   { value: '#FEE2E2', label: '红色' },
-  { value: '#F5F5F5', label: '灰色' }
+  { value: '#F5F5F5', label: '灰色' },
 ]
 
 const isEditing = computed(() => !!form.id)
 
-watch(() => noteStore.editingNote, (note) => {
-  if (note) {
-    if (note.id) {
-      Object.assign(form, {
-        id: note.id,
-        title: note.title || '',
-        content: note.content || '',
-        color: note.color || '#FEF3C7',
-        pinned: note.pinned || 0
-      })
-    } else {
-      resetForm()
+watch(
+  () => noteStore.editingNote,
+  (note) => {
+    if (note) {
+      if (note.id) {
+        Object.assign(form, {
+          id: note.id,
+          title: note.title || '',
+          content: note.content || '',
+          color: note.color || '#FEF3C7',
+          pinned: note.pinned || 0,
+        })
+      } else {
+        resetForm()
+      }
+      visible.value = true
+      nextTick(() => titleInput.value?.focus())
     }
-    visible.value = true
-    nextTick(() => titleInput.value?.focus())
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+)
 
 const resetForm = () => {
   form.id = ''
@@ -115,7 +119,7 @@ const save = async () => {
     title: form.title,
     content: form.content,
     color: form.color,
-    pinned: form.pinned
+    pinned: form.pinned,
   }
 
   try {
@@ -257,7 +261,7 @@ const deleteNote = async () => {
 }
 
 .check-mark {
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .modal-footer {
@@ -294,7 +298,7 @@ const deleteNote = async () => {
 }
 
 .btn-danger {
-  background: #EF4444;
+  background: #ef4444;
   color: white;
   border: none;
 }

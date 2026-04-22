@@ -2,9 +2,9 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { Task, TaskFilters } from './database/repositories/task.repo'
 import type { List } from './database/repositories/list.repo'
-import type { Habit, HabitRecord, HabitFilters } from './database/repositories/habit.repo'
-import type { Note, NoteFilters } from './database/repositories/note.repo'
-import type { PomodoroRecord, PomodoroStats } from './database/repositories/pomodoro.repo'
+import type { Habit } from './database/repositories/habit.repo'
+import type { Note } from './database/repositories/note.repo'
+import type { PomodoroRecord } from './database/repositories/pomodoro.repo'
 import type { Tag } from './database/repositories/tag.repo'
 import type { NotificationOptions } from './services/notification'
 
@@ -15,7 +15,8 @@ const api = {
   createTask: (data: Partial<Task>) => ipcRenderer.invoke('task:create', data),
   updateTask: (id: string, data: Partial<Task>) => ipcRenderer.invoke('task:update', id, data),
   deleteTask: (id: string) => ipcRenderer.invoke('task:delete', id),
-  toggleTaskCompletion: (id: string, completed: boolean) => ipcRenderer.invoke('task:toggle', id, completed),
+  toggleTaskCompletion: (id: string, completed: boolean) =>
+    ipcRenderer.invoke('task:toggle', id, completed),
 
   // List operations
   getLists: () => ipcRenderer.invoke('list:all'),
@@ -29,7 +30,8 @@ const api = {
   updateHabit: (id: string, data: Partial<Habit>) => ipcRenderer.invoke('habit:update', id, data),
   deleteHabit: (id: string) => ipcRenderer.invoke('habit:delete', id),
   toggleHabit: (id: string, date: string) => ipcRenderer.invoke('habit:toggle', id, date),
-  getHabitRecords: (habitId: string, month?: string) => ipcRenderer.invoke('habit:records', habitId, month),
+  getHabitRecords: (habitId: string, month?: string) =>
+    ipcRenderer.invoke('habit:records', habitId, month),
 
   // Note operations
   getNotes: () => ipcRenderer.invoke('note:all'),
@@ -48,13 +50,16 @@ const api = {
   deleteTag: (id: string) => ipcRenderer.invoke('tag:delete', id),
 
   // System operations
-  showNotification: (options: NotificationOptions) => ipcRenderer.invoke('notification:show', options),
+  showNotification: (options: NotificationOptions) =>
+    ipcRenderer.invoke('notification:show', options),
   getAppVersion: () => ipcRenderer.invoke('app:getVersion'),
   getUserDataPath: () => ipcRenderer.invoke('app:getPath', 'userData'),
 
   // Event listeners
-  onReminder: (callback: (data: any) => void) => ipcRenderer.on('reminder:trigger', (_, data) => callback(data)),
-  onDatabaseChange: (callback: (data: any) => void) => ipcRenderer.on('database:change', (_, data) => callback(data)),
+  onReminder: (callback: (data: any) => void) =>
+    ipcRenderer.on('reminder:trigger', (_, _data: any) => callback(_data)),
+  onDatabaseChange: (callback: (data: any) => void) =>
+    ipcRenderer.on('database:change', (_, _data: any) => callback(_data)),
 
   // Shortcut listeners
   onShortcut: (action: string, callback: () => void) => {
@@ -67,7 +72,7 @@ const api = {
   closeWindow: () => ipcRenderer.send('window:close'),
 
   // Mini window
-  openMiniWindow: () => ipcRenderer.invoke('mini-window:create')
+  openMiniWindow: () => ipcRenderer.invoke('mini-window:create'),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

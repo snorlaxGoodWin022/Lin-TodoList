@@ -34,7 +34,11 @@
                 <button
                   v-for="(p, index) in priorities"
                   :key="index"
-                  :class="['priority-btn', `priority-${index}`, { active: form.priority === index }]"
+                  :class="[
+                    'priority-btn',
+                    `priority-${index}`,
+                    { active: form.priority === index },
+                  ]"
                   @click="form.priority = index"
                 >
                   {{ p }}
@@ -104,7 +108,7 @@
 
         <div class="modal-footer">
           <button class="btn btn-secondary" @click="close">取消</button>
-          <button class="btn btn-primary" @click="save" :disabled="!form.title.trim()">
+          <button class="btn btn-primary" :disabled="!form.title.trim()" @click="save">
             {{ isEditing ? '保存' : '创建' }}
           </button>
         </div>
@@ -137,7 +141,7 @@ const form = reactive({
   remind_at: '',
   quadrant: 0 as number,
   repeat_rule: '',
-  tags: '[]'
+  tags: '[]',
 })
 
 const priorities = ['无', '低', '中', '高']
@@ -147,31 +151,35 @@ const lists = computed(() => listStore.lists)
 
 const isEditing = computed(() => !!form.id)
 
-watch(() => taskStore.editingTask, (task) => {
-  if (task) {
-    if (task.id) {
-      Object.assign(form, {
-        id: task.id,
-        title: task.title || '',
-        description: task.description || '',
-        priority: (task.priority || 0) as number,
-        list_id: task.list_id || 'inbox',
-        due_date: task.due_date || '',
-        start_time: task.start_time || '',
-        end_time: task.end_time || '',
-        remind_at: task.remind_at || '',
-        quadrant: (task.quadrant || 0) as number,
-        repeat_rule: task.repeat_rule || '',
-        tags: task.tags || '[]'
-      })
-    } else {
-      resetForm()
-      form.list_id = (task as any).list_id || 'inbox'
+watch(
+  () => taskStore.editingTask,
+  (task) => {
+    if (task) {
+      if (task.id) {
+        Object.assign(form, {
+          id: task.id,
+          title: task.title || '',
+          description: task.description || '',
+          priority: (task.priority || 0) as number,
+          list_id: task.list_id || 'inbox',
+          due_date: task.due_date || '',
+          start_time: task.start_time || '',
+          end_time: task.end_time || '',
+          remind_at: task.remind_at || '',
+          quadrant: (task.quadrant || 0) as number,
+          repeat_rule: task.repeat_rule || '',
+          tags: task.tags || '[]',
+        })
+      } else {
+        resetForm()
+        form.list_id = (task as any).list_id || 'inbox'
+      }
+      visible.value = true
+      nextTick(() => titleInput.value?.focus())
     }
-    visible.value = true
-    nextTick(() => titleInput.value?.focus())
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+)
 
 const resetForm = () => {
   form.id = ''
@@ -208,7 +216,7 @@ const save = async () => {
     remind_at: form.remind_at || undefined,
     quadrant: form.quadrant,
     repeat_rule: form.repeat_rule || undefined,
-    tags: form.tags
+    tags: form.tags,
   }
 
   try {
@@ -358,16 +366,50 @@ const save = async () => {
   border-width: 2px;
 }
 
-.priority-0.active { border-color: var(--color-priority-none); background: var(--color-priority-none); color: white; }
-.priority-1.active { border-color: var(--color-priority-low); background: var(--color-priority-low); color: white; }
-.priority-2.active { border-color: var(--color-priority-medium); background: var(--color-priority-medium); color: white; }
-.priority-3.active { border-color: var(--color-priority-high); background: var(--color-priority-high); color: white; }
+.priority-0.active {
+  border-color: var(--color-priority-none);
+  background: var(--color-priority-none);
+  color: white;
+}
+.priority-1.active {
+  border-color: var(--color-priority-low);
+  background: var(--color-priority-low);
+  color: white;
+}
+.priority-2.active {
+  border-color: var(--color-priority-medium);
+  background: var(--color-priority-medium);
+  color: white;
+}
+.priority-3.active {
+  border-color: var(--color-priority-high);
+  background: var(--color-priority-high);
+  color: white;
+}
 
-.quadrant-0.active { border-color: var(--color-text-muted); }
-.quadrant-1.active { border-color: #EF4444; background: #FEE2E2; color: #EF4444; }
-.quadrant-2.active { border-color: #10B981; background: #D1FAE5; color: #10B981; }
-.quadrant-3.active { border-color: #F59E0B; background: #FEF3C7; color: #F59E0B; }
-.quadrant-4.active { border-color: #6B7280; background: #F3F4F6; color: #6B7280; }
+.quadrant-0.active {
+  border-color: var(--color-text-muted);
+}
+.quadrant-1.active {
+  border-color: #ef4444;
+  background: #fee2e2;
+  color: #ef4444;
+}
+.quadrant-2.active {
+  border-color: #10b981;
+  background: #d1fae5;
+  color: #10b981;
+}
+.quadrant-3.active {
+  border-color: #f59e0b;
+  background: #fef3c7;
+  color: #f59e0b;
+}
+.quadrant-4.active {
+  border-color: #6b7280;
+  background: #f3f4f6;
+  color: #6b7280;
+}
 
 .modal-footer {
   display: flex;

@@ -25,7 +25,10 @@ export function setupNoteHandlers(): void {
   ipcMain.handle('note:delete', handleDeleteNote)
 }
 
-async function handleGetAllNotes(_event: Electron.IpcMainInvokeEvent, filters: NoteFilters = {}): Promise<Note[]> {
+async function handleGetAllNotes(
+  _event: Electron.IpcMainInvokeEvent,
+  filters: NoteFilters = {}
+): Promise<Note[]> {
   const db = getDatabase()
 
   let sql = 'SELECT * FROM notes WHERE 1=1'
@@ -48,7 +51,10 @@ async function handleGetAllNotes(_event: Electron.IpcMainInvokeEvent, filters: N
   return stmt.all(...params) as Note[]
 }
 
-async function handleCreateNote(_event: Electron.IpcMainInvokeEvent, noteData: Partial<Note>): Promise<Note> {
+async function handleCreateNote(
+  _event: Electron.IpcMainInvokeEvent,
+  noteData: Partial<Note>
+): Promise<Note> {
   const db = getDatabase()
   const now = new Date().toISOString()
   const id = uuidv4()
@@ -61,7 +67,7 @@ async function handleCreateNote(_event: Electron.IpcMainInvokeEvent, noteData: P
     pinned: noteData.pinned || 0,
     sort_order: noteData.sort_order || Date.now(),
     created_at: now,
-    updated_at: now
+    updated_at: now,
   }
 
   const stmt = db.prepare(`
@@ -83,7 +89,11 @@ async function handleCreateNote(_event: Electron.IpcMainInvokeEvent, noteData: P
   return note
 }
 
-async function handleUpdateNote(_event: Electron.IpcMainInvokeEvent, id: string, updates: Partial<Note>): Promise<boolean> {
+async function handleUpdateNote(
+  _event: Electron.IpcMainInvokeEvent,
+  id: string,
+  updates: Partial<Note>
+): Promise<boolean> {
   const db = getDatabase()
 
   const fields: string[] = []

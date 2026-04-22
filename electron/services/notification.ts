@@ -28,7 +28,7 @@ export function setMainWindow(window: BrowserWindow | null): void {
 }
 
 export function showNotification(options: NotificationOptions): void {
-  const { title, body, subtitle, silent = false, icon, data } = options
+  const { title, body, subtitle, silent = false, icon } = options
 
   const notification = new Notification({
     title,
@@ -37,7 +37,7 @@ export function showNotification(options: NotificationOptions): void {
     silent,
     icon,
     hasReply: false,
-    timeoutType: 'default'
+    timeoutType: 'default',
   })
 
   notification.on('click', () => {
@@ -99,14 +99,14 @@ async function checkDueReminders(): Promise<void> {
         title: '任务提醒',
         body: task.title,
         subtitle: task.description || '点击查看详情',
-        silent: false
+        silent: false,
       })
 
       if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send('reminder:trigger', {
           taskId: task.id,
           title: task.title,
-          remindAt: task.remind_at
+          remindAt: task.remind_at,
         })
       }
 
@@ -151,14 +151,14 @@ async function checkDueReminders(): Promise<void> {
             title: '习惯提醒',
             body: `${habit.icon} ${habit.name}`,
             subtitle: '今天还没完成，记得打卡哦！',
-            silent: false
+            silent: false,
           })
 
           if (mainWindow && !mainWindow.isDestroyed()) {
             mainWindow.webContents.send('habit-reminder:trigger', {
               habitId: habit.id,
               name: habit.name,
-              remindAt: habit.remind_at
+              remindAt: habit.remind_at,
             })
           }
         }
@@ -188,7 +188,7 @@ async function checkDueReminders(): Promise<void> {
         title: '任务即将到期',
         body: `${task.title} (${task.remind_advance}分钟前提醒)`,
         subtitle: `截止时间: ${task.due_date}`,
-        silent: false
+        silent: false,
       })
 
       if (mainWindow && !mainWindow.isDestroyed()) {
@@ -196,7 +196,7 @@ async function checkDueReminders(): Promise<void> {
           taskId: task.id,
           title: task.title,
           dueDate: task.due_date,
-          remindAdvance: task.remind_advance
+          remindAdvance: task.remind_advance,
         })
       }
     }

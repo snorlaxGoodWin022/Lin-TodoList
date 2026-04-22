@@ -30,7 +30,10 @@ export function setupPomodoroHandlers(): void {
   ipcMain.handle('pomodoro:stats', handleGetPomodoroStats)
 }
 
-async function handleSavePomodoro(_event: Electron.IpcMainInvokeEvent, recordData: Partial<PomodoroRecord>): Promise<PomodoroRecord> {
+async function handleSavePomodoro(
+  _event: Electron.IpcMainInvokeEvent,
+  recordData: Partial<PomodoroRecord>
+): Promise<PomodoroRecord> {
   const db = getDatabase()
   const id = uuidv4()
 
@@ -40,7 +43,7 @@ async function handleSavePomodoro(_event: Electron.IpcMainInvokeEvent, recordDat
     duration: recordData.duration || 25,
     type: recordData.type || 'focus',
     started_at: recordData.started_at || new Date().toISOString(),
-    completed_at: recordData.completed_at || new Date().toISOString()
+    completed_at: recordData.completed_at || new Date().toISOString(),
   }
 
   const stmt = db.prepare(`
@@ -60,7 +63,10 @@ async function handleSavePomodoro(_event: Electron.IpcMainInvokeEvent, recordDat
   return record
 }
 
-async function handleGetPomodoroStats(_event: Electron.IpcMainInvokeEvent, range?: string): Promise<PomodoroStats> {
+async function handleGetPomodoroStats(
+  _event: Electron.IpcMainInvokeEvent,
+  _range?: string
+): Promise<PomodoroStats> {
   const db = getDatabase()
 
   // Default to last 30 days if no range specified
@@ -128,6 +134,6 @@ async function handleGetPomodoroStats(_event: Electron.IpcMainInvokeEvent, range
     total_focus_minutes: totalFocus,
     total_break_minutes: totalBreak,
     daily_average: dailyAverage,
-    streak_days: streakDays
+    streak_days: streakDays,
   }
 }

@@ -42,7 +42,10 @@ export function setupTaskHandlers(): void {
   ipcMain.handle('task:toggle', handleToggleTask)
 }
 
-async function handleListTasks(_event: Electron.IpcMainInvokeEvent, filters: TaskFilters = {}): Promise<Task[]> {
+async function handleListTasks(
+  _event: Electron.IpcMainInvokeEvent,
+  filters: TaskFilters = {}
+): Promise<Task[]> {
   const db = getDatabase()
 
   let sql = 'SELECT * FROM tasks WHERE 1=1'
@@ -85,7 +88,10 @@ async function handleListTasks(_event: Electron.IpcMainInvokeEvent, filters: Tas
   return stmt.all(...params) as Task[]
 }
 
-async function handleCreateTask(_event: Electron.IpcMainInvokeEvent, taskData: Partial<Task>): Promise<Task> {
+async function handleCreateTask(
+  _event: Electron.IpcMainInvokeEvent,
+  taskData: Partial<Task>
+): Promise<Task> {
   const db = getDatabase()
   const now = new Date().toISOString()
   const id = uuidv4()
@@ -109,7 +115,7 @@ async function handleCreateTask(_event: Electron.IpcMainInvokeEvent, taskData: P
     remind_advance: taskData.remind_advance || 0,
     remind_persistent: taskData.remind_persistent || 0,
     created_at: now,
-    updated_at: now
+    updated_at: now,
   }
 
   const stmt = db.prepare(`
@@ -148,7 +154,11 @@ async function handleCreateTask(_event: Electron.IpcMainInvokeEvent, taskData: P
   return task
 }
 
-async function handleUpdateTask(_event: Electron.IpcMainInvokeEvent, id: string, updates: Partial<Task>): Promise<boolean> {
+async function handleUpdateTask(
+  _event: Electron.IpcMainInvokeEvent,
+  id: string,
+  updates: Partial<Task>
+): Promise<boolean> {
   const db = getDatabase()
 
   // Build dynamic update query
@@ -261,7 +271,11 @@ async function handleDeleteTask(_event: Electron.IpcMainInvokeEvent, id: string)
   return result.changes > 0
 }
 
-async function handleToggleTask(_event: Electron.IpcMainInvokeEvent, id: string, completed: boolean): Promise<boolean> {
+async function handleToggleTask(
+  _event: Electron.IpcMainInvokeEvent,
+  id: string,
+  completed: boolean
+): Promise<boolean> {
   const db = getDatabase()
   const now = new Date().toISOString()
 
@@ -271,12 +285,7 @@ async function handleToggleTask(_event: Electron.IpcMainInvokeEvent, id: string,
     WHERE id = ?
   `)
 
-  const result = stmt.run(
-    completed ? 1 : 0,
-    completed ? now : null,
-    now,
-    id
-  )
+  const result = stmt.run(completed ? 1 : 0, completed ? now : null, now, id)
 
   return result.changes > 0
 }

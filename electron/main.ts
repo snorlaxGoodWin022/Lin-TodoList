@@ -50,7 +50,7 @@ const saveWindowState = (window: BrowserWindow) => {
     const bounds = window.getBounds()
     const state: WindowState = {
       ...bounds,
-      isMaximized: window.isMaximized()
+      isMaximized: window.isMaximized(),
     }
     const configPath = getConfigPath()
     writeFileSync(configPath, JSON.stringify(state, null, 2))
@@ -81,8 +81,8 @@ function createWindow(): void {
       preload: join(__dirname, '../electron/preload.js'),
       sandbox: false,
       contextIsolation: true,
-      nodeIntegration: false
-    }
+      nodeIntegration: false,
+    },
   })
 
   // Restore maximized state
@@ -148,8 +148,8 @@ function createMiniWindow(): void {
       preload: join(__dirname, '../electron/preload.js'),
       sandbox: false,
       contextIsolation: true,
-      nodeIntegration: false
-    }
+      nodeIntegration: false,
+    },
   })
 
   if (import.meta.env.DEV) {

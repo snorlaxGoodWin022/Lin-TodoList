@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAppStore } from '../../stores/app.store'
 import { useListStore } from '../../stores/list.store'
@@ -74,13 +74,13 @@ const mainNavItems = [
   { id: 'quadrant', label: '四象限', icon: '📊', path: '/quadrant' },
   { id: 'pomodoro', label: '番茄钟', icon: '🍅', path: '/pomodoro' },
   { id: 'habit', label: '习惯', icon: '🔖', path: '/habits' },
-  { id: 'note', label: '便签', icon: '📝', path: '/notes' }
+  { id: 'note', label: '便签', icon: '📝', path: '/notes' },
 ]
 
 const lists = computed(() => listStore.lists)
 
-const themeIcon = computed(() => appStore.theme === 'dark' ? '🌙' : '☀️')
-const themeLabel = computed(() => appStore.theme === 'dark' ? '深色模式' : '浅色模式')
+const themeIcon = computed(() => (appStore.theme === 'dark' ? '🌙' : '☀️'))
+const themeLabel = computed(() => (appStore.theme === 'dark' ? '深色模式' : '浅色模式'))
 
 const navigateTo = (path: string) => {
   router.push(path)

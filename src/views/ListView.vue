@@ -62,9 +62,7 @@
         <div class="empty-icon">📝</div>
         <h3 class="empty-title">清单为空</h3>
         <p class="empty-description">添加第一个任务开始使用</p>
-        <button class="btn btn-primary" @click="createTask">
-          创建新任务
-        </button>
+        <button class="btn btn-primary" @click="createTask">创建新任务</button>
       </div>
     </div>
   </div>
@@ -97,7 +95,7 @@ const totalTasks = computed(() => pendingTasks.value.length + completedTasks.val
 
 const pendingTaskList = computed({
   get: () => pendingTasks.value,
-  set: () => {}
+  set: () => {},
 })
 
 // Watch for list ID changes

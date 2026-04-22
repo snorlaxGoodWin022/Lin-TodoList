@@ -41,8 +41,6 @@ export function useShortcuts() {
   }
 
   // IPC event listeners
-  let listeners: Array<() => void> = []
-
   onMounted(() => {
     // Register shortcut listeners
     window.electronAPI.onShortcut?.('shortcut:new-task', handleNewTask)

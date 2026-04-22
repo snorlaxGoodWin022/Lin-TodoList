@@ -11,14 +11,14 @@ export const useNoteStore = defineStore('note', () => {
   const error = ref<string | null>(null)
 
   // Getters
-  const pinnedNotes = computed(() => notes.value.filter(note => note.pinned === 1))
-  const unpinnedNotes = computed(() => notes.value.filter(note => note.pinned === 0))
+  const pinnedNotes = computed(() => notes.value.filter((note) => note.pinned === 1))
+  const unpinnedNotes = computed(() => notes.value.filter((note) => note.pinned === 0))
   const searchResults = computed(() => {
     if (!filters.value.search) return notes.value
     const query = filters.value.search.toLowerCase()
-    return notes.value.filter(note =>
-      note.title.toLowerCase().includes(query) ||
-      note.content.toLowerCase().includes(query)
+    return notes.value.filter(
+      (note) =>
+        note.title.toLowerCase().includes(query) || note.content.toLowerCase().includes(query)
     )
   })
 
@@ -61,7 +61,7 @@ export const useNoteStore = defineStore('note', () => {
       loading.value = true
       const success = await window.electronAPI.updateNote(id, updates)
       if (success) {
-        const index = notes.value.findIndex(note => note.id === id)
+        const index = notes.value.findIndex((note) => note.id === id)
         if (index !== -1) {
           notes.value[index] = { ...notes.value[index], ...updates }
         }
@@ -82,7 +82,7 @@ export const useNoteStore = defineStore('note', () => {
       loading.value = true
       const success = await window.electronAPI.deleteNote(id)
       if (success) {
-        notes.value = notes.value.filter(note => note.id !== id)
+        notes.value = notes.value.filter((note) => note.id !== id)
       }
       error.value = null
       return success
@@ -117,7 +117,7 @@ export const useNoteStore = defineStore('note', () => {
 
   const openNoteEditor = (noteId?: string) => {
     if (noteId) {
-      const note = notes.value.find(n => n.id === noteId)
+      const note = notes.value.find((n) => n.id === noteId)
       editingNote.value = note ? { ...note } : null
     } else {
       editingNote.value = {}
@@ -156,6 +156,6 @@ export const useNoteStore = defineStore('note', () => {
     clearSearch,
     openNoteEditor,
     closeNoteEditor,
-    init
+    init,
   }
 })

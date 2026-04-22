@@ -2,9 +2,16 @@
 
 import type { Task, TaskFilters } from '../../electron/database/repositories/task.repo'
 import type { List } from '../../electron/database/repositories/list.repo'
-import type { Habit, HabitFilters, HabitRecord } from '../../electron/database/repositories/habit.repo'
+import type {
+  Habit,
+  HabitFilters,
+  HabitRecord,
+} from '../../electron/database/repositories/habit.repo'
 import type { Note, NoteFilters } from '../../electron/database/repositories/note.repo'
-import type { PomodoroRecord, PomodoroStats } from '../../electron/database/repositories/pomodoro.repo'
+import type {
+  PomodoroRecord,
+  PomodoroStats,
+} from '../../electron/database/repositories/pomodoro.repo'
 import type { Tag } from '../../electron/database/repositories/tag.repo'
 
 export interface ElectronAPI {

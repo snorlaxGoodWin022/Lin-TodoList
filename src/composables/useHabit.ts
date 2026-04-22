@@ -21,7 +21,7 @@ export function useHabit() {
   const getHabitCompletion = (habitId: string, date: Date) => {
     const dateStr = date.toISOString().split('T')[0]
     const records = habitStore.getHabitRecords(habitId)
-    const record = records.find(r => r.date === dateStr)
+    const record = records.find((r) => r.date === dateStr)
     return record?.completed === 1
   }
 
@@ -37,9 +37,10 @@ export function useHabit() {
     let currentDate = new Date()
 
     // Check consecutive days from today backwards
-    for (let i = 0; i < 365; i++) { // Max 1 year
+    for (let i = 0; i < 365; i++) {
+      // Max 1 year
       const dateStr = currentDate.toISOString().split('T')[0]
-      const record = sortedRecords.find(r => r.date === dateStr)
+      const record = sortedRecords.find((r) => r.date === dateStr)
 
       if (!record || record.completed === 0) {
         // Streak broken
@@ -59,7 +60,7 @@ export function useHabit() {
     const records = habitStore.getHabitRecords(habitId)
 
     const completionMap: Record<string, boolean> = {}
-    records.forEach(record => {
+    records.forEach((record) => {
       if (record.date.startsWith(monthStr)) {
         completionMap[record.date] = record.completed === 1
       }
@@ -75,14 +76,14 @@ export function useHabit() {
     const oneWeekAgo = new Date(now)
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
-    const weekRecords = records.filter(record => {
+    const weekRecords = records.filter((record) => {
       const recordDate = new Date(record.date)
       return recordDate >= oneWeekAgo && recordDate <= now
     })
 
     if (weekRecords.length === 0) return 0
 
-    const completed = weekRecords.filter(r => r.completed === 1).length
+    const completed = weekRecords.filter((r) => r.completed === 1).length
     return (completed / weekRecords.length) * 100
   }
 
@@ -119,7 +120,7 @@ export function useHabit() {
   // Habit editor
   const openHabitEditor = (habitId?: string) => {
     if (habitId) {
-      const habit = habitStore.habits.find(h => h.id === habitId)
+      const habit = habitStore.habits.find((h) => h.id === habitId)
       editingHabit.value = habit ? { ...habit } : { id: habitId }
     } else {
       editingHabit.value = {
@@ -129,7 +130,7 @@ export function useHabit() {
         target_days: '[]',
         remind_at: null,
         sort_order: Date.now(),
-        archived: 0
+        archived: 0,
       }
     }
   }
@@ -195,6 +196,6 @@ export function useHabit() {
     getHabitCompletion,
     getHabitStreak,
     getMonthlyCompletion,
-    getWeeklyCompletionRate
+    getWeeklyCompletionRate,
   }
 }

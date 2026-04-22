@@ -36,7 +36,10 @@ export function setupHabitHandlers(): void {
   ipcMain.handle('habit:records', handleGetHabitRecords)
 }
 
-async function handleGetAllHabits(_event: Electron.IpcMainInvokeEvent, filters: HabitFilters = {}): Promise<Habit[]> {
+async function handleGetAllHabits(
+  _event: Electron.IpcMainInvokeEvent,
+  filters: HabitFilters = {}
+): Promise<Habit[]> {
   const db = getDatabase()
 
   let sql = 'SELECT * FROM habits WHERE 1=1'
@@ -53,7 +56,10 @@ async function handleGetAllHabits(_event: Electron.IpcMainInvokeEvent, filters: 
   return stmt.all(...params) as Habit[]
 }
 
-async function handleCreateHabit(_event: Electron.IpcMainInvokeEvent, habitData: Partial<Habit>): Promise<Habit> {
+async function handleCreateHabit(
+  _event: Electron.IpcMainInvokeEvent,
+  habitData: Partial<Habit>
+): Promise<Habit> {
   const db = getDatabase()
   const now = new Date().toISOString()
   const id = uuidv4()
@@ -68,7 +74,7 @@ async function handleCreateHabit(_event: Electron.IpcMainInvokeEvent, habitData:
     sort_order: habitData.sort_order || Date.now(),
     archived: 0,
     created_at: now,
-    updated_at: now
+    updated_at: now,
   }
 
   const stmt = db.prepare(`
@@ -94,7 +100,11 @@ async function handleCreateHabit(_event: Electron.IpcMainInvokeEvent, habitData:
   return habit
 }
 
-async function handleUpdateHabit(_event: Electron.IpcMainInvokeEvent, id: string, updates: Partial<Habit>): Promise<boolean> {
+async function handleUpdateHabit(
+  _event: Electron.IpcMainInvokeEvent,
+  id: string,
+  updates: Partial<Habit>
+): Promise<boolean> {
   const db = getDatabase()
 
   const fields: string[] = []
@@ -153,7 +163,10 @@ async function handleUpdateHabit(_event: Electron.IpcMainInvokeEvent, id: string
   return result.changes > 0
 }
 
-async function handleDeleteHabit(_event: Electron.IpcMainInvokeEvent, id: string): Promise<boolean> {
+async function handleDeleteHabit(
+  _event: Electron.IpcMainInvokeEvent,
+  id: string
+): Promise<boolean> {
   const db = getDatabase()
   // habit_records has foreign key constraint with ON DELETE CASCADE
   const stmt = db.prepare('DELETE FROM habits WHERE id = ?')
@@ -161,12 +174,18 @@ async function handleDeleteHabit(_event: Electron.IpcMainInvokeEvent, id: string
   return result.changes > 0
 }
 
-async function handleToggleHabitRecord(_event: Electron.IpcMainInvokeEvent, habitId: string, date: string): Promise<boolean> {
+async function handleToggleHabitRecord(
+  _event: Electron.IpcMainInvokeEvent,
+  habitId: string,
+  date: string
+): Promise<boolean> {
   const db = getDatabase()
   const now = new Date().toISOString()
 
   // Check if record exists
-  const existing = db.prepare('SELECT * FROM habit_records WHERE habit_id = ? AND date = ?').get(habitId, date) as HabitRecord | undefined
+  const existing = db
+    .prepare('SELECT * FROM habit_records WHERE habit_id = ? AND date = ?')
+    .get(habitId, date) as HabitRecord | undefined
 
   if (existing) {
     // Toggle completion
@@ -175,12 +194,7 @@ async function handleToggleHabitRecord(_event: Electron.IpcMainInvokeEvent, habi
       SET completed = ?, created_at = ?
       WHERE habit_id = ? AND date = ?
     `)
-    const result = stmt.run(
-      existing.completed === 1 ? 0 : 1,
-      now,
-      habitId,
-      date
-    )
+    const result = stmt.run(existing.completed === 1 ? 0 : 1, now, habitId, date)
     return result.changes > 0
   } else {
     // Create new record with completed = 1
@@ -194,7 +208,11 @@ async function handleToggleHabitRecord(_event: Electron.IpcMainInvokeEvent, habi
   }
 }
 
-async function handleGetHabitRecords(_event: Electron.IpcMainInvokeEvent, habitId: string, month?: string): Promise<HabitRecord[]> {
+async function handleGetHabitRecords(
+  _event: Electron.IpcMainInvokeEvent,
+  habitId: string,
+  month?: string
+): Promise<HabitRecord[]> {
   const db = getDatabase()
 
   let sql = 'SELECT * FROM habit_records WHERE habit_id = ?'

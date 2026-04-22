@@ -23,7 +23,7 @@ export function useTag() {
     '#6366F1', // Indigo
     '#14B8A6', // Teal
     '#F97316', // Orange
-    '#84CC16'  // Lime
+    '#84CC16', // Lime
   ]
 
   // Get random color from palette
@@ -52,12 +52,12 @@ export function useTag() {
   // Tag editor
   const openTagEditor = (tagId?: string) => {
     if (tagId) {
-      const tag = tagStore.tags.find(t => t.id === tagId)
+      const tag = tagStore.tags.find((t) => t.id === tagId)
       editingTag.value = tag ? { ...tag } : { id: tagId }
     } else {
       editingTag.value = {
         name: '',
-        color: getRandomColor()
+        color: getRandomColor(),
       }
     }
   }
@@ -86,7 +86,7 @@ export function useTag() {
   const getTaskTags = (taskTagsJson: string) => {
     try {
       const tagIds = JSON.parse(taskTagsJson || '[]')
-      return tagStore.tags.filter(tag => tagIds.includes(tag.id))
+      return tagStore.tags.filter((tag) => tagIds.includes(tag.id))
     } catch {
       return []
     }
@@ -140,6 +140,6 @@ export function useTag() {
     addTagToTask,
     removeTagFromTask,
     getRandomColor,
-    init
+    init,
   }
 }
