@@ -234,7 +234,7 @@ const deleteCurrentGroup = async () => {
 }
 
 const openSettings = () => {
-  // TODO: Open settings
+  router.push('/settings')
 }
 
 onMounted(() => {

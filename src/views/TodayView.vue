@@ -13,9 +13,55 @@
       <span class="selected-count">已选择 {{ selectedCount }} 项</span>
       <button class="btn btn-secondary" @click="selectAll">全选</button>
       <button class="btn btn-secondary" @click="batchComplete">标记完成</button>
+      <button class="btn btn-secondary" @click="batchPriority">修改优先级</button>
       <button class="btn btn-secondary" @click="batchMove">移动到</button>
       <button class="btn btn-danger" @click="batchDelete">删除</button>
       <button class="btn btn-text" @click="cancelBatch">取消</button>
+    </div>
+
+    <!-- Batch Edit Modal -->
+    <div v-if="showBatchEdit" class="modal-overlay" @click="closeBatchEdit">
+      <div class="modal-content" @click.stop>
+        <h3>批量编辑任务</h3>
+        <div class="form-group">
+          <label>选择优先级</label>
+          <div class="priority-options">
+            <button
+              v-for="p in priorityOptions"
+              :key="p.value"
+              class="priority-btn"
+              :class="[`priority-${p.value}`, { active: selectedPriority === p.value }]"
+              @click="selectedPriority = p.value"
+            >
+              {{ p.label }}
+            </button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" @click="closeBatchEdit">取消</button>
+          <button class="btn btn-primary" @click="applyBatchPriority">应用</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Move to List Modal -->
+    <div v-if="showMoveModal" class="modal-overlay" @click="closeMoveModal">
+      <div class="modal-content" @click.stop>
+        <h3>移动到清单</h3>
+        <div class="form-group">
+          <label>选择清单</label>
+          <select v-model="targetListId" class="form-select">
+            <option value="">选择清单...</option>
+            <option v-for="list in lists" :key="list.id" :value="list.id">
+              {{ list.name }}
+            </option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" @click="closeMoveModal">取消</button>
+          <button class="btn btn-primary" @click="applyBatchMove">移动</button>
+        </div>
+      </div>
     </div>
 
     <div class="view-content">
@@ -92,7 +138,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import draggable from 'vuedraggable'
 import { useTask } from '../composables/useTask'
 import { useList } from '../composables/useList'
@@ -119,12 +165,52 @@ const batchComplete = () => {
   taskStore.batchCompleteTasks(true)
 }
 
-const batchMove = () => {
-  const targetListId = prompt('请输入目标清单ID:')
-  if (targetListId) {
-    taskStore.batchMoveTasks(targetListId)
-  }
+// Batch priority modal
+const showBatchEdit = ref(false)
+const selectedPriority = ref(0)
+const priorityOptions = [
+  { value: 0, label: '无' },
+  { value: 1, label: '低' },
+  { value: 2, label: '中' },
+  { value: 3, label: '高' },
+]
+
+const batchPriority = () => {
+  showBatchEdit.value = true
 }
+
+const closeBatchEdit = () => {
+  showBatchEdit.value = false
+  selectedPriority.value = 0
+}
+
+const applyBatchPriority = () => {
+  taskStore.batchPriority(selectedPriority.value)
+  closeBatchEdit()
+}
+
+// Batch move modal
+const showMoveModal = ref(false)
+const targetListId = ref('')
+const isDragging = ref(false)
+
+const batchMove = () => {
+  showMoveModal.value = true
+}
+
+const closeMoveModal = () => {
+  showMoveModal.value = false
+  targetListId.value = ''
+}
+
+const applyBatchMove = () => {
+  if (targetListId.value) {
+    taskStore.batchMoveTasks(targetListId.value)
+  }
+  closeMoveModal()
+}
+
+const lists = computed(() => list.lists.value)
 
 const batchDelete = () => {
   if (confirm(`确定要删除选中的 ${selectedCount.value} 个任务吗？此操作不可撤销。`)) {
@@ -176,28 +262,49 @@ const onDragEnd = async (event: any) => {
   const toSection = to.dataset?.section
   if (!fromSection) return
 
+  // Skip if a drag operation is already in progress
+  if (isDragging.value) return
+  isDragging.value = true
+
   try {
-    // Update source section tasks
-    const fromTasks = fromSection === 'overdue' ? overdueTasks.value : todayTasks.value
-    for (let i = 0; i < fromTasks.length; i++) {
-      const sortOrder = (i + 1) * 1000
-      if (fromTasks[i].sort_order !== sortOrder) {
-        await task.updateTask(fromTasks[i].id, { sort_order: sortOrder })
+    // Collect all sort order updates
+    const updates: { id: string; sort_order: number }[] = []
+
+    // Get current task lists
+    const currentOverdue = overdueTasks.value
+    const currentToday = todayTasks.value
+
+    // Calculate new sort orders for source section
+    const sourceTasks = fromSection === 'overdue' ? currentOverdue : currentToday
+    sourceTasks.forEach((t, i) => {
+      const newSortOrder = (i + 1) * 1000
+      if (t.sort_order !== newSortOrder) {
+        updates.push({ id: t.id, sort_order: newSortOrder })
       }
-    }
+    })
 
     // If moved between different sections, also update destination section
     if (fromSection !== toSection && toSection) {
-      const toTasks = toSection === 'overdue' ? overdueTasks.value : todayTasks.value
-      for (let i = 0; i < toTasks.length; i++) {
-        const sortOrder = (i + 1) * 1000
-        if (toTasks[i].sort_order !== sortOrder) {
-          await task.updateTask(toTasks[i].id, { sort_order: sortOrder })
+      const destTasks = toSection === 'overdue' ? currentOverdue : currentToday
+      destTasks.forEach((t, i) => {
+        const newSortOrder = (i + 1) * 1000
+        if (t.sort_order !== newSortOrder) {
+          updates.push({ id: t.id, sort_order: newSortOrder })
         }
-      }
+      })
+    }
+
+    // Batch update all sort orders
+    for (const update of updates) {
+      await task.updateTask(update.id, { sort_order: update.sort_order })
     }
   } catch (err) {
     console.error('Error updating task order:', err)
+  } finally {
+    // Delay resetting flag to prevent rapid re-triggers
+    setTimeout(() => {
+      isDragging.value = false
+    }, 100)
   }
 }
 
@@ -385,5 +492,102 @@ onMounted(() => {
 
 .btn-text:hover {
   color: var(--color-primary);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.modal-content h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.form-group label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.form-select {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.priority-options {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.priority-btn {
+  flex: 1;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-fast);
+}
+
+.priority-btn.priority-0 {
+  color: var(--color-priority-none);
+}
+.priority-btn.priority-1 {
+  color: var(--color-priority-low);
+}
+.priority-btn.priority-2 {
+  color: var(--color-priority-medium);
+}
+.priority-btn.priority-3 {
+  color: var(--color-priority-high);
+}
+
+.priority-btn.active {
+  border-color: currentColor;
+  background: currentColor;
+  color: white;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
 }
 </style>

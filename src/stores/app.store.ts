@@ -17,6 +17,14 @@ export const useAppStore = defineStore('app', () => {
     theme.value = theme.value === 'light' ? 'dark' : 'light'
     // Update HTML data-theme attribute
     document.documentElement.setAttribute('data-theme', theme.value)
+    // Persist to localStorage
+    localStorage.setItem('theme', theme.value)
+  }
+
+  const setTheme = (newTheme: 'light' | 'dark') => {
+    theme.value = newTheme
+    document.documentElement.setAttribute('data-theme', newTheme)
+    localStorage.setItem('theme', newTheme)
   }
 
   const toggleSidebar = () => {
@@ -61,6 +69,7 @@ export const useAppStore = defineStore('app', () => {
 
     // Actions
     toggleTheme,
+    setTheme,
     toggleSidebar,
     setView,
     setLoading,

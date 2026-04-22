@@ -296,6 +296,60 @@ export const useTaskStore = defineStore('task', () => {
     }
   }
 
+  const batchPriority = async (priority: number) => {
+    const ids = Array.from(selectedTaskIds.value)
+    if (ids.length === 0) return
+
+    try {
+      loading.value = true
+      for (const id of ids) {
+        await window.electronAPI.updateTask(id, { priority })
+        const task = tasks.value.find((t) => t.id === id)
+        if (task) {
+          task.priority = priority
+        }
+      }
+      selectedTaskIds.value.clear()
+      batchSelectMode.value = false
+      error.value = null
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to update priority'
+      console.error('Error batch updating priority:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const copyTask = async (taskId: string, targetListId: string) => {
+    const task = tasks.value.find((t) => t.id === taskId)
+    if (!task) return null
+
+    try {
+      loading.value = true
+      const newTask = await window.electronAPI.createTask({
+        title: task.title,
+        description: task.description,
+        priority: task.priority,
+        start_time: task.start_time,
+        end_time: task.end_time,
+        due_date: task.due_date,
+        list_id: targetListId,
+        tags: task.tags,
+        quadrant: task.quadrant,
+      })
+      tasks.value.unshift(newTask)
+      error.value = null
+      return newTask
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to copy task'
+      console.error('Error copying task:', err)
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   // Initial load
   const init = () => {
     loadTasks()
@@ -344,5 +398,7 @@ export const useTaskStore = defineStore('task', () => {
     batchDeleteTasks,
     batchMoveTasks,
     batchCompleteTasks,
+    batchPriority,
+    copyTask,
   }
 })

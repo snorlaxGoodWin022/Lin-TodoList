@@ -8,6 +8,7 @@ import HabitView from '../views/HabitView.vue'
 import NoteView from '../views/NoteView.vue'
 import KanbanView from '../views/KanbanView.vue'
 import DashboardView from '../views/DashboardView.vue'
+import SettingsView from '../views/SettingsView.vue'
 
 const routes = [
   {
@@ -59,6 +60,11 @@ const routes = [
     path: '/dashboard',
     name: 'Dashboard',
     component: DashboardView,
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: SettingsView,
   },
 ]
 
