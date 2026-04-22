@@ -29,7 +29,9 @@ export const useNoteStore = defineStore('note', () => {
       if (newFilters) {
         filters.value = newFilters
       }
-      const result = await window.electronAPI.getNotes(filters.value)
+      // Convert reactive proxy to plain object for IPC serialization
+      const plainFilters = JSON.parse(JSON.stringify(filters.value))
+      const result = await window.electronAPI.getNotes(plainFilters)
       notes.value = result
       error.value = null
     } catch (err) {

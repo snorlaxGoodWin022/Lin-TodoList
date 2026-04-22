@@ -22,7 +22,9 @@ export const useHabitStore = defineStore('habit', () => {
       if (newFilters) {
         filters.value = newFilters
       }
-      const result = await window.electronAPI.getHabits(filters.value)
+      // Convert reactive proxy to plain object for IPC serialization
+      const plainFilters = JSON.parse(JSON.stringify(filters.value))
+      const result = await window.electronAPI.getHabits(plainFilters)
       habits.value = result
       error.value = null
     } catch (err) {
