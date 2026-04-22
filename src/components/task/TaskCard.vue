@@ -2,6 +2,7 @@
   <div
     class="task-card"
     :class="{ selected: isSelected, completed: task.completed, 'batch-mode': batchSelectMode }"
+    :data-id="task.id"
     @click="handleClick"
   >
     <div class="task-content">

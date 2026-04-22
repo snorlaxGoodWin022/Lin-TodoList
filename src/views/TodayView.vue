@@ -26,6 +26,7 @@
           item-key="id"
           class="task-list"
           ghost-class="ghost"
+          data-section="overdue"
           @end="onDragEnd"
         >
           <template #item="{ element }">
@@ -54,6 +55,7 @@
           item-key="id"
           class="task-list"
           ghost-class="ghost"
+          data-section="today"
           @end="onDragEnd"
         >
           <template #item="{ element }">
@@ -164,8 +166,29 @@ const createTask = () => {
   task.openTaskEditor()
 }
 
-const onDragEnd = () => {
-  // Update task sort orders after drag
+const onDragEnd = async (event: any) => {
+  const { from, to, oldIndex, newIndex } = event
+
+  // If nothing moved, skip
+  if (oldIndex === newIndex && from === to) return
+
+  const section = from.dataset?.section
+  if (!section) return
+
+  try {
+    // Get the tasks array for this section
+    const tasks = section === 'overdue' ? overdueTasks.value : todayTasks.value
+
+    // Update sort_order for all tasks in the section based on their current order
+    for (let i = 0; i < tasks.length; i++) {
+      const sortOrder = (i + 1) * 1000
+      if (tasks[i].sort_order !== sortOrder) {
+        await task.updateTask(tasks[i].id, { sort_order: sortOrder })
+      }
+    }
+  } catch (err) {
+    console.error('Error updating task order:', err)
+  }
 }
 
 // Lifecycle
