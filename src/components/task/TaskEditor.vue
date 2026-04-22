@@ -124,6 +124,7 @@ import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useTaskStore } from '../../stores/task.store'
 import { useListStore } from '../../stores/list.store'
 import SubtaskList from './SubtaskList.vue'
+import { parseTaskInput } from '../../utils/smartParse'
 import type { Task } from '../../types/repositories'
 
 const taskStore = useTaskStore()
@@ -146,6 +147,30 @@ const form = reactive({
   repeat_rule: '',
   tags: '[]',
 })
+
+// Watch title changes for smart parsing
+watch(
+  () => form.title,
+  (newTitle) => {
+    if (!newTitle.trim()) return
+
+    // Only parse for new tasks (not editing existing ones)
+    if (form.id) return
+
+    const parsed = parseTaskInput(newTitle)
+
+    // Update form fields with parsed values
+    if (parsed.due_date) form.due_date = parsed.due_date
+    if (parsed.start_time) form.start_time = parsed.start_time
+    if (parsed.end_time) form.end_time = parsed.end_time
+    if (parsed.priority !== undefined) form.priority = parsed.priority
+    if (parsed.quadrant !== undefined) form.quadrant = parsed.quadrant
+    if (parsed.tags) form.tags = parsed.tags
+
+    // Update title with parsed result
+    form.title = parsed.title
+  }
+)
 
 const priorities = ['无', '低', '中', '高']
 const quadrants = ['未分类', '重要紧急', '重要不紧急', '紧急不重要', '不紧急不重要']
