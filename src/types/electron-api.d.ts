@@ -13,6 +13,8 @@ import type {
   PomodoroStats,
 } from '../../electron/database/repositories/pomodoro.repo'
 import type { Tag } from '../../electron/database/repositories/tag.repo'
+import type { FilterPreset } from '../../electron/database/repositories/filterPreset.repo'
+import type { Subtask } from '../../electron/database/repositories/subtask.repo'
 
 export interface ElectronAPI {
   // Task operations
@@ -51,6 +53,18 @@ export interface ElectronAPI {
   createTag: (data: Partial<Tag>) => Promise<Tag>
   updateTag: (id: string, data: Partial<Tag>) => Promise<boolean>
   deleteTag: (id: string) => Promise<boolean>
+
+  // Filter preset operations
+  getFilterPresets: () => Promise<FilterPreset[]>
+  createFilterPreset: (data: Partial<FilterPreset>) => Promise<FilterPreset>
+  updateFilterPreset: (id: string, data: Partial<FilterPreset>) => Promise<boolean>
+  deleteFilterPreset: (id: string) => Promise<boolean>
+
+  // Subtask operations
+  getSubtasks: (filters?: { parentId?: string }) => Promise<Subtask[]>
+  createSubtask: (data: Partial<Subtask>) => Promise<Subtask>
+  updateSubtask: (id: string, data: Partial<Subtask>) => Promise<boolean>
+  deleteSubtask: (id: string) => Promise<boolean>
 
   // System operations
   showNotification: (options: { title: string; body: string }) => Promise<void>

@@ -254,7 +254,7 @@ const deleteList = async () => {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 14px;
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-primary);
 }
 
@@ -274,7 +274,7 @@ const deleteList = async () => {
   height: 40px;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: var(--color-background);
+  background: var(--color-bg);
   font-size: 20px;
   cursor: pointer;
   transition: all 0.2s;
@@ -346,13 +346,13 @@ const deleteList = async () => {
 }
 
 .btn-secondary {
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-primary);
   border: 1px solid var(--color-border);
 }
 
 .btn-danger {
-  background: #ef4444;
+  background: var(--color-priority-high);
   color: white;
   border: none;
 }

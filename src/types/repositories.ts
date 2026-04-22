@@ -12,6 +12,7 @@ export interface Task {
   list_id: string
   tags: string
   quadrant: number
+  kanban_column: number
   completed: number
   completed_at: string | null
   sort_order: number
@@ -25,12 +26,16 @@ export interface Task {
 export interface TaskFilters {
   listId?: string
   dueDate?: string
+  dueDateStart?: string
+  dueDateEnd?: string
   completed?: boolean
   priority?: number
+  priorityIn?: number[]
   quadrant?: number
-  tags?: string[]
+  tagsInclude?: string[]
   search?: string
   list_id?: string
+  kanbanColumn?: number
 }
 
 export interface List {
@@ -105,4 +110,18 @@ export interface Tag {
   name: string
   color: string
   created_at: string
+}
+
+export interface Subtask {
+  id: string
+  parent_id: string
+  title: string
+  completed: number
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
+export interface SubtaskFilters {
+  parentId?: string
 }

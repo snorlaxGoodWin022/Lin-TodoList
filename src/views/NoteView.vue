@@ -681,7 +681,7 @@ onMounted(() => {
 }
 
 .tab-btn:hover {
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-primary);
 }
 
@@ -1195,7 +1195,7 @@ onMounted(() => {
 
 .btn-text:hover {
   color: var(--color-text-primary);
-  background: var(--color-background);
+  background: var(--color-bg);
 }
 
 .btn-icon {

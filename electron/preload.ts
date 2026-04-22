@@ -6,6 +6,8 @@ import type { Habit } from './database/repositories/habit.repo'
 import type { Note } from './database/repositories/note.repo'
 import type { PomodoroRecord } from './database/repositories/pomodoro.repo'
 import type { Tag } from './database/repositories/tag.repo'
+import type { FilterPreset } from './database/repositories/filterPreset.repo'
+import type { Subtask } from './database/repositories/subtask.repo'
 import type { NotificationOptions } from './services/notification'
 
 // Custom APIs for renderer
@@ -48,6 +50,21 @@ const api = {
   createTag: (data: Partial<Tag>) => ipcRenderer.invoke('tag:create', data),
   updateTag: (id: string, data: Partial<Tag>) => ipcRenderer.invoke('tag:update', id, data),
   deleteTag: (id: string) => ipcRenderer.invoke('tag:delete', id),
+
+  // Filter preset operations
+  getFilterPresets: () => ipcRenderer.invoke('filterPreset:all'),
+  createFilterPreset: (data: Partial<FilterPreset>) =>
+    ipcRenderer.invoke('filterPreset:create', data),
+  updateFilterPreset: (id: string, data: Partial<FilterPreset>) =>
+    ipcRenderer.invoke('filterPreset:update', id, data),
+  deleteFilterPreset: (id: string) => ipcRenderer.invoke('filterPreset:delete', id),
+
+  // Subtask operations
+  getSubtasks: (filters: { parentId?: string }) => ipcRenderer.invoke('subtask:all', filters),
+  createSubtask: (data: Partial<Subtask>) => ipcRenderer.invoke('subtask:create', data),
+  updateSubtask: (id: string, data: Partial<Subtask>) =>
+    ipcRenderer.invoke('subtask:update', id, data),
+  deleteSubtask: (id: string) => ipcRenderer.invoke('subtask:delete', id),
 
   // System operations
   showNotification: (options: NotificationOptions) =>

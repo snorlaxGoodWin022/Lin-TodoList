@@ -72,6 +72,7 @@ const mainNavItems = [
   { id: 'today', label: '今天', icon: '📋', path: '/today' },
   { id: 'calendar', label: '日历', icon: '📅', path: '/calendar' },
   { id: 'quadrant', label: '四象限', icon: '📊', path: '/quadrant' },
+  { id: 'kanban', label: '看板', icon: '📋', path: '/kanban' },
   { id: 'pomodoro', label: '番茄钟', icon: '🍅', path: '/pomodoro' },
   { id: 'habit', label: '习惯', icon: '🔖', path: '/habits' },
   { id: 'note', label: '便签', icon: '📝', path: '/notes' },

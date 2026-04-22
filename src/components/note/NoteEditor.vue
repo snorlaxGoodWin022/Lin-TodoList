@@ -223,7 +223,7 @@ const deleteNote = async () => {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 14px;
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-primary);
 }
 
@@ -292,13 +292,13 @@ const deleteNote = async () => {
 }
 
 .btn-secondary {
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-primary);
   border: 1px solid var(--color-border);
 }
 
 .btn-danger {
-  background: #ef4444;
+  background: var(--color-priority-high);
   color: white;
   border: none;
 }

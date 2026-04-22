@@ -228,34 +228,34 @@ const selectTask = (task: any) => {
 
 /* 象限特定样式 */
 .quadrant-1 {
-  border-top: 4px solid #ef4444;
+  border-top: 4px solid var(--color-priority-high);
 }
 
 .quadrant-2 {
-  border-top: 4px solid #10b981;
+  border-top: 4px solid var(--color-primary);
 }
 
 .quadrant-3 {
-  border-top: 4px solid #f59e0b;
+  border-top: 4px solid var(--color-priority-medium);
 }
 
 .quadrant-4 {
-  border-top: 4px solid #6b7280;
+  border-top: 4px solid var(--color-text-muted);
 }
 
 .quadrant-1 .quadrant-title {
-  color: #ef4444;
+  color: var(--color-priority-high);
 }
 
 .quadrant-2 .quadrant-title {
-  color: #10b981;
+  color: var(--color-primary);
 }
 
 .quadrant-3 .quadrant-title {
-  color: #f59e0b;
+  color: var(--color-priority-medium);
 }
 
 .quadrant-4 .quadrant-title {
-  color: #6b7280;
+  color: var(--color-text-muted);
 }
 </style>

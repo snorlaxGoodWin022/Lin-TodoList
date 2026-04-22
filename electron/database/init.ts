@@ -58,6 +58,7 @@ function createTables(): void {
       list_id TEXT NOT NULL,
       tags TEXT DEFAULT '[]',
       quadrant INTEGER DEFAULT 0,
+      kanban_column INTEGER DEFAULT 0,
       completed INTEGER DEFAULT 0,
       completed_at TEXT,
       sort_order REAL DEFAULT 0,
@@ -146,6 +147,32 @@ function createTables(): void {
       name TEXT NOT NULL UNIQUE,
       color TEXT DEFAULT '#10B981',
       created_at TEXT NOT NULL
+    )
+  `)
+
+  // Filter presets table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS filter_presets (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      filters TEXT NOT NULL,
+      is_default INTEGER DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  // Subtasks table
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS subtasks (
+      id TEXT PRIMARY KEY,
+      parent_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      completed INTEGER DEFAULT 0,
+      sort_order REAL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (parent_id) REFERENCES tasks(id) ON DELETE CASCADE
     )
   `)
 

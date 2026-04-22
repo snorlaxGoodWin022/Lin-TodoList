@@ -6,6 +6,7 @@ import QuadrantView from '../views/QuadrantView.vue'
 import PomodoroView from '../views/PomodoroView.vue'
 import HabitView from '../views/HabitView.vue'
 import NoteView from '../views/NoteView.vue'
+import KanbanView from '../views/KanbanView.vue'
 
 const routes = [
   {
@@ -37,6 +38,11 @@ const routes = [
     path: '/pomodoro',
     name: 'Pomodoro',
     component: PomodoroView,
+  },
+  {
+    path: '/kanban',
+    name: 'Kanban',
+    component: KanbanView,
   },
   {
     path: '/habits',

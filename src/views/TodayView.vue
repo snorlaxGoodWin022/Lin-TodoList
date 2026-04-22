@@ -323,7 +323,7 @@ onMounted(() => {
 }
 
 .btn-secondary {
-  background-color: var(--color-background);
+  background-color: var(--color-bg);
   color: var(--color-text-primary);
   border: 1px solid var(--color-border);
 }
@@ -334,13 +334,13 @@ onMounted(() => {
 }
 
 .btn-danger {
-  background-color: #ef4444;
+  background-color: var(--color-priority-high);
   color: white;
   border: none;
 }
 
 .btn-danger:hover {
-  background-color: #dc2626;
+  background-color: var(--color-priority-high);
 }
 
 .btn-text {

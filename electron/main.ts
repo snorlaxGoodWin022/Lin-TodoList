@@ -14,6 +14,8 @@ import { setupHabitHandlers } from './database/repositories/habit.repo'
 import { setupNoteHandlers } from './database/repositories/note.repo'
 import { setupPomodoroHandlers } from './database/repositories/pomodoro.repo'
 import { setupTagHandlers } from './database/repositories/tag.repo'
+import { setupFilterPresetHandlers } from './database/repositories/filterPreset.repo'
+import { setupSubtaskHandlers } from './database/repositories/subtask.repo'
 
 // Window state storage
 interface WindowState {
@@ -222,6 +224,8 @@ function setupIPCHandlers(): void {
   setupNoteHandlers()
   setupPomodoroHandlers()
   setupTagHandlers()
+  setupFilterPresetHandlers()
+  setupSubtaskHandlers()
 
   // System handlers
   ipcMain.handle('app:getVersion', () => app.getVersion())

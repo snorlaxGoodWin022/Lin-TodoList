@@ -492,7 +492,7 @@ onMounted(() => {
 }
 
 .tab-btn:hover {
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-primary);
 }
 
@@ -640,7 +640,7 @@ onMounted(() => {
 }
 
 .week-progress {
-  background: var(--color-background);
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 16px;
@@ -708,7 +708,7 @@ onMounted(() => {
 }
 
 .month-heatmap {
-  background: var(--color-background);
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 16px;
@@ -789,7 +789,7 @@ onMounted(() => {
   align-items: center;
   text-align: center;
   padding: 12px;
-  background: var(--color-background);
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: 8px;
 }
@@ -861,7 +861,7 @@ onMounted(() => {
 
 .calendar-day.current-month {
   color: var(--color-text-primary);
-  background: var(--color-background);
+  background: var(--color-bg);
 }
 
 .calendar-day:not(.current-month) {
@@ -972,7 +972,7 @@ onMounted(() => {
 
 .btn-text:hover {
   color: var(--color-text-primary);
-  background: var(--color-background);
+  background: var(--color-bg);
 }
 
 .btn-icon {

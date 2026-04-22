@@ -104,6 +104,8 @@
               <option value="yearly">每年</option>
             </select>
           </div>
+
+          <SubtaskList v-if="form.id" :parent-id="form.id" />
         </div>
 
         <div class="modal-footer">
@@ -121,6 +123,7 @@
 import { ref, reactive, computed, watch, nextTick } from 'vue'
 import { useTaskStore } from '../../stores/task.store'
 import { useListStore } from '../../stores/list.store'
+import SubtaskList from './SubtaskList.vue'
 import type { Task } from '../../types/repositories'
 
 const taskStore = useTaskStore()
@@ -316,7 +319,7 @@ const save = async () => {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 14px;
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-primary);
   transition: border-color 0.2s;
 }
@@ -349,7 +352,7 @@ const save = async () => {
   padding: 8px 12px;
   border: 1px solid var(--color-border);
   border-radius: 6px;
-  background: var(--color-background);
+  background: var(--color-bg);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
@@ -391,24 +394,24 @@ const save = async () => {
   border-color: var(--color-text-muted);
 }
 .quadrant-1.active {
-  border-color: #ef4444;
-  background: #fee2e2;
-  color: #ef4444;
+  border-color: var(--color-priority-high);
+  background: var(--color-priority-high);
+  color: white;
 }
 .quadrant-2.active {
-  border-color: #10b981;
-  background: #d1fae5;
-  color: #10b981;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: white;
 }
 .quadrant-3.active {
-  border-color: #f59e0b;
-  background: #fef3c7;
-  color: #f59e0b;
+  border-color: var(--color-priority-medium);
+  background: var(--color-priority-medium);
+  color: white;
 }
 .quadrant-4.active {
-  border-color: #6b7280;
-  background: #f3f4f6;
-  color: #6b7280;
+  border-color: var(--color-text-muted);
+  background: var(--color-text-muted);
+  color: white;
 }
 
 .modal-footer {
@@ -444,7 +447,7 @@ const save = async () => {
 }
 
 .btn-secondary {
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-primary);
   border: 1px solid var(--color-border);
 }

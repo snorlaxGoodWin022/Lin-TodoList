@@ -14,6 +14,7 @@ export interface Task {
   list_id: string
   tags: string
   quadrant: number
+  kanban_column: number
   completed: number
   completed_at: string | null
   sort_order: number
@@ -27,10 +28,14 @@ export interface Task {
 export interface TaskFilters {
   listId?: string
   dueDate?: string
+  dueDateStart?: string
+  dueDateEnd?: string
   completed?: boolean
   priority?: number
+  priorityIn?: number[]
   quadrant?: number
-  tags?: string[]
+  kanbanColumn?: number
+  tagsInclude?: string[]
   search?: string
 }
 
@@ -61,6 +66,16 @@ async function handleListTasks(
     params.push(filters.dueDate)
   }
 
+  if (filters.dueDateStart) {
+    sql += ' AND due_date >= ?'
+    params.push(filters.dueDateStart)
+  }
+
+  if (filters.dueDateEnd) {
+    sql += ' AND due_date <= ?'
+    params.push(filters.dueDateEnd)
+  }
+
   if (filters.completed !== undefined) {
     sql += ' AND completed = ?'
     params.push(filters.completed ? 1 : 0)
@@ -71,9 +86,19 @@ async function handleListTasks(
     params.push(filters.priority)
   }
 
+  if (filters.priorityIn && filters.priorityIn.length > 0) {
+    sql += ` AND priority IN (${filters.priorityIn.map(() => '?').join(', ')})`
+    params.push(...filters.priorityIn)
+  }
+
   if (filters.quadrant !== undefined) {
     sql += ' AND quadrant = ?'
     params.push(filters.quadrant)
+  }
+
+  if (filters.kanbanColumn !== undefined) {
+    sql += ' AND kanban_column = ?'
+    params.push(filters.kanbanColumn)
   }
 
   if (filters.search) {
@@ -108,6 +133,7 @@ async function handleCreateTask(
     list_id: taskData.list_id || 'inbox',
     tags: taskData.tags || '[]',
     quadrant: taskData.quadrant || 0,
+    kanban_column: taskData.kanban_column || 0,
     completed: 0,
     completed_at: null,
     sort_order: taskData.sort_order || Date.now(),
@@ -121,11 +147,11 @@ async function handleCreateTask(
   const stmt = db.prepare(`
     INSERT INTO tasks (
       id, title, description, priority, start_time, end_time, due_date,
-      repeat_rule, list_id, tags, quadrant, completed, completed_at,
+      repeat_rule, list_id, tags, quadrant, kanban_column, completed, completed_at,
       sort_order, remind_at, remind_advance, remind_persistent,
       created_at, updated_at
     ) VALUES (
-      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     )
   `)
 
@@ -141,6 +167,7 @@ async function handleCreateTask(
     task.list_id,
     task.tags,
     task.quadrant,
+    task.kanban_column,
     task.completed,
     task.completed_at,
     task.sort_order,
@@ -213,6 +240,11 @@ async function handleUpdateTask(
   if (updates.quadrant !== undefined) {
     fields.push('quadrant = ?')
     values.push(updates.quadrant)
+  }
+
+  if (updates.kanban_column !== undefined) {
+    fields.push('kanban_column = ?')
+    values.push(updates.kanban_column)
   }
 
   if (updates.completed !== undefined) {

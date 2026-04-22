@@ -42,6 +42,7 @@
           <span v-if="task.priority > 0" class="priority-tag" :class="`priority-${task.priority}`">
             {{ priorityText }}
           </span>
+          <span v-if="subtaskCount > 0" class="subtask-badge"> {{ subtaskCount }}个子任务 </span>
         </div>
       </div>
       <div class="task-actions">
@@ -54,10 +55,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { Task } from '../../types/repositories'
 import { useTag } from '../../composables/useTag'
 import { useTaskStore } from '../../stores/task.store'
+import { useSubtaskStore } from '../../stores/subtask.store'
 
 const props = defineProps<{
   task: Task
@@ -71,6 +73,7 @@ const emit = defineEmits<{
 
 const tag = useTag()
 const taskStore = useTaskStore()
+const subtaskStore = useSubtaskStore()
 
 // Computed properties
 const isSelected = computed(() => props.selected || taskStore.selectedTaskIds.has(props.task.id))
@@ -81,6 +84,10 @@ const priorityText = computed(() => {
 })
 const taskTags = computed(() => {
   return tag.getTaskTags(props.task.tags || '[]')
+})
+
+const subtaskCount = computed(() => {
+  return subtaskStore.getSubtasksByParentId(props.task.id).length
 })
 
 // Format date for display
@@ -273,6 +280,15 @@ const editTask = () => {
 
 .priority-tag.priority-3 {
   background-color: var(--color-priority-high);
+}
+
+.subtask-badge {
+  font-size: var(--font-size-xs);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-weight: var(--font-weight-medium);
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary);
 }
 
 .task-actions {

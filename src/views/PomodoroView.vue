@@ -634,7 +634,7 @@ onUnmounted(() => {
   padding: 8px 12px;
   border: 1px solid var(--color-border);
   border-radius: 20px;
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-secondary);
   font-size: 13px;
   cursor: pointer;
@@ -682,7 +682,7 @@ onUnmounted(() => {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 14px;
-  background: var(--color-background);
+  background: var(--color-bg);
   color: var(--color-text-primary);
 }
 
@@ -814,7 +814,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  background: var(--color-background);
+  background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: 8px;
 }
@@ -830,13 +830,13 @@ onUnmounted(() => {
 }
 
 .session-type.type-focus {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
 }
 
 .session-type.type-break {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
+  background: var(--color-primary-light);
+  color: var(--color-priority-low);
 }
 
 .session-duration {

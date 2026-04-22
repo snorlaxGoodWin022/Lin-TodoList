@@ -323,7 +323,7 @@ const deleteTask = () => {
 }
 
 .btn-danger:hover {
-  background-color: #dc2626;
+  background-color: var(--color-priority-high);
 }
 
 .empty-state {
