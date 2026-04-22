@@ -115,13 +115,13 @@ async function handleGetPomodoroStats(
     )
     SELECT MAX(streak) as streak_days
     FROM (
-      SELECT date,
-             ROW_NUMBER() OVER (ORDER BY date DESC) -
-             ROW_NUMBER() OVER (PARTITION BY focus_days.date IS NOT NULL ORDER BY date DESC) as streak_group
+      SELECT dates.date,
+             ROW_NUMBER() OVER (ORDER BY dates.date DESC) -
+             ROW_NUMBER() OVER (PARTITION BY focus_days.date IS NOT NULL ORDER BY dates.date DESC) as streak_group
       FROM dates
       LEFT JOIN focus_days ON dates.date = focus_days.date
     )
-    WHERE date IS NOT NULL
+    WHERE dates.date IS NOT NULL
     GROUP BY streak_group
     ORDER BY COUNT(*) DESC
     LIMIT 1
